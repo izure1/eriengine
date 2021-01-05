@@ -1,0 +1,19 @@
+import Phaser from 'phaser'
+
+export default class {{ KEY }} extends Phaser.Scene {
+    constructor() {
+        super({ key: '{{ KEY }}', active: true })
+    }
+
+    preload(): void {
+    
+    }
+
+    create(): void {
+
+    }
+
+    update(): void {
+
+    }
+}

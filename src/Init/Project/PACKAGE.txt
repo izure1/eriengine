@@ -1,0 +1,11 @@
+{
+  "name": "{{ NAME }}",
+  "version": "{{ VERSION }}",
+  "description": "{{ DESCRIPTION }}",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "{{ AUTHOR }}",
+  "license": "{{ LICENSE }}"
+}

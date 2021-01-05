@@ -1,0 +1,8 @@
+export const PROJECT_DIRECTORY_NAME: string = 'Eriengine Project_{{ PROJECT_NAME }}'
+export const PROJECT_CONFIG_NAME: string = 'config.json'
+export const PROJECT_SCENE_DIRECTORY_NAME: string = 'Scene'
+export const PROJECT_SCENE_SCRIPT_DIRECTORY_NAME: string = 'Script'
+export const PROJECT_SCENE_ANIMATION_DIRECTORY_NAME: string = 'Animation'
+export const PROJECT_ASSET_DIRECTORY_NAME: string = 'Asset'
+export const PROJECT_ACTOR_DIRECTORY_NAME: string = 'Actor'
+export const PROJECT_PHASER_VERSION: string = '^3.50.1'
