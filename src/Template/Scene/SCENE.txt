@@ -1,0 +1,43 @@
+import Phaser from 'phaser'
+import { Plugin as ActorPlugin, Actor } from 'eriengine-core-plugin-actor'
+import { Plugin as IsometricScenePlugin } from 'eriengine-core-plugin-isometric-scene'
+import { Plugin as IsometricCursorPlugin } from 'eriengine-core-plugin-isometric-cursor'
+import { Plugin as DialoguePlugin } from 'eriengine-core-plugin-dialogue'
+import { Plugin as FogOfWarPlugin } from 'eriengine-core-plugin-fog-of-war'
+
+import BaseScene from '@/{{ PROJECT_SRC_SCENE_DIRECTORY_NAME }}/BaseScene'
+
+/**
+ *
+ *  이곳에서 씬의 기본적인 설정을 변경할 수 있습니다.
+ *  기본적인 작동을 위한 코드가 이미 작성되어 있습니다만,
+ *  좀 더 정교한 프로그래밍을 원한다면 이곳에서 수정을 할 수 있습니다.
+ *
+ *  하지만 대부분의 기능은 스크립트를 이용하여 처리할 수 있습니다.
+ *  가능하다면 스크립트 기능을 이용하도록 하십시오.
+ *
+ */
+export default class {{ KEY }} extends BaseScene {
+    protected actor!: ActorPlugin
+    protected isometric!: IsometricScenePlugin
+    protected cursor!: IsometricCursorPlugin
+    protected dialogue!: DialoguePlugin
+    protected fow!: FogOfWarPlugin
+
+    constructor() {
+        super({ key: '{{ KEY }}', active: true })
+        this.events.on(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__destroys))
+    }
+
+    preload(): void {
+        this.runScript(this.__preloads)
+    }
+
+    create(): void {
+        this.runScript(this.__creates)
+    }
+
+    update(): void {
+        this.runScript(this.__updates)
+    }
+}

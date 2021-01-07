@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, dialog, IpcMainInvokeEvent } from 'electron'
 import path from 'path'
-import slash from 'slash'
+import normalize from 'normalize-path'
 import del from 'del'
 
 export async function handler(itemPath: string, confirm: boolean): Promise<Engine.FileSystem.DeleteSuccess|Engine.FileSystem.DeleteFail> {
@@ -25,7 +25,7 @@ export async function handler(itemPath: string, confirm: boolean): Promise<Engin
     }
     
     try {
-        await del(slash(itemPath), { force: true })
+        await del(normalize(itemPath), { force: true })
     } catch(e) {
         const { message } = e as Error
         return {

@@ -1,5 +1,4 @@
 import path from 'path'
-import fs from 'fs-extra'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { PROJECT_CONFIG_NAME } from '@/Const'
 import { handler as readJSON } from '../FileSystem/readJSON'

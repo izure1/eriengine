@@ -1,0 +1,25 @@
+{
+    "name": "{{ NAME }}",
+    "version": "1.0.0",
+    "description": "{{ DESCRIPTION }}",
+    "main": "index.js",
+    "scripts": {
+        "serve": "",
+        "build": ""
+    },
+    "dependencies": {
+        "phaser": "^3.50.1",
+        "eriengine-core-plugin-actor": "^1.0.0",
+        "eriengine-core-plugin-isometric-scene": "^1.0.0",
+        "eriengine-core-plugin-isometric-cursor": "^1.0.0",
+        "eriengine-core-plugin-dialogue": "^1.0.0",
+        "eriengine-core-plugin-fog-of-war": "^1.0.0"
+    },
+    "devDependencies": {
+        "typescript": "^4.1.3",
+        "ts-loader": "^8.0.14",
+        "webpack": "^5.11.1"
+    },
+    "author": "{{ AUTHOR }}",
+    "license": "{{ LICENSE }}"
+}

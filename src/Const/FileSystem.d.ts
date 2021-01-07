@@ -34,8 +34,11 @@ declare namespace Engine {
         interface ReadJsonSuccess extends ReadFileSuccess { content: object }
         interface ReadJsonFail extends ReadFileFail {}
 
-        interface ReadDirectorySuccess extends FileSystemState, DirectoryList, Engine.ActionSuccessState { files: string[] }
+        interface ReadDirectorySuccess extends FileSystemState, Engine.ActionSuccessState { files: string[] }
         interface ReadDirectoryFail extends Engine.ActionFailState {}
+
+        interface FindSuccess extends FileSystemState, Engine.ActionSuccessState { files: string[] }
+        interface FindFail extends Engine.ActionFailState {}
 
         interface CopySuccess extends FileTranslate, Engine.ActionSuccessState {}
         interface CopyFail extends Engine.ActionFailState {}
@@ -55,6 +58,13 @@ declare namespace Engine {
         interface FileFilter {
             name: string
             extensions: string[]
+        }
+
+        interface FileSearchFilter {
+            includeDirectories?: boolean
+            includeFiles?: boolean
+            absolute?: boolean
+            extensions?: string[]
         }
     }
 }

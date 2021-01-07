@@ -1,10 +1,21 @@
 <template>
     <v-app>
         <v-main>
-            <v-card flat>
+            <v-card
+                :loading="isLoading"
+                :disabled="isLoading"
+                flat
+            >
                 <v-card-title>프로젝트 열기</v-card-title>
                 <v-card-text>
-                    프로젝트 디렉토리를 선택하세요.
+                    <p v-if="isLoading">
+                        프로젝트를 재구축하는 중입니다.
+                        <br>
+                        필요한 모듈을 다운로드받고 있으며, 이 작업에는 인터넷 연결이 필요합니다.
+                        <br>
+                        잠시만 기다려주세요.
+                    </p>
+                    <span v-else>프로젝트 디렉토리를 선택하세요.</span>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
@@ -33,6 +44,8 @@ import { ipcRenderer } from 'electron'
 
 @Component
 export default class OpenProjectComponent extends Vue {
+    private isLoading: boolean = false
+
     private async selectDirectory(): Promise<void> {
         const directoryOpen: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
         if (!directoryOpen.success) {
@@ -40,14 +53,18 @@ export default class OpenProjectComponent extends Vue {
             return
         }
 
+        this.isLoading = true
+
         const projectRead: Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail = await ipcRenderer.invoke('read-project', directoryOpen.path)
         if (!projectRead.success) {
+            this.isLoading = false
             this.$store.dispatch('snackbar', projectRead.message)
             return
         }
 
         const projectEnsure: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('ensure-project', directoryOpen.path, projectRead.config)
         if (!projectEnsure.success) {
+            this.isLoading = false
             this.$store.dispatch('snackbar', projectEnsure.message)
             return
         }

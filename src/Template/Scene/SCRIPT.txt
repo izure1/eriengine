@@ -1,0 +1,19 @@
+import Phaser from 'phaser'
+import { Actor } from 'eriengine-core-plugin-actor'
+import Scene from '@/Scene/{{ KEY }}/Scene'
+
+export function onScenePreload(this: Scene): void {
+
+}
+
+export function onSceneUpdate(this: Scene): void {
+
+}
+
+export function OnSceneCreate(this: Scene): void {
+
+}
+
+export function OnSceneDestroy(this: Scene): void {
+
+}

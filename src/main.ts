@@ -13,4 +13,4 @@ const app = new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-app.$router.replace('/')
+app.$router.replace('/project')

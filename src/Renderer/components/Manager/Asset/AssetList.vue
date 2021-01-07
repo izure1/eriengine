@@ -1,60 +1,33 @@
 <template>
-    <section>
-        <v-card
-            :loading="isLoading"
-            tile
-            elevation="0"
-        >
-
-            <v-card-actions>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="add">
-                            <v-icon color="blue-grey">mdi-plus</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>에셋 추가</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="openDirectory">
-                            <v-icon color="blue-grey">mdi-folder-open-outline</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>폴더 열기</span>
-                </v-tooltip>
-
-            </v-card-actions>
-
-            <file-list-component
-                :cwd="cwd"
-                :filter="filters"
-                :preload="10"
-                :open="openPath"
-                :actions="actions"
-            />
-
-        </v-card>
-    </section>
+    <explore-component
+        :buttons="buttons"
+        :cwd="cwd"
+        :options="{ extensions }"
+        :preload="10"
+        :openFile="openPath"
+        :actions="actions"
+    />
 </template>
 
 <script lang="ts">
 import path from 'path'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
-import FileListComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/FileList.vue'
+import ExploreComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
-import { PROJECT_ASSET_DIRECTORY_NAME } from '@/Const'
+import {
+    PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_ASSET_DIRECTORY_NAME
+} from '@/Const'
 
 @Component({
     components: {
-        FileListComponent
+        ExploreComponent
     }
 })
 export default class AssetListComponent extends Vue {
     private isLoading: boolean = false
+    private currentDirectory: string = this.cwd
     private extensions: string[] = [
         'jpg',
         'jpeg',
@@ -89,19 +62,32 @@ export default class AssetListComponent extends Vue {
         }
     ]
 
+    private buttons: ContextItemAction[] = [
+        {
+            icon: 'mdi-plus',
+            description: '에셋 추가',
+            action: (directoryPath: string) => {
+                this.add(directoryPath)
+            }
+        },
+        {
+            icon: 'mdi-folder-open-outline',
+            description: '폴더 열기',
+            action: (directoryPath: string) => {
+                shell.openPath(directoryPath)
+            }
+        }
+    ]
+
     private get cwd(): string {
         const { projectDirectory } = this.$store.state
         if (!projectDirectory) {
             return ''
         }
-        return path.join(projectDirectory, PROJECT_ASSET_DIRECTORY_NAME)
+        return path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
     }
 
-    private get filters(): string[] {
-        return this.extensions.map((extension: string): string => `**/*.${extension}`)
-    }
-
-    private async add(): Promise<void> {
+    private async add(directoryPath: string): Promise<void> {
         const filesOpen: Engine.FileSystem.OpenFilesSuccess|Engine.FileSystem.OpenFilesFail = await ipcRenderer.invoke('open-files', [{ name: 'Asset files', extensions: this.extensions }])
         if (!filesOpen.success) {
             return
@@ -112,7 +98,7 @@ export default class AssetListComponent extends Vue {
         const fails: string[] = []
         for (const file of filesOpen.path) {
             const name: string = path.basename(file)
-            const dist: string = path.join(this.cwd, name)
+            const dist: string = path.join(directoryPath, name)
 
             const fileCopy: Engine.FileSystem.CopySuccess|Engine.FileSystem.CopyFail = await ipcRenderer.invoke('copy', file, dist)
             if (!fileCopy.success) {
@@ -133,7 +119,7 @@ export default class AssetListComponent extends Vue {
     }
 
     private openDirectory(): void {
-        shell.openPath(this.cwd)
+        shell.openPath(this.currentDirectory)
     }
 
     private openPath(filePath: string): void {

@@ -9,7 +9,7 @@ import { Vue, Component } from 'vue-property-decorator'
 export default class CloseComponent extends Vue {
     created(): void {
         this.$store.dispatch('closeProject')
-        this.$router.replace('/')
+        this.$router.replace('/project')
     }
 }
 </script>

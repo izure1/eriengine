@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Error404 from '@/Renderer/components/Error/404.vue'
-import Home from '@/Renderer/components/Project/Home.vue'
+import ProjectMain from '@/Renderer/components/Project/Main.vue'
 import ProjectNew from '@/Renderer/components/Project/New.vue'
 import ProjectOpen from '@/Renderer/components/Project/Open.vue'
 import ProjectClose from '@/Renderer/components/Project/Close.vue'
-import Manager from '@/Renderer/components/Manager/index.vue'
+import Manager from '@/Renderer/components/Manager/Main.vue'
+import ManagerConfigMain from '@/Renderer/components/Manager/Config/Main.vue'
 import ManagerSceneMain from '@/Renderer/components/Manager/Scene/Main.vue'
 import ManagerScriptList from '@/Renderer/components/Manager/Scene/List/Script.vue'
 import ManagerAnimationList from '@/Renderer/components/Manager/Scene/List/Animation.vue'
@@ -15,8 +16,8 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
     {
-        path: '/',
-        component: Home
+        path: '/project',
+        component: ProjectMain
     },
     {
         path: '/project/new',
@@ -39,15 +40,19 @@ const routes: Array<RouteConfig> = [
                 redirect: 'scene'
             },
             {
+                path: 'config',
+                component: ManagerConfigMain
+            },
+            {
                 path: 'scene',
                 component: ManagerSceneMain
             },
             {
-                path: 'scene/:key/script',
+                path: 'scene/script/:key',
                 component: ManagerScriptList
             },
             {
-                path: 'scene/:key/animation',
+                path: 'scene/animation/:key',
                 component: ManagerAnimationList
             },
             {

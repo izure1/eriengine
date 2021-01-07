@@ -1,9 +1,10 @@
 <template>
     <v-app>
         <v-app-bar
-            fixed
             elevation="1"
             color="blue-grey"
+            fixed
+            tile
         >
             <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen" class="white--text"></v-app-bar-nav-icon>
             <v-app-bar-title class="white--text">{{ projectName }}</v-app-bar-title>
@@ -36,13 +37,7 @@
 
 <script lang="ts">
 import path from 'path'
-import slash from 'slash'
 import { Vue, Component } from 'vue-property-decorator'
-import {
-    PROJECT_SCENE_DIRECTORY_NAME,
-    PROJECT_ASSET_DIRECTORY_NAME,
-    PROJECT_ACTOR_DIRECTORY_NAME,
-} from '@/Const'
 
 interface ContextmenuGroup {
     title: string
@@ -70,16 +65,21 @@ export default class ProjectFileListComponent extends Vue {
                     name: '에셋',
                     description: '에셋을 관리합니다',
                     path: '/manager/asset'
+                },
+                {
+                    name: '설정',
+                    description: '프로젝트 설정을 변경합니다',
+                    path: `/manager/config`
                 }
             ]
         },
         {
-            title: '프로젝트',
+            title: '기타',
             menus: [
                 {
                     name: '종료',
-                    path: '/project/close',
-                    description: '메인화면으로 돌아갑니다'
+                    description: '메인화면으로 돌아갑니다',
+                    path: '/project/close'
                 }
             ]
         }

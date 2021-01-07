@@ -1,0 +1,30 @@
+import Phaser from 'phaser'
+
+type ScriptCallback = (scene: Phaser.Scene) => void
+interface EriengineScript {
+    preloads: ScriptCallback[]
+    creates: ScriptCallback[]
+    updates: ScriptCallback[]
+    destroys: ScriptCallback[]
+}
+
+export default class EriengineScene extends Phaser.Scene {
+
+    protected __preloads!: ScriptCallback[]
+    protected __creates!: ScriptCallback[]
+    protected __updates!: ScriptCallback[]
+    protected __destroys!: ScriptCallback[]
+
+    init(script: EriengineScript): void {
+        const { preloads, creates, updates, destroys } = script
+        this.__preloads = preloads
+        this.__creates = creates
+        this.__updates = updates
+        this.__destroys = destroys
+    }
+
+    protected runScript(callbacks: ((scene: this) => void)[]): void {
+        callbacks.forEach((callback): void => callback(this))
+    }
+
+}

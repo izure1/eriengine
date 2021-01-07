@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, dialog, IpcMainInvokeEvent } from 'electron'
 import path from 'path'
-import slash from 'slash'
+import normalize from 'normalize-path'
 import trash from 'trash'
 
 export async function handler(itemPath: string, confirm: boolean): Promise<Engine.FileSystem.TrashSuccess|Engine.FileSystem.TrashFail> {
@@ -25,7 +25,7 @@ export async function handler(itemPath: string, confirm: boolean): Promise<Engin
     }
     
     try {
-        await trash(slash(itemPath))
+        await trash(normalize(itemPath))
     } catch(e) {
         const { message } = e as Error
         return {

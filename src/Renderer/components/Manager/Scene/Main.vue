@@ -1,40 +1,17 @@
 <template>
     <section>
-        <v-card tile elevation="0">
 
-            <v-card-actions>
+        <explorer-component
+            :cwd="cwd"
+            :buttons="buttons"
+            :singleLine="false"
+            :options="{ includeFiles: false }"
+            :preload="10"
+            :openDirectory="openSceneFile"
+            :actions="actions"
+            @update:structure="setSceneNames"
+        />
 
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="add">
-                            <v-icon color="blue-grey">mdi-plus</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>새로운 씬 추가</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="openDirectory">
-                            <v-icon color="blue-grey">mdi-folder-open-outline</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>폴더 열기</span>
-                </v-tooltip>
-
-            </v-card-actions>
-
-            <file-list-component
-                :cwd="cwd"
-                :singleLine="false"
-                :globOption="{ onlyDirectories: true, deep: 2 }"
-                :preload="10"
-                :open="openSceneFile"
-                :actions="actions"
-                @update="setSceneNames"
-            />
-            
-        </v-card>
         <v-dialog
             v-model="isPromptOpen"
             persistent
@@ -62,17 +39,18 @@
 import path from 'path'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
-import FileListComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/FileList.vue'
+import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
 import {
-    PROJECT_SCENE_DIRECTORY_NAME
+    PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_SCENE_DIRECTORY_NAME
 } from '@/Const'
 
 type Rule = (v: string) => boolean|string
 
 @Component({
     components: {
-        FileListComponent
+        ExplorerComponent
     }
 })
 export default class SceneListComponent extends Vue {
@@ -86,11 +64,20 @@ export default class SceneListComponent extends Vue {
 
     private actions: ContextItemAction[] = [
         {
+            icon: 'mdi-folder-open-outline',
+            description: '씬 폴더로 이동합니다',
+            action: (filePath: string): void => {
+                const key: string = path.basename(filePath)
+                const sceneDir: string = path.join(this.cwd, key)
+                this.openPath(sceneDir)   
+            }
+        },
+        {
             icon: 'mdi-script-text-outline',
             description: '스크립트 파일을 찾습니다',
             action: (filePath: string): void => {
                 const key: string = path.basename(filePath)
-                this.$router.replace(`/manager/scene/${key}/script`)
+                this.$router.replace(`/manager/scene/script/${key}`)
             }
         },
         {
@@ -98,7 +85,7 @@ export default class SceneListComponent extends Vue {
             description: '애니메이션 파일을 찾습니다',
             action: (filePath: string): void => {
                 const key: string = path.basename(filePath)
-                this.$router.replace(`/manager/scene/${key}/animation`)
+                this.$router.replace(`/manager/scene/animation/${key}`)
             }
         },
         {
@@ -113,12 +100,29 @@ export default class SceneListComponent extends Vue {
         }
     ]
 
+    private buttons: ContextItemAction[] = [
+        {
+            icon: 'mdi-plus',
+            description: '새로운 씬 만들기',
+            action: async (directoryPath: string): Promise<void> => {
+                this.add()
+            }
+        },
+        {
+            icon: 'mdi-folder-open-outline',
+            description: '폴더 열기',
+            action: (directoryPath: string): void => {
+                this.openPath(directoryPath)
+            }
+        }
+    ]
+
     private get cwd(): string {
         const { projectDirectory } = this.$store.state
         if (!projectDirectory) {
             return ''
         }
-        return path.join(projectDirectory, PROJECT_SCENE_DIRECTORY_NAME)
+        return path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
     }
 
     private get isValidAnswer(): boolean {
@@ -132,10 +136,6 @@ export default class SceneListComponent extends Vue {
 
     private openPath(filePath: string): void {
         shell.openPath(filePath)
-    }
-
-    private openDirectory(): void {
-        shell.openPath(this.cwd)
     }
 
     private openSceneFile(filePath: string): void {
@@ -164,14 +164,15 @@ export default class SceneListComponent extends Vue {
             return
         }
 
+        const sceneKey: string = this.promptAnswer
         this.isPromptJobDoing = true
-        this.promptText = `'${this.promptAnswer}' 씬을 생성하는 중입니다. 잠시만 기다려주세요.`
+        this.promptText = `'${sceneKey}' 씬을 생성하는 중입니다. 잠시만 기다려주세요.`
 
-        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await ipcRenderer.invoke('add-scene', projectDirectory, this.promptAnswer)
+        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await ipcRenderer.invoke('add-scene', projectDirectory, sceneKey)
         if (!sceneAdd.success) {
 
-            const tmpdir: string = path.join(this.cwd, this.promptAnswer)
-            await ipcRenderer.invoke('delete', tmpdir)
+            const tmpdir: string = path.join(this.cwd, sceneKey)
+            await ipcRenderer.invoke('delete', tmpdir, false)
 
             this.isPromptJobDoing = false
             this.$store.dispatch('snackbar', sceneAdd.message)
@@ -191,7 +192,7 @@ export default class SceneListComponent extends Vue {
 
         this.prompt(
             '씬 생성하기',
-            '씬의 키 값을 설정해주세요.<br>이 값은 다른 씬과 중복되어선 안됩니다.<br><strong>영문과 숫자만 사용할 수 있으며, 영문으로 시작해야 합니다.</strong>',
+            '씬의 키 값을 설정해주세요.<br>이 값은 다른 씬과 중복되어선 안됩니다.<br><strong>영문과 숫자, 밑줄만 사용할 수 있으며, 영문으로 시작해야 합니다.</strong>',
             [
                 (v: string) => /^[A-Za-z][A-Za-z\d_]*$/g.test(v) || '유효하지 않은 값입니다.',
                 (v: string) => this.sceneNames.indexOf(v.toLowerCase()) === -1 || '이미 존재하는 값입니다.'
@@ -200,7 +201,7 @@ export default class SceneListComponent extends Vue {
     }
 
     private async setSceneNames(): Promise<void> {
-        const dirRead: Engine.FileSystem.ReadDirectorySuccess|Engine.FileSystem.ReadFileFail = await ipcRenderer.invoke('read-directory', this.cwd, '**/*', { onlyDirectories: true, deep: 2 })
+        const dirRead: Engine.FileSystem.ReadDirectorySuccess|Engine.FileSystem.ReadFileFail = await ipcRenderer.invoke('read-directory', this.cwd, { includeFiles: false })
         if (!dirRead.success) {
             this.$store.dispatch('snackbar', dirRead.message)
             return

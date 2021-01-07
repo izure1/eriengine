@@ -10,32 +10,29 @@
                     <v-list-item
                         v-for="file in loadedFiles"
                         :key="`file-list-${file}`"
-                        @click="open(getAbsolutePath(file))"
+                        @click="open(file)"
                     >
 
                         <v-list-item-content>
-                            <v-list-item-title :class="{
-                                'subtitle-1': isTwoLine,
-                                'caption': !isTwoLine
-                            }">
+                            <v-list-item-title :class="{ 'subtitle-1': isTwoLine, 'caption': !isTwoLine }">
                                 {{ getRelativePath(file) }}
                             </v-list-item-title>
                             <v-list-item-subtitle
                                 v-if="isTwoLine"
                                 class="caption"
                             >
-                                {{ file }}
+                                {{ getAbsolutePath(file) }}
                             </v-list-item-subtitle>
                         </v-list-item-content>
 
-                        <v-list-item-action class="flex-row">
+                        <v-list-item-action class="flex-row" v-if="!isUpperDirectory(file)">
                             <div
                                 v-for="({ icon, description, action }, i) in actions"
                                 :key="`file-list-action-${file}-${i}`"
                             >
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
-                                        <v-btn icon v-on="on" @click.stop="action(file)">
+                                        <v-btn icon v-on="on" @click.stop="action(getAbsolutePath(file))">
                                             <v-icon color="blue-grey">{{ icon }}</v-icon>
                                         </v-btn>
                                     </template>
@@ -69,11 +66,11 @@
 
 <script lang="ts">
 import path from 'path'
-import slash from 'slash'
+import normalize from 'normalize-path'
 import fs from 'fs-extra'
 import { ipcRenderer, shell } from 'electron'
-import { Options as GlobOptions } from 'fast-glob'
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import { PropOptions } from 'vue'
 
 export interface ContextItemAction {
     icon: string
@@ -81,53 +78,58 @@ export interface ContextItemAction {
     action: (filePath: string) => void
 }
 
-@Component({
-    props: {
-        cwd: {
-            type: String,
-            required: true
-        },
-        preload: {
-            type: Number,
-            default: Number.MAX_SAFE_INTEGER
-        },
-        additional: {
-            type: Number,
-            default: 10
-        },
-        singleLine: {
-            type: Boolean,
-            default: true
-        },
-        actions: {
-            type: Array,
-            default: () => []
-        },
-        globOption: {
-            type: Object as () => GlobOptions,
-            default: () => ({})
-        },
-        open: {
-            type: Function,
-            default: () => {}
-        },
-        filter: {
-            type: Array,
-            default: () => ['*']
+export const props = {
+    cwd: {
+        type: String,
+        required: true
+    },
+    preload: {
+        type: Number,
+        default: Number.MAX_SAFE_INTEGER
+    },
+    additional: {
+        type: Number,
+        default: 10
+    },
+    singleLine: {
+        type: Boolean,
+        default: true
+    },
+    actions: {
+        type: Array,
+        default: () => []
+    },
+    options: {
+        type: Object as () => Engine.FileSystem.FileSearchFilter,
+        default: () => ({})
+    },
+    openDirectory: {
+        type: Function,
+        default(this: FileListComponent, filePath: string): void {
+            this.openDirectoryDefault(filePath)
         }
+    },
+    openFile: {
+        type: Function,
+        default: () => ({})
     }
+}
+
+@Component({
+    props
 })
 export default class FileListComponent extends Vue {
     private cwd!: string
-    private filter!: string[]
     private actions!: ContextItemAction
-    private globOption!: GlobOptions
+    private options!: Engine.FileSystem.FileSearchFilter
     private singleLine!: boolean
     private preload!: number
     private additional!: number
     private additionalReduce: number = 1
     private additionalLoaded: number = 0
-    private open!: (filePath: string) => void
+    private currentPath: string = this.cwd
+    private openDirectory!: (filePath: string) => void
+    private openFile!: (filePath: string) => void
     
     private files: string[] = []
     private isLoaded: boolean = false
@@ -146,21 +148,25 @@ export default class FileListComponent extends Vue {
         return !this.singleLine
     }
 
-    private get mergedGlobOption(): GlobOptions {
-        return { ...this.globOption, absolute: true }
-    }
-
     private async setFiles(): Promise<void> {
-        if (!this.cwd) return
+        if (!this.currentPath) return
         
         this.isLoaded = false
-        const directoryRead: Engine.FileSystem.ReadDirectorySuccess|Engine.FileSystem.ReadDirectoryFail = await ipcRenderer.invoke('read-directory', this.cwd, this.filter, this.mergedGlobOption)
+        const directoryRead: Engine.FileSystem.ReadDirectorySuccess|Engine.FileSystem.ReadDirectoryFail = await ipcRenderer.invoke('read-directory', this.currentPath, { ...this.options, absolute: false })
         this.isLoaded = true
 
         if (!directoryRead.success) {
             return
         }
+
+        // 최상위 탐색 디렉토리가 아닐 경우, 상위 이동 경로를 추가해야 함
+        const cwd: string = this.getAbsolutePath(this.cwd)
+        const current: string = this.getAbsolutePath(this.currentPath)
+
         this.files = directoryRead.files
+        if (path.relative(cwd, current))  {
+            this.files.unshift('..')
+        }
     }
 
     private loadMore(): void {
@@ -171,39 +177,62 @@ export default class FileListComponent extends Vue {
         }
     }
 
-    private getAbsolutePath(filePath: string): string {
-        if (path.isAbsolute(filePath)) {
-            return slash(filePath)
+    private getAbsolutePath(filename: string): string {
+        if (path.isAbsolute(filename)) {
+            return normalize(filename)
         }
-        filePath = path.isAbsolute(filePath) ? slash(filePath) : path.resolve(this.cwd, filePath)
-        return slash(filePath)
+        const result: string = path.isAbsolute(filename) ? filename : path.resolve(this.currentPath, filename)
+        return normalize(result)
     }
 
-    private getRelativePath(filePath: string): string {
-        if (!path.isAbsolute(filePath)) {
-            filePath = path.resolve(this.cwd, filePath)
+    private getRelativePath(filename: string): string {
+        if (!path.isAbsolute(filename)) {
+            return filename
         }
-        return filePath.replace(slash(this.cwd), '').substr(1)
+        return normalize(filename).replace( normalize(this.currentPath), '' ).substr(1)
     }
 
-    private async deleteFile(filePath: string): Promise<void> {
-        filePath = this.getAbsolutePath(filePath)
-        const fileDel: Engine.FileSystem.TrashSuccess|Engine.FileSystem.TrashFail = await ipcRenderer.invoke('trash', filePath, true)
+    private async deleteFile(filename: string): Promise<void> {
+        const target: string = this.getAbsolutePath(filename)
+        const fileDel: Engine.FileSystem.TrashSuccess|Engine.FileSystem.TrashFail = await ipcRenderer.invoke('trash', target, true)
         if (!fileDel.success) {
             this.$store.dispatch('snackbar', fileDel.message)
         }
     }
 
+    private async open(filename: string): Promise<void> {
+        const dist: string = this.getAbsolutePath(filename)
+        const stat: fs.Stats = await fs.lstat(dist)
+        if (stat.isDirectory()) {
+            this.openDirectory(dist)
+        }
+        else if (stat.isFile()) {
+            this.openFile(dist)
+        }
+    }
+
+    protected openDirectoryDefault(filePath: string): void {
+        this.currentPath = filePath
+        this.onDirectoryPathChange()
+    }
+
     private async onDirectoryUpdate(): Promise<void> {
         await this.setFiles()
-        this.$emit('update', this.files)
+        this.$emit('update:structure', this.files)
+    }
+
+    private isUpperDirectory(filename: string): boolean {
+        return path.basename(filename) === '..'
     }
 
     private startWatcher(): void {
         if (this.watcher) {
             this.destroyWatcher()
         }
-        this.watcher = fs.watch(this.cwd, { recursive: true }, this.onDirectoryUpdate)
+        if (!fs.existsSync(this.currentPath)) {
+            return
+        }
+        this.watcher = fs.watch(this.currentPath, { recursive: false }, this.onDirectoryUpdate)
     }
 
     private destroyWatcher(): void {
@@ -214,8 +243,15 @@ export default class FileListComponent extends Vue {
         this.watcher = null
     }
 
+    private onDirectoryPathChange(): void {
+        this.destroyWatcher()
+        this.startWatcher()
+        this.setFiles()
+        this.$emit('update:path', this.currentPath)
+    }
+
     created(): void {
-        this.setFiles().then(this.startWatcher)
+        this.onDirectoryPathChange()
     }
 
     beforeDestroy(): void {

@@ -1,65 +1,78 @@
 <template>
-    <section>
-        <v-card tile elevation="0">
-
-            <v-card-actions>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="add">
-                            <v-icon color="blue-grey">mdi-plus</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>애니메이션 추가</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="openDirectory">
-                            <v-icon color="blue-grey">mdi-folder-open-outline</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>폴더 열기</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on" @click="goBack">
-                            <v-icon color="blue-grey">mdi-arrow-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>뒤로</span>
-                </v-tooltip>
-
-            </v-card-actions>
-
-            <file-list-component
-                :cwd="cwd"
-                :filter="filters"
-                :preload="10"
-                :open="openFile"
-            />
-
-        </v-card>
-    </section>
+    <explorer-component
+        :cwd="cwd"
+        :buttons="buttons"
+        :options="{ extensions: ['ts'] }"
+        :preload="10"
+        :openFile="openPath"
+    />
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-property-decorator'
-import { PROJECT_SCENE_ANIMATION_DIRECTORY_NAME } from '@/Const'
-import BaseComponent from './BaseComponent'
-import FileListComponent from '@/Renderer/components/FileSystem/FileList.vue'
+import path from 'path'
+import { Vue, Component } from 'vue-property-decorator'
+import { shell } from 'electron'
+import {
+    PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_SCENE_DIRECTORY_NAME,
+    PROJECT_SRC_SCENE_ANIMATION_DIRECTORY_NAME
+} from '@/Const'
+import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
 @Component({
     components: {
-        FileListComponent
-    },
-    mixins: [ BaseComponent ]
+        ExplorerComponent
+    }
 })
-export default class AnimationListComponent extends BaseComponent {
-    private filters: string[] = [`${PROJECT_SCENE_ANIMATION_DIRECTORY_NAME}/**/*.ts`]
+export default class AnimationListComponent extends Vue {
+    private get cwd(): string {
+        const { key } = this.$route.params
+        const { projectDirectory } = this.$store.state
+        if (!projectDirectory) {
+            return ''
+        }
+        return path.resolve(
+            projectDirectory,
+            PROJECT_SRC_DIRECTORY_NAME,
+            PROJECT_SRC_SCENE_DIRECTORY_NAME,
+            key,
+            PROJECT_SRC_SCENE_ANIMATION_DIRECTORY_NAME
+        )
+    }
 
-    private add(): void {
+    private buttons: ContextItemAction[] = [
+        {
+            icon: 'mdi-plus',
+            description: '애니메이션 추가',
+            action: (directoryPath: string): void => {
+
+            }
+        },
+        {
+            icon: 'mdi-folder-open-outline',
+            description: '폴더 열기',
+            action: (directoryPath: string): void => {
+                this.openPath(directoryPath)
+            }
+        },
+        {
+            icon: 'mdi-arrow-left',
+            description: '뒤로가기',
+            action: (directoryPath: string): void => {
+                this.goBack()
+            }
+        }
+    ]
+
+    private openDirectory(): void {
+        shell.openPath(this.cwd)
+    }
+
+    private openPath(filePath: string): void {
+        shell.openPath(filePath)
+    }
+
+    private add(directoryPath: string): void {
     }
 
     private goBack(): void {
