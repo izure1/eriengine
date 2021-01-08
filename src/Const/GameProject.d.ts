@@ -15,6 +15,15 @@ declare namespace Engine {
         interface AddScriptSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddScriptFail extends Engine.ActionFailState {}
 
+        interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateAssetListFail extends Engine.ActionFailState {}
+
+        interface AddAnimationSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddAnimationFail extends Engine.ActionFailState {}
+
+        interface GenerateAnimationListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateAnimationListFail extends Engine.ActionFailState {}
+
         interface Config extends Engine.Type.Json {
             ENGINE_VERSION: string
             PROJECT_NAME: string

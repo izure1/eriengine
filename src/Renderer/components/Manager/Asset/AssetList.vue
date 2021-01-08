@@ -1,11 +1,12 @@
 <template>
-    <explore-component
-        :buttons="buttons"
+    <explorer-component
         :cwd="cwd"
+        :actions="actions"
+        :contextmenus="contextmenus"
         :options="{ extensions }"
         :preload="10"
         :openFile="openPath"
-        :actions="actions"
+        :loading="isLoading"
     />
 </template>
 
@@ -13,36 +14,42 @@
 import path from 'path'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
-import ExploreComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
+import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ASSET_DIRECTORY_NAME
+    PROJECT_SRC_ASSET_DIRECTORY_NAME,
+    PROJECT_ALLOW_ASSET_EXTENSIONS
 } from '@/Const'
 
 @Component({
     components: {
-        ExploreComponent
+        ExplorerComponent
     }
 })
 export default class AssetListComponent extends Vue {
     private isLoading: boolean = false
     private currentDirectory: string = this.cwd
-    private extensions: string[] = [
-        'jpg',
-        'jpeg',
-        'png',
-        'gif',
-        'webp',
-        'ogg',
-        'mp4',
-        'webm',
-        'mp4',
-        'woff',
-        'woff2'
-    ]
+    private extensions: string[] = PROJECT_ALLOW_ASSET_EXTENSIONS
 
     private actions: ContextItemAction[] = [
+        {
+            icon: 'mdi-plus',
+            description: '에셋 추가',
+            action: (directoryPath: string) => {
+                this.add(directoryPath)
+            }
+        },
+        {
+            icon: 'mdi-folder-open-outline',
+            description: '폴더 열기',
+            action: (directoryPath: string) => {
+                shell.openPath(directoryPath)
+            }
+        }
+    ]
+
+    private contextmenus: ContextItemAction[] = [
         {
             icon: 'mdi-open-in-new',
             description: '파일로 이동합니다',
@@ -58,23 +65,6 @@ export default class AssetListComponent extends Vue {
                 if (!trash.success) {
                     this.$store.dispatch('snackbar', trash.message)
                 }
-            }
-        }
-    ]
-
-    private buttons: ContextItemAction[] = [
-        {
-            icon: 'mdi-plus',
-            description: '에셋 추가',
-            action: (directoryPath: string) => {
-                this.add(directoryPath)
-            }
-        },
-        {
-            icon: 'mdi-folder-open-outline',
-            description: '폴더 열기',
-            action: (directoryPath: string) => {
-                shell.openPath(directoryPath)
             }
         }
     ]

@@ -12,6 +12,7 @@ import {
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
     PROJECT_SRC_ACTOR_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
+    PROJECT_SRC_ANIMATION_DIRECTORY_NAME,
 } from '@/Const'
 import RAW_PROJECT_PACKAGE from 'raw-loader!@/Template/Project/PACKAGE.txt'
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
@@ -74,6 +75,7 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
         path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME),
         path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME),
         path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME),
+        path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME),
     ]
 
     for (const dirPath of dirs) {

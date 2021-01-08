@@ -1,43 +1,36 @@
 <template>
-    <v-card
-        elevation="0"
-        tile
-    >
-        <v-card-actions>
-
-            <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                    <v-btn icon v-on="on" @click="openDirectory">
-                        <v-icon color="blue-grey">mdi-folder-open-outline</v-icon>
-                    </v-btn>
-                </template>
-                <span>폴더 열기</span>
-            </v-tooltip>
-
-        </v-card-actions>
-
-        <file-list-component
-            :cwd="cwd"
-            :openFile="openPath"
-            :options="{ includeDirectories: false, extensions: ['json'] }"
-            :actions="actions"
-        />
-    </v-card>
+    <explorer-component
+        :cwd="cwd"
+        :actions="actions"
+        :openFile="openPath"
+        :options="{ includeDirectories: false, extensions: ['json'] }"
+        :contextmenus="contextmenus"
+    />
 </template>
 
 <script lang="ts">
 import path from 'path'
 import { Vue, Component } from 'vue-property-decorator'
 import { shell, ipcRenderer } from 'electron'
-import FileListComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/FileList.vue'
+import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
 @Component({
     components: {
-        FileListComponent
+        ExplorerComponent
     }
 })
 export default class ProjectEditComponent extends Vue {
     private actions: ContextItemAction[] = [
+        {
+            icon: 'mdi-folder-open-outline',
+            description: '폴더 열기',
+            action: (directoryPath: string): void => {
+                this.openPath(directoryPath)
+            }
+        }
+    ]
+
+    private contextmenus: ContextItemAction[] = [
         {
             icon: 'mdi-open-in-new',
             description: '파일로 이동합니다',
@@ -53,10 +46,6 @@ export default class ProjectEditComponent extends Vue {
             return ''
         }
         return projectDirectory
-    }
-
-    private openDirectory(): void {
-        shell.openPath(this.cwd)
     }
 
     private openPath(filePath: string): void {

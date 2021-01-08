@@ -9,8 +9,8 @@ import Manager from '@/Renderer/components/Manager/Main.vue'
 import ManagerConfigMain from '@/Renderer/components/Manager/Config/Main.vue'
 import ManagerSceneMain from '@/Renderer/components/Manager/Scene/Main.vue'
 import ManagerScriptList from '@/Renderer/components/Manager/Scene/List/Script.vue'
-import ManagerAnimationList from '@/Renderer/components/Manager/Scene/List/Animation.vue'
 import ManagerAssetList from '@/Renderer/components/Manager/Asset/AssetList.vue'
+import ManagerAnimationList from '@/Renderer/components/Manager/Animation/AnimationList.vue'
 
 Vue.use(VueRouter)
 
@@ -52,12 +52,12 @@ const routes: Array<RouteConfig> = [
                 component: ManagerScriptList
             },
             {
-                path: 'scene/animation/:key',
-                component: ManagerAnimationList
-            },
-            {
                 path: 'asset',
                 component: ManagerAssetList
+            },
+            {
+                path: 'animation',
+                component: ManagerAnimationList
             }
         ]
     },

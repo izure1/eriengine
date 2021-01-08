@@ -33,6 +33,10 @@ function *generateIPC() {
 
     yield require('./Main/IPC/GameProject/addScene')
     yield require('./Main/IPC/GameProject/addScript')
+    yield require('./Main/IPC/GameProject/addAnimation')
+
+    yield require('./Main/IPC/GameProject/generateAssetList')
+    yield require('./Main/IPC/GameProject/generateAnimationList')
 }
 
 // IPC 함수를 실행합니다.

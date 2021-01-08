@@ -3,12 +3,12 @@
 
         <explorer-component
             :cwd="cwd"
-            :buttons="buttons"
-            :singleLine="false"
+            :actions="actions"
+            :singleline="false"
             :options="{ includeFiles: false }"
             :preload="10"
             :openDirectory="openSceneFile"
-            :actions="actions"
+            :contextmenus="contextmenus"
             @update:structure="setSceneNames"
         />
 
@@ -64,6 +64,23 @@ export default class SceneListComponent extends Vue {
 
     private actions: ContextItemAction[] = [
         {
+            icon: 'mdi-plus',
+            description: '새로운 씬 만들기',
+            action: async (directoryPath: string): Promise<void> => {
+                this.add()
+            }
+        },
+        {
+            icon: 'mdi-folder-open-outline',
+            description: '폴더 열기',
+            action: (directoryPath: string): void => {
+                this.openPath(directoryPath)
+            }
+        }
+    ]
+
+    private contextmenus: ContextItemAction[] = [
+        {
             icon: 'mdi-folder-open-outline',
             description: '씬 폴더로 이동합니다',
             action: (filePath: string): void => {
@@ -81,14 +98,6 @@ export default class SceneListComponent extends Vue {
             }
         },
         {
-            icon: 'mdi-transition',
-            description: '애니메이션 파일을 찾습니다',
-            action: (filePath: string): void => {
-                const key: string = path.basename(filePath)
-                this.$router.replace(`/manager/scene/animation/${key}`)
-            }
-        },
-        {
             icon: 'mdi-delete-outline',
             description: '씬을 삭제합니다',
             action: async (filePath: string): Promise<void> => {
@@ -96,23 +105,6 @@ export default class SceneListComponent extends Vue {
                 if (!trash.success) {
                     this.$store.dispatch('snackbar', trash.message)
                 }
-            }
-        }
-    ]
-
-    private buttons: ContextItemAction[] = [
-        {
-            icon: 'mdi-plus',
-            description: '새로운 씬 만들기',
-            action: async (directoryPath: string): Promise<void> => {
-                this.add()
-            }
-        },
-        {
-            icon: 'mdi-folder-open-outline',
-            description: '폴더 열기',
-            action: (directoryPath: string): void => {
-                this.openPath(directoryPath)
             }
         }
     ]

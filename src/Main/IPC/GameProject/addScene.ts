@@ -1,12 +1,14 @@
 import path from 'path'
+import fs from 'fs-extra'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_ASSETLIST_NAME,
+    PROJECT_SRC_ANIMSLIST_NAME,
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_ANIMATION_DIRECTORY_NAME
+    PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
@@ -26,8 +28,7 @@ async function ensureDirectory(projectDirPath: string, key: string): Promise<Eng
     const sceneDirPath: string = path.join(sceneRootPath, getSceneKey(key))
     const dirs: string[] = [
         sceneRootPath,
-        path.join(sceneDirPath, PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME),
-        path.join(sceneDirPath, PROJECT_SRC_SCENE_ANIMATION_DIRECTORY_NAME),
+        path.join(sceneDirPath, PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME)
     ]
 
     for (const dir of dirs) {
@@ -61,7 +62,12 @@ async function ensureFile(projectDirPath: string, key: string): Promise<Engine.F
         },
         {
             path: path.join(sceneDirPath, `Scene.ts`),
-            content: parseProperty(RAW_SCENE, { PROJECT_SRC_SCENE_DIRECTORY_NAME, KEY })
+            content: parseProperty(RAW_SCENE, {
+                PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
+                PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
+                PROJECT_SRC_SCENE_DIRECTORY_NAME,
+                KEY
+            })
         }
     ]
 
@@ -81,6 +87,16 @@ async function ensureFile(projectDirPath: string, key: string): Promise<Engine.F
 }
 
 export async function handler(projectDirPath: string, key: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> {
+
+    const sceneDirectory: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME, getSceneKey(key))
+    if (fs.existsSync(sceneDirectory)) {
+        return {
+            success: false,
+            name: '씬 생성 실패',
+            message: '이미 동일한 키를 가진 씬이 존재합니다.'
+        }
+    }
+    
     const directoryEnsure = await ensureDirectory(projectDirPath, key)
     if (!directoryEnsure.success) {
         return directoryEnsure as Engine.GameProject.AddSceneFail

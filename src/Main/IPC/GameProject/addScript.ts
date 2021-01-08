@@ -3,9 +3,8 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import {
-    PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
+    PROJECT_SRC_ASSETLIST_NAME,
+    PROJECT_SRC_ANIMSLIST_NAME
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
@@ -22,7 +21,11 @@ function getSceneKey(key: string): string {
 async function writeScriptFile(directoryPath: string, key: string, filename: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const KEY:  string          = getSceneKey(key)
     const filePath: string      = path.resolve(directoryPath, `${filename}.ts`)
-    const fileContent: string   = parseProperty(RAW_SCRIPT, { KEY })
+    const fileContent: string   = parseProperty(RAW_SCRIPT, {
+        KEY,
+        PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
+        PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name
+    })
 
     const fileWrite = await writeFile(filePath, fileContent)
     if (!fileWrite.success) {

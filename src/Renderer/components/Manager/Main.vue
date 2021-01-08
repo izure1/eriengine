@@ -37,7 +37,16 @@
 
 <script lang="ts">
 import path from 'path'
+import fs from 'fs-extra'
+import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
+import { FileWatcher } from '@/Utils/FileWatcher'
+import {
+    PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_ASSET_DIRECTORY_NAME,
+    PROJECT_SRC_ASSETLIST_NAME,
+    PROJECT_SRC_ANIMATION_DIRECTORY_NAME
+} from '@/Const'
 
 interface ContextmenuGroup {
     title: string
@@ -67,6 +76,11 @@ export default class ProjectFileListComponent extends Vue {
                     path: '/manager/asset'
                 },
                 {
+                    name: '애니메이션',
+                    description: '애니메이션을 관리합니다',
+                    path: '/manager/animation'
+                },
+                {
                     name: '설정',
                     description: '프로젝트 설정을 변경합니다',
                     path: `/manager/config`
@@ -85,6 +99,8 @@ export default class ProjectFileListComponent extends Vue {
         }
     ]
 
+    private watchers: Set<FileWatcher> = new Set
+
     private get projectName(): string {
         const { PROJECT_NAME } = this.$store.state.projectConfig
         if (!PROJECT_NAME) {
@@ -93,8 +109,43 @@ export default class ProjectFileListComponent extends Vue {
         return PROJECT_NAME
     }
 
+    private get projectDirectory(): string {
+        return this.$store.state.projectDirectory
+    }
+
     private showManager(url: string): void {
-        this.$router.replace(url)
+        this.$router.replace(url).catch(() => {})
+    }
+
+    private generateWatchers(): void {
+        this.destroyWatchers()
+        
+        // 에셋 디렉토리 감지
+        const assetDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
+        const assetWatcher = new FileWatcher(assetDir).update(() => ipcRenderer.invoke('generate-asset-list', this.projectDirectory)).start().emit()
+
+        // 애니메이션 디렉토리 감지
+        const animsDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME)
+        const animsWatcher = new FileWatcher(animsDir).update(() => ipcRenderer.invoke('generate-animation-list', this.projectDirectory)).start().emit()
+
+        // 애니메이션 디렉토리 감지
+        this.watchers.add(assetWatcher)
+        this.watchers.add(animsWatcher)
+    }
+
+    private destroyWatchers(): void {
+        for (const watcher of this.watchers) {
+            watcher.destroy()
+        }
+        this.watchers.clear()
+    }
+
+    created(): void {
+        this.generateWatchers()
+    }
+
+    beforeDestroy(): void {
+        this.destroyWatchers()
     }
 }
 </script>
