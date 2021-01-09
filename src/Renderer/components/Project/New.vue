@@ -430,7 +430,14 @@ export default class NewProjectComponent extends Vue {
 
         this.goNextStep()
 
+        const engineAuth: Engine.GameProject.GetEngineAuthSuccess|Engine.GameProject.GetEngineAuthFail = await ipcRenderer.invoke('get-engine-auth', this.applicationId)
+        if (!engineAuth.success) {
+            this.$store.dispatch('snackbar', engineAuth.message)
+            return 
+        }
+
         const config: Engine.GameProject.Config = {
+            ENGINE_AUTH: engineAuth.auth,
             ENGINE_VERSION: remote.app.getVersion(),
             PROJECT_NAME: this.projectName,
             APPLICATION_ID: this.applicationId,

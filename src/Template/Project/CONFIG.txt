@@ -1,4 +1,5 @@
 {
+    "ENGINE_AUTH": "{{ ENGINE_AUTH }}",
     "ENGINE_VERSION": "{{ ENGINE_VERSION }}",
     "PROJECT_NAME": "{{ PROJECT_NAME }}",
     "APPLICATION_ID": "{{ APPLICATION_ID }}",

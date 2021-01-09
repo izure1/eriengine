@@ -4,7 +4,8 @@ import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import {
     PROJECT_SRC_ASSETLIST_NAME,
-    PROJECT_SRC_ANIMSLIST_NAME
+    PROJECT_SRC_ANIMSLIST_NAME,
+    PROJECT_SRC_SKILLLIST_NAME
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
@@ -18,13 +19,13 @@ function getSceneKey(key: string): string {
     return chars.join('')
 }
 
-async function writeScriptFile(directoryPath: string, key: string, filename: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const KEY:  string          = getSceneKey(key)
-    const filePath: string      = path.resolve(directoryPath, `${filename}.ts`)
+async function writeScriptFile(filePath: string, sceneKey: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+    const KEY:  string          = getSceneKey(sceneKey)
     const fileContent: string   = parseProperty(RAW_SCRIPT, {
         KEY,
         PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
-        PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name
+        PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
+        PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name
     })
 
     const fileWrite = await writeFile(filePath, fileContent)
@@ -40,13 +41,13 @@ async function writeScriptFile(directoryPath: string, key: string, filename: str
     }
 }
 
-export async function handler(directoryPath: string, key: string, filename: string): Promise<Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail> {
-    const directoryEnsure = await makeDirectory(directoryPath)
+export async function handler(filePath: string, sceneKey: string): Promise<Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail> {
+    const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
         return directoryEnsure as Engine.GameProject.AddSceneFail
     }
 
-    const fileWrite = await writeScriptFile(directoryPath, key, filename)
+    const fileWrite = await writeScriptFile(filePath, sceneKey)
     if (!fileWrite.success) {
         return fileWrite as Engine.GameProject.AddScriptFail
     }
@@ -55,7 +56,7 @@ export async function handler(directoryPath: string, key: string, filename: stri
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-script', async (e: IpcMainInvokeEvent, directoryPath: string, key: string, filename: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddScriptFail> => {
-        return await handler(directoryPath, key, filename)
+    ipcMain.handle('add-script', async (e: IpcMainInvokeEvent, filePath: string, sceneKey: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddScriptFail> => {
+        return await handler(filePath, sceneKey)
     })
 }

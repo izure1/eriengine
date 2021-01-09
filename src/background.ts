@@ -30,13 +30,19 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/createProject')
     yield require('./Main/IPC/GameProject/ensureProject')
     yield require('./Main/IPC/GameProject/readProject')
+    yield require('./Main/IPC/GameProject/getEngineAuth')
+    yield require('./Main/IPC/GameProject/checkValidProject')
 
     yield require('./Main/IPC/GameProject/addScene')
     yield require('./Main/IPC/GameProject/addScript')
     yield require('./Main/IPC/GameProject/addAnimation')
+    yield require('./Main/IPC/GameProject/addSkill')
 
     yield require('./Main/IPC/GameProject/generateAssetList')
     yield require('./Main/IPC/GameProject/generateAnimationList')
+    yield require('./Main/IPC/GameProject/generateSkillList')
+
+    yield require('./Main/IPC/Process/check-command-exists')
 }
 
 // IPC 함수를 실행합니다.

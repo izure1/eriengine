@@ -7,7 +7,16 @@
             tile
         >
             <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen" class="white--text"></v-app-bar-nav-icon>
-            <v-app-bar-title class="white--text">{{ projectName }}</v-app-bar-title>
+            <v-app-bar-title>
+                <v-btn
+                    color="white"
+                    class="subtitle-1"
+                    text
+                    @click="openPath(projectDirectory)"
+                >
+                    {{ projectName }}
+                </v-btn>
+            </v-app-bar-title>
         </v-app-bar>
         <v-navigation-drawer v-model="isDrawerOpen" fixed temporary class="py-3 px-1">
             <v-list subheader>
@@ -38,14 +47,15 @@
 <script lang="ts">
 import path from 'path'
 import fs from 'fs-extra'
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_ASSETLIST_NAME,
-    PROJECT_SRC_ANIMATION_DIRECTORY_NAME
+    PROJECT_SRC_ANIMATION_DIRECTORY_NAME,
+    PROJECT_SRC_SKILL_DIRECTORY_NAME
 } from '@/Const'
 
 interface ContextmenuGroup {
@@ -79,6 +89,11 @@ export default class ProjectFileListComponent extends Vue {
                     name: '애니메이션',
                     description: '애니메이션을 관리합니다',
                     path: '/manager/animation'
+                },
+                {
+                    name: '스킬',
+                    description: '스킬을 관리합니다',
+                    path: '/manager/skill'
                 },
                 {
                     name: '설정',
@@ -128,9 +143,14 @@ export default class ProjectFileListComponent extends Vue {
         const animsDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME)
         const animsWatcher = new FileWatcher(animsDir).update(() => ipcRenderer.invoke('generate-animation-list', this.projectDirectory)).start().emit()
 
+        // 스킬 디렉토리 감지
+        const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SKILL_DIRECTORY_NAME)
+        const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
+
         // 애니메이션 디렉토리 감지
         this.watchers.add(assetWatcher)
         this.watchers.add(animsWatcher)
+        this.watchers.add(skillWatcher)
     }
 
     private destroyWatchers(): void {
@@ -138,6 +158,10 @@ export default class ProjectFileListComponent extends Vue {
             watcher.destroy()
         }
         this.watchers.clear()
+    }
+
+    private openPath(filePath: string): void {
+        shell.openPath(filePath)
     }
 
     created(): void {
@@ -152,8 +176,8 @@ export default class ProjectFileListComponent extends Vue {
 
 <style lang="scss" scoped>
 .main-view {
-    height: calc(100vh - 100px);
-    margin-top: 100px !important;
+    height: calc(100vh - 64px);
+    margin-top: 64px !important;
     overflow: auto;
 }
 </style>

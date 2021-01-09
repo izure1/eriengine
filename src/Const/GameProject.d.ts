@@ -21,10 +21,23 @@ declare namespace Engine {
         interface AddAnimationSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddAnimationFail extends Engine.ActionFailState {}
 
+        interface AddSkillSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddSkillFail extends Engine.ActionFailState {}
+
         interface GenerateAnimationListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAnimationListFail extends Engine.ActionFailState {}
 
+        interface GenerateSkillListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateSkillListFail extends Engine.ActionFailState {}
+
+        interface CheckValidProjectSuccess extends Engine.ActionSuccessState {}
+        interface CheckValidProjectFail extends Engine.ActionFailState {}
+
+        interface GetEngineAuthSuccess extends Engine.ActionSuccessState { auth: string }
+        interface GetEngineAuthFail extends Engine.ActionFailState {}
+
         interface Config extends Engine.Type.Json {
+            ENGINE_AUTH: string
             ENGINE_VERSION: string
             PROJECT_NAME: string
             APPLICATION_ID: string

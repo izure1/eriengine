@@ -11,6 +11,7 @@ import ManagerSceneMain from '@/Renderer/components/Manager/Scene/Main.vue'
 import ManagerScriptList from '@/Renderer/components/Manager/Scene/List/Script.vue'
 import ManagerAssetList from '@/Renderer/components/Manager/Asset/AssetList.vue'
 import ManagerAnimationList from '@/Renderer/components/Manager/Animation/AnimationList.vue'
+import ManagerSkillList from '@/Renderer/components/Manager/Skill/SkillList.vue'
 
 Vue.use(VueRouter)
 
@@ -58,7 +59,11 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'animation',
                 component: ManagerAnimationList
-            }
+            },
+            {
+                path: 'skill',
+                component: ManagerSkillList
+            },
         ]
     },
     {

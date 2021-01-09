@@ -1,0 +1,18 @@
+import Phaser from 'phaser'
+import { Actor } from 'eriengine-core-plugin-actor'
+import { ActorDot } from 'eriengine-core-plugin-actor/dist/actor/src/Actor/ActorDot'
+
+import Asset from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
+import Animation from '@/{{ PROJECT_SRC_ANIMSLIST_NAME }}'
+import Skill from '@/{{ PROJECT_SRC_SKILLLIST_NAME }}'
+
+/**
+ * 
+ * @param target 이 스킬에 적중한 대상입니다.
+ * @param dot 이 스킬에 도트 효과가 필요하다면 사용하십시오. 이는 독 데미지같은 기능을 구현하는데 유용합니다.
+ */
+export default function(target: Actor, dot: ActorDot): object {
+    // 이 스킬이 적중한 대상
+    // 이 스킬에 적중한 대상이 피격이벤트(get-hit)에서 수신받을 정보입니다.
+    return {}
+}

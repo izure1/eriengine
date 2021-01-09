@@ -7,11 +7,8 @@ import { PROJECT_SRC_ASSETLIST_NAME } from '@/Const'
 import { parseProperty } from '@/Utils/parseProperty'
 import RAW_ANIMATION from 'raw-loader!@/Template/Scene/ANIMATION.txt'
 
-async function writeAnimationFile(directoryPath: string, filename: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const KEY: string           = path.parse(filename).name
-    const filePath: string      = path.resolve(directoryPath, `${filename}.ts`)
+async function writeAnimationFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_ANIMATION, {
-        KEY,
         PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
         ASSET_KEY: '',
         START: 0,
@@ -33,13 +30,13 @@ async function writeAnimationFile(directoryPath: string, filename: string): Prom
     }
 }
 
-export async function handler(directoryPath: string, filename: string): Promise<Engine.GameProject.AddAnimationSuccess|Engine.GameProject.AddAnimationFail> {
-    const directoryEnsure = await makeDirectory(directoryPath)
+export async function handler(filePath: string): Promise<Engine.GameProject.AddAnimationSuccess|Engine.GameProject.AddAnimationFail> {
+    const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
         return directoryEnsure as Engine.GameProject.AddAnimationFail
     }
 
-    const fileWrite = await writeAnimationFile(directoryPath, filename)
+    const fileWrite = await writeAnimationFile(filePath)
     if (!fileWrite.success) {
         return fileWrite as Engine.GameProject.AddAnimationFail
     }
@@ -48,7 +45,7 @@ export async function handler(directoryPath: string, filename: string): Promise<
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-animation', async (e: IpcMainInvokeEvent, directoryPath: string, filename: string): Promise<Engine.GameProject.AddAnimationSuccess|Engine.GameProject.AddAnimationFail> => {
-        return await handler(directoryPath, filename)
+    ipcMain.handle('add-animation', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddAnimationSuccess|Engine.GameProject.AddAnimationFail> => {
+        return await handler(filePath)
     })
 }

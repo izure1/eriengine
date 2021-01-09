@@ -7,7 +7,7 @@
             tile
         >
 
-            <v-card-subtitle>{{ currentPath }}</v-card-subtitle>
+            <v-card-subtitle class="overline pb-0">{{ cwdOffset }}</v-card-subtitle>
 
             <v-card-actions>
 
@@ -184,6 +184,12 @@ export default class ExplorerComponent extends Vue {
 
     private get isTwoLine(): boolean {
         return !this.singleline
+    }
+
+    private get cwdOffset(): string {
+        const current: string   = normalize(this.currentPath)
+        const cwd: string       = normalize(this.cwd)
+        return current.replace(cwd, '')
     }
 
     private async setFiles(): Promise<void> {

@@ -1,107 +1,66 @@
 <template>
-    <explorer-component
+    <generator-component
         :cwd="cwd"
-        :actions="actions"
-        :options="{ extensions: ['ts'] }"
-        :preload="10"
-        :openFile="openPath"
-        :contextmenus="contextmenus"
+        :add="add"
+        :description="[
+            '씬에서 벌어지는 내용을 프로그래밍합니다.',
+            '하지만 씬 파일에서 모든 내용을 프로그래밍하기는 불편하고, 관리하기 힘듭니다.<br>스크립트는 프로그래밍 코드를 쪼개서 관리할 수 있도록 도와줍니다.',
+            '이곳에서 추가한 스크립트는 자동으로 해당 씬에 등록됩니다.'
+        ]"
+        :extraActions="extraActions"
+        filename="script.ts"
     />
 </template>
 
 <script lang="ts">
 import path from 'path'
+import increment from 'add-filename-increment'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
-import { getRandomSentence } from '@/Utils/getRandomSentence'
+import GeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/Generator.vue'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
     PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
 } from '@/Const'
-import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
 @Component({
     components: {
-        ExplorerComponent
+        GeneratorComponent
     }
 })
 export default class ScriptListComponent extends Vue {
-    private actions: ContextItemAction[] = [
-        {
-            icon: 'mdi-plus',
-            description: '스크립트 추가',
-            action: (directoryPath: string): void => {
-                this.add(directoryPath)
-            }
-        },
-        {
-            icon: 'mdi-folder-open-outline',
-            description: '폴더 열기',
-            action: (directoryPath: string): void => {
-                this.openPath(directoryPath)
-            }
-        },
+    private cwd: string = path.resolve(
+            this.$store.state.projectDirectory,
+            PROJECT_SRC_DIRECTORY_NAME,
+            PROJECT_SRC_SCENE_DIRECTORY_NAME,
+            this.sceneKey,
+            PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
+        )
+
+    private extraActions: ContextItemAction[] = [
         {
             icon: 'mdi-arrow-left',
             description: '뒤로가기',
             action: (): void => {
                 this.goBack()
             }
-        },
-    ]
-
-    private contextmenus: ContextItemAction[] = [
-        {
-            icon: 'mdi-open-in-new',
-            description: '파일로 이동합니다',
-            action: (filePath: string): void => {
-                ipcRenderer.invoke('show-item', filePath)
-            }
-        },
-        {
-            icon: 'mdi-delete-outline',
-            description: '스크립트를 삭제합니다',
-            action: async (filePath: string): Promise<void> => {
-                const trash: Engine.FileSystem.TrashSuccess|Engine.FileSystem.TrashFail = await ipcRenderer.invoke('trash', filePath, true)
-                if (!trash.success) {
-                    this.$store.dispatch('snackbar', trash.message)
-                }
-            }
         }
     ]
 
-    private get projectDirectory(): string {
-        return this.$store.state.projectDirectory
-    }
-
     private get sceneKey(): string {
         return this.$route.params.key || ''
-    }
-
-    private get cwd(): string {
-        return path.resolve(
-            this.projectDirectory,
-            PROJECT_SRC_DIRECTORY_NAME,
-            PROJECT_SRC_SCENE_DIRECTORY_NAME,
-            this.sceneKey,
-            PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
-        )
     }
 
     private openPath(filePath: string): void {
         shell.openPath(filePath)
     }
 
-    private async add(directoryPath: string): Promise<void> {
-        if (!this.projectDirectory) {
-            return
-        }
+    private async add(filePath: string): Promise<void> {
         if (!this.sceneKey) {
             return
         }
-        const filename: string = getRandomSentence(3)
-        const scriptAdd: Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail = await ipcRenderer.invoke('add-script', directoryPath, this.sceneKey, filename)
+        const scriptAdd: Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail = await ipcRenderer.invoke('add-script', filePath, this.sceneKey)
         if (!scriptAdd.success) {
             this.$store.dispatch('snackbar', scriptAdd.message)
             return

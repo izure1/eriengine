@@ -7,6 +7,7 @@ import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSETLIST_NAME,
     PROJECT_SRC_ANIMSLIST_NAME,
+    PROJECT_SRC_SKILLLIST_NAME,
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
     PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
 } from '@/Const'
@@ -65,6 +66,7 @@ async function ensureFile(projectDirPath: string, key: string): Promise<Engine.F
             content: parseProperty(RAW_SCENE, {
                 PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
                 PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
+                PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name,
                 PROJECT_SRC_SCENE_DIRECTORY_NAME,
                 KEY
             })
