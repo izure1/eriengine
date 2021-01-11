@@ -1,5 +1,7 @@
 import Phaser from 'phaser'
-import Asset from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
+
+import Assets from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
+
 
 /**
  *
@@ -13,7 +15,7 @@ import Asset from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
  */
 
 // 애니메이션에 사용될 스프라이트에셋입니다.
-const assetKey: string = Asset['{{ ASSET_KEY }}']
+const assetKey: string = Assets['{{ ASSET_KEY }}']
 
 // 스프라이트에셋에서 프레임 범위를 지정합니다.
 // 프레임은 0부터 시작합니다.

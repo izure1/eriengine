@@ -55,7 +55,8 @@ import {
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_ASSETLIST_NAME,
     PROJECT_SRC_ANIMATION_DIRECTORY_NAME,
-    PROJECT_SRC_SKILL_DIRECTORY_NAME
+    PROJECT_SRC_SKILL_DIRECTORY_NAME,
+    PROJECT_SRC_ACTOR_DIRECTORY_NAME
 } from '@/Const'
 
 interface ContextmenuGroup {
@@ -73,12 +74,17 @@ export default class ProjectFileListComponent extends Vue {
     private isDrawerOpen: boolean = false
     private contextmenuGroups: ContextmenuGroup[] = [
         {
-            title: '관리',
+            title: '게임',
             menus: [
                 {
                     name: '씬',
                     description: '씬의 메인 파일을 관리합니다',
                     path: '/manager/scene'
+                },
+                {
+                    name: '액터',
+                    description: '액터를 관리합니다',
+                    path: '/manager/actor'
                 },
                 {
                     name: '에셋',
@@ -94,17 +100,17 @@ export default class ProjectFileListComponent extends Vue {
                     name: '스킬',
                     description: '스킬을 관리합니다',
                     path: '/manager/skill'
-                },
-                {
-                    name: '설정',
-                    description: '프로젝트 설정을 변경합니다',
-                    path: `/manager/config`
                 }
             ]
         },
         {
-            title: '기타',
+            title: '프로젝트',
             menus: [
+                {
+                    name: '설정',
+                    description: '설정을 변경합니다',
+                    path: `/manager/config`
+                },
                 {
                     name: '종료',
                     description: '메인화면으로 돌아갑니다',
@@ -147,10 +153,15 @@ export default class ProjectFileListComponent extends Vue {
         const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SKILL_DIRECTORY_NAME)
         const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
 
+        // 액터 디렉토리 감지
+        const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME)
+        const actorWatcher = new FileWatcher(actorDir).update(() => ipcRenderer.invoke('generate-actor-list', this.projectDirectory)).start().emit()
+
         // 애니메이션 디렉토리 감지
         this.watchers.add(assetWatcher)
         this.watchers.add(animsWatcher)
         this.watchers.add(skillWatcher)
+        this.watchers.add(actorWatcher)
     }
 
     private destroyWatchers(): void {

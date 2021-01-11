@@ -3,8 +3,9 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import {
-    PROJECT_SRC_ASSETLIST_NAME,
+    PROJECT_SRC_ACTORLIST_NAME,
     PROJECT_SRC_ANIMSLIST_NAME,
+    PROJECT_SRC_ASSETLIST_NAME,
     PROJECT_SRC_SKILLLIST_NAME
 } from '@/Const'
 
@@ -23,8 +24,9 @@ async function writeScriptFile(filePath: string, sceneKey: string): Promise<Engi
     const KEY:  string          = getSceneKey(sceneKey)
     const fileContent: string   = parseProperty(RAW_SCRIPT, {
         KEY,
-        PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
+        PROJECT_SRC_ACTORLIST_NAME: path.parse(PROJECT_SRC_ACTORLIST_NAME).name,
         PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
+        PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
         PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name
     })
 

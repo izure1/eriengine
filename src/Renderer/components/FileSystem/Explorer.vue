@@ -233,7 +233,8 @@ export default class ExplorerComponent extends Vue {
         if (!path.isAbsolute(filename)) {
             return filename
         }
-        return normalize(filename).replace( normalize(this.currentPath), '' ).substr(1)
+        const result: string = path.relative(this.currentPath, filename)
+        return normalize(result)
     }
 
     private async deleteFile(filename: string): Promise<void> {

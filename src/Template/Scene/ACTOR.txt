@@ -1,0 +1,39 @@
+import { Actor } from 'eriengine-core-plugin-actor'
+
+import Actors from '@/{{ PROJECT_SRC_ACTORLIST_NAME }}'
+import Animations from '@/{{ PROJECT_SRC_ANIMSLIST_NAME }}'
+import Assets from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
+import Skills from '@/{{ PROJECT_SRC_SKILLLIST_NAME }}'
+
+
+export default class SampleActor extends Actor {
+    start(): void {
+        // this.run.useMoveKey('arrow') /* 커서로 액터를 움직일 수 있도록 만듭니다. wasd, arrow 둘 중 택할 수 있습니다. */
+    }
+
+    update(): void {
+        // this.run.stop()
+        // this.playMovingAnimation()
+    }
+
+    end(): void {
+
+    }
+
+    private playMovingAnimation(): void {
+
+        if (this.run.isMovingLeft) {
+            // this.play(Animations[''])
+        }
+        if (this.run.isMovingRight) {
+            // this.play(Animations[''])
+        }
+        if (this.run.isMovingDown) {
+            // this.play(Animations[''])
+        }
+        if (this.run.isMovingUp) {
+            // this.play(Animations[''])
+        }
+
+    }
+}

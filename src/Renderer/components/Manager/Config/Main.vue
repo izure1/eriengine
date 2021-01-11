@@ -19,7 +19,7 @@ import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/File
         ExplorerComponent
     }
 })
-export default class ProjectEditComponent extends Vue {
+export default class ConfigMainComponent extends Vue {
     private actions: ContextItemAction[] = [
         {
             icon: 'mdi-folder-open-outline',

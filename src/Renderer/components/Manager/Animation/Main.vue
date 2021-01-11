@@ -1,5 +1,5 @@
 <template>
-    <generator-component
+    <file-generator-component
         :cwd="cwd"
         :add="add"
         :description="[
@@ -14,7 +14,7 @@
 import path from 'path'
 import normalize from 'normalize-path'
 import increment from 'add-filename-increment'
-import GeneratorComponent from '@/Renderer/components/Manager/Generator.vue'
+import FileGeneratorComponent from '@/Renderer/components/Manager/FileGenerator.vue'
 import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import {
@@ -24,10 +24,10 @@ import {
 
 @Component({
     components: {
-        GeneratorComponent
+        FileGeneratorComponent
     }
 })
-export default class AnimationListComponent extends Vue {
+export default class AnimationMainComponent extends Vue {
     private cwd: string = path.resolve(
         this.$store.state.projectDirectory,
         PROJECT_SRC_DIRECTORY_NAME,

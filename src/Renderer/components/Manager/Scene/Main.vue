@@ -53,7 +53,7 @@ type Rule = (v: string) => boolean|string
         ExplorerComponent
     }
 })
-export default class SceneListComponent extends Vue {
+export default class SceneMainComponent extends Vue {
     private isPromptJobDoing: boolean = false
     private isPromptOpen: boolean = false
     private promptTitle: string = ''

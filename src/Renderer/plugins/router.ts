@@ -6,12 +6,13 @@ import ProjectNew from '@/Renderer/components/Project/New.vue'
 import ProjectOpen from '@/Renderer/components/Project/Open.vue'
 import ProjectClose from '@/Renderer/components/Project/Close.vue'
 import Manager from '@/Renderer/components/Manager/Main.vue'
-import ManagerConfigMain from '@/Renderer/components/Manager/Config/Main.vue'
-import ManagerSceneMain from '@/Renderer/components/Manager/Scene/Main.vue'
-import ManagerScriptList from '@/Renderer/components/Manager/Scene/List/Script.vue'
-import ManagerAssetList from '@/Renderer/components/Manager/Asset/AssetList.vue'
-import ManagerAnimationList from '@/Renderer/components/Manager/Animation/AnimationList.vue'
-import ManagerSkillList from '@/Renderer/components/Manager/Skill/SkillList.vue'
+import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue'
+import ManagerScene from '@/Renderer/components/Manager/Scene/Main.vue'
+import ManagerScript from '@/Renderer/components/Manager/Scene/List/Main.vue'
+import ManagerActor from '@/Renderer/components/Manager/Actor/Main.vue'
+import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue'
+import ManagerAnimation from '@/Renderer/components/Manager/Animation/Main.vue'
+import ManagerSkill from '@/Renderer/components/Manager/Skill/Main.vue'
 
 Vue.use(VueRouter)
 
@@ -41,28 +42,32 @@ const routes: Array<RouteConfig> = [
                 redirect: 'scene'
             },
             {
-                path: 'config',
-                component: ManagerConfigMain
-            },
-            {
                 path: 'scene',
-                component: ManagerSceneMain
+                component: ManagerScene
             },
             {
                 path: 'scene/script/:key',
-                component: ManagerScriptList
+                component: ManagerScript
+            },
+            {
+                path: 'actor',
+                component: ManagerActor
             },
             {
                 path: 'asset',
-                component: ManagerAssetList
+                component: ManagerAsset
             },
             {
                 path: 'animation',
-                component: ManagerAnimationList
+                component: ManagerAnimation
             },
             {
                 path: 'skill',
-                component: ManagerSkillList
+                component: ManagerSkill
+            },
+            {
+                path: 'config',
+                component: ManagerConfig
             },
         ]
     },

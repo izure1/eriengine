@@ -27,7 +27,7 @@ import {
         ExplorerComponent
     }
 })
-export default class AssetListComponent extends Vue {
+export default class AssetMainComponent extends Vue {
     private isLoading: boolean = false
     private currentDirectory: string = this.cwd
     private extensions: string[] = PROJECT_ALLOW_ASSET_EXTENSIONS

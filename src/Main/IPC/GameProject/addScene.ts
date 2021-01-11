@@ -5,11 +5,13 @@ import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ASSETLIST_NAME,
+    PROJECT_SRC_ACTORLIST_NAME,
     PROJECT_SRC_ANIMSLIST_NAME,
+    PROJECT_SRC_ASSETLIST_NAME,
     PROJECT_SRC_SKILLLIST_NAME,
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
+    PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME,
+    PROJECT_SRC_SCENE_MAP_DIRECTORY_NAME
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
@@ -29,7 +31,8 @@ async function ensureDirectory(projectDirPath: string, key: string): Promise<Eng
     const sceneDirPath: string = path.join(sceneRootPath, getSceneKey(key))
     const dirs: string[] = [
         sceneRootPath,
-        path.join(sceneDirPath, PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME)
+        path.join(sceneDirPath, PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME),
+        path.join(sceneDirPath, PROJECT_SRC_SCENE_MAP_DIRECTORY_NAME)
     ]
 
     for (const dir of dirs) {
@@ -62,14 +65,19 @@ async function ensureFile(projectDirPath: string, key: string): Promise<Engine.F
             content: RAW_BASE_SCENE
         },
         {
-            path: path.join(sceneDirPath, `Scene.ts`),
+            path: path.join(sceneDirPath, 'Scene.ts'),
             content: parseProperty(RAW_SCENE, {
-                PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
+                PROJECT_SRC_ACTORLIST_NAME: path.parse(PROJECT_SRC_ACTORLIST_NAME).name,
                 PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
+                PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
                 PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name,
                 PROJECT_SRC_SCENE_DIRECTORY_NAME,
                 KEY
             })
+        },
+        {
+            path: path.join(sceneDirPath, PROJECT_SRC_SCENE_MAP_DIRECTORY_NAME, 'Map.json'),
+            content: JSON.stringify({ })
         }
     ]
 

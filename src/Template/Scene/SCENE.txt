@@ -6,9 +6,11 @@ import { Plugin as DialoguePlugin } from 'eriengine-core-plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from 'eriengine-core-plugin-fog-of-war'
 
 import BaseScene from '@/{{ PROJECT_SRC_SCENE_DIRECTORY_NAME }}/BaseScene'
-import Asset from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
-import Animation from '@/{{ PROJECT_SRC_ANIMSLIST_NAME }}'
-import Skill from '@/{{ PROJECT_SRC_SKILLLIST_NAME }}'
+import Actors from '@/{{ PROJECT_SRC_ACTORLIST_NAME }}'
+import Animations from '@/{{ PROJECT_SRC_ANIMSLIST_NAME }}'
+import Assets from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
+import Skills from '@/{{ PROJECT_SRC_SKILLLIST_NAME }}'
+
 
 /**
  *

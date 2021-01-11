@@ -6,17 +6,17 @@ import {
     PROJECT_SRC_ACTORLIST_NAME,
     PROJECT_SRC_ANIMSLIST_NAME,
     PROJECT_SRC_ASSETLIST_NAME,
-    PROJECT_SRC_SKILLLIST_NAME
+    PROJECT_SRC_SKILLLIST_NAME,
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
-import RAW_SKILL from 'raw-loader!@/Template/Scene/SKILL.txt'
+import RAW_ACTOR from 'raw-loader!@/Template/Scene/ACTOR.txt'
 
 async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_SKILL, {
+    const fileContent: string   = parseProperty(RAW_ACTOR, {
         PROJECT_SRC_ACTORLIST_NAME: path.parse(PROJECT_SRC_ACTORLIST_NAME).name,
-        PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
         PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
+        PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
         PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name
     })
 
@@ -27,28 +27,28 @@ async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.Write
 
     return {
         success: true,
-        name: '스킬 생성 성공',
-        message: '스킬 생성에 성공했습니다',
+        name: '액터 생성 성공',
+        message: '액터 생성에 성공했습니다',
         path: filePath
     }
 }
 
-export async function handler(filePath: string): Promise<Engine.GameProject.AddSkillSuccess|Engine.GameProject.AddSkillFail> {
+export async function handler(filePath: string): Promise<Engine.GameProject.addActorSuccess|Engine.GameProject.addActorFail> {
     const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
-        return directoryEnsure as Engine.GameProject.AddSkillFail
+        return directoryEnsure as Engine.GameProject.addActorFail
     }
 
     const fileWrite = await writeSkillFile(filePath)
     if (!fileWrite.success) {
-        return fileWrite as Engine.GameProject.AddSkillFail
+        return fileWrite as Engine.GameProject.addActorFail
     }
 
     return fileWrite
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-skill', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddSkillSuccess|Engine.GameProject.AddSkillFail> => {
+    ipcMain.handle('add-actor', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.addActorSuccess|Engine.GameProject.addActorFail> => {
         return await handler(filePath)
     })
 }

@@ -1,5 +1,5 @@
 <template>
-    <generator-component
+    <file-generator-component
         :cwd="cwd"
         :add="add"
         :description="[
@@ -17,7 +17,7 @@ import path from 'path'
 import increment from 'add-filename-increment'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
-import GeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/Generator.vue'
+import FileGeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/FileGenerator.vue'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
@@ -26,10 +26,10 @@ import {
 
 @Component({
     components: {
-        GeneratorComponent
+        FileGeneratorComponent
     }
 })
-export default class ScriptListComponent extends Vue {
+export default class ScriptMainComponent extends Vue {
     private cwd: string = path.resolve(
             this.$store.state.projectDirectory,
             PROJECT_SRC_DIRECTORY_NAME,

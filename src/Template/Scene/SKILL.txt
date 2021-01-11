@@ -2,9 +2,11 @@ import Phaser from 'phaser'
 import { Actor } from 'eriengine-core-plugin-actor'
 import { ActorDot } from 'eriengine-core-plugin-actor/dist/actor/src/Actor/ActorDot'
 
-import Asset from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
-import Animation from '@/{{ PROJECT_SRC_ANIMSLIST_NAME }}'
-import Skill from '@/{{ PROJECT_SRC_SKILLLIST_NAME }}'
+import Assets from '@/{{ PROJECT_SRC_ACTORLIST_NAME }}'
+import Animations from '@/{{ PROJECT_SRC_ANIMSLIST_NAME }}'
+import Assets from '@/{{ PROJECT_SRC_ASSETLIST_NAME }}'
+import Skills from '@/{{ PROJECT_SRC_SKILLLIST_NAME }}'
+
 
 /**
  * 

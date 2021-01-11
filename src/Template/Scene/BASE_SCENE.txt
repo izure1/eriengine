@@ -10,16 +10,16 @@ interface EriengineScript {
 
 export default class EriengineScene extends Phaser.Scene {
 
-    protected __preloads!: ScriptCallback[]
-    protected __creates!: ScriptCallback[]
-    protected __updates!: ScriptCallback[]
-    protected __destroys!: ScriptCallback[]
+    protected __preloads!:  ScriptCallback[]
+    protected __creates!:   ScriptCallback[]
+    protected __updates!:   ScriptCallback[]
+    protected __destroys!:  ScriptCallback[]
 
     init(script: EriengineScript): void {
         const { preloads, creates, updates, destroys } = script
         this.__preloads = preloads
-        this.__creates = creates
-        this.__updates = updates
+        this.__creates  = creates
+        this.__updates  = updates
         this.__destroys = destroys
     }
 

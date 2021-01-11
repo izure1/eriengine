@@ -3,6 +3,36 @@ interface GameProjectState extends PathRequired, Engine.ActionState { config: En
 
 declare namespace Engine {
     namespace GameProject {
+        namespace Scene {
+            interface Map {
+                wall: {
+                    [key: string]: [number, number, string]
+                }
+                floor: {
+                    [key: string]: [number, number, string]
+                }
+                actor: {
+                    name: string
+                    x: number
+                    y: number
+                }
+            }
+        }
+    }
+}
+
+declare namespace Engine {
+    namespace GameProject {
+        interface Config extends Engine.Type.Json {
+            ENGINE_AUTH: string
+            ENGINE_VERSION: string
+            PROJECT_NAME: string
+            APPLICATION_ID: string
+            GAME_DISPLAY_SIZE: [number, number]
+            GAME_THEME_TEXT_COLOR: string
+            GAME_THEME_BACKGROUND_COLOR: string
+        }
+
         interface CreateProjectSuccess extends GameProjectState, Engine.ActionSuccessState {}
         interface CreateProjectFail extends Engine.ActionFailState {}
 
@@ -24,26 +54,22 @@ declare namespace Engine {
         interface AddSkillSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddSkillFail extends Engine.ActionFailState {}
 
+        interface addActorSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface addActorFail extends Engine.ActionFailState {}
+
         interface GenerateAnimationListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAnimationListFail extends Engine.ActionFailState {}
 
         interface GenerateSkillListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateSkillListFail extends Engine.ActionFailState {}
 
+        interface GenerateActorListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateActorListFail extends Engine.ActionFailState {}
+
         interface CheckValidProjectSuccess extends Engine.ActionSuccessState {}
         interface CheckValidProjectFail extends Engine.ActionFailState {}
 
         interface GetEngineAuthSuccess extends Engine.ActionSuccessState { auth: string }
         interface GetEngineAuthFail extends Engine.ActionFailState {}
-
-        interface Config extends Engine.Type.Json {
-            ENGINE_AUTH: string
-            ENGINE_VERSION: string
-            PROJECT_NAME: string
-            APPLICATION_ID: string
-            GAME_DISPLAY_SIZE: number[]
-            GAME_THEME_TEXT_COLOR: string
-            GAME_THEME_BACKGROUND_COLOR: string
-        }
     }
 }
