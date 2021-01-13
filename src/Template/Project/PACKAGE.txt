@@ -9,11 +9,11 @@
     },
     "dependencies": {
         "phaser": "^3.50.1",
-        "eriengine-core-plugin-actor": "^1.0.0",
-        "eriengine-core-plugin-isometric-scene": "^1.0.0",
-        "eriengine-core-plugin-isometric-cursor": "^1.0.0",
-        "eriengine-core-plugin-dialogue": "^1.0.0",
-        "eriengine-core-plugin-fog-of-war": "^1.0.0"
+        "@eriengine/plugin-actor": "^1.0.0",
+        "@eriengine/plugin-dialogue": "^1.0.0",
+        "@eriengine/plugin-fog-of-war": "^1.0.0",
+        "@eriengine/plugin-isometric-scene": "^1.0.0",
+        "@eriengine/plugin-isometric-cursor": "^1.0.0"
     },
     "devDependencies": {
         "typescript": "^4.1.3",

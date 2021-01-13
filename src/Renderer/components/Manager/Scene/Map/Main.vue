@@ -9,11 +9,11 @@ import path from 'path'
 import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import Phaser from 'phaser'
-import { Plugin as ActorPlugin, Actor } from 'eriengine-core-plugin-actor'
-import { Plugin as IsometricScenePlugin } from 'eriengine-core-plugin-isometric-scene'
-import { Plugin as IsometricCursorPlugin } from 'eriengine-core-plugin-isometric-cursor'
-import { Plugin as FogOfWarPlugin } from 'eriengine-core-plugin-fog-of-war'
-import { Plugin as DialoguePlugin } from 'eriengine-core-plugin-dialogue'
+import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
+import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
 import Logo from '@/Renderer/assets/logo.png'
 
 class TestActor extends Actor {
@@ -50,7 +50,7 @@ class PreviewScene extends Phaser.Scene {
         // this.fow.setRevealer(this.player, 0x000000, (object): boolean => {
         //     return object instanceof Actor
         // })
-        
+
         this.dialogue.say(null, 'asdfasdfasdfasdl;kfjas;ldkjf;lkasdjfl;jasl;djf;asdkjlfja;sdjfklaj;sdfkl')
     }
 }
