@@ -33,22 +33,22 @@ async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.Write
     }
 }
 
-export async function handler(filePath: string): Promise<Engine.GameProject.addActorSuccess|Engine.GameProject.addActorFail> {
+export async function handler(filePath: string): Promise<Engine.GameProject.AddActorSuccess|Engine.GameProject.AddActorFail> {
     const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
-        return directoryEnsure as Engine.GameProject.addActorFail
+        return directoryEnsure as Engine.GameProject.AddActorFail
     }
 
     const fileWrite = await writeSkillFile(filePath)
     if (!fileWrite.success) {
-        return fileWrite as Engine.GameProject.addActorFail
+        return fileWrite as Engine.GameProject.AddActorFail
     }
 
     return fileWrite
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-actor', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.addActorSuccess|Engine.GameProject.addActorFail> => {
+    ipcMain.handle('add-actor', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddActorSuccess|Engine.GameProject.AddActorFail> => {
         return await handler(filePath)
     })
 }

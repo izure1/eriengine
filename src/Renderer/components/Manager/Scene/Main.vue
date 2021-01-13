@@ -9,7 +9,6 @@
             :preload="10"
             :openDirectory="openSceneFile"
             :contextmenus="contextmenus"
-            @update:structure="setSceneNames"
         />
 
         <v-dialog
@@ -60,7 +59,6 @@ export default class SceneMainComponent extends Vue {
     private promptText: string = ''
     private promptAnswer: string = ''
     private promptRules: Rule[] = []
-    private sceneNames: string[] = []
 
     private actions: ContextItemAction[] = [
         {
@@ -95,6 +93,14 @@ export default class SceneMainComponent extends Vue {
             action: (filePath: string): void => {
                 const key: string = path.basename(filePath)
                 this.$router.replace(`/manager/scene/script/${key}`)
+            }
+        },
+        {
+            icon: 'mdi-pencil-ruler',
+            description: '씬을 꾸밉니다',
+            action: (filePath: string): void => {
+                const key: string = path.basename(filePath)
+                this.$router.replace(`/manager/scene/map/${key}`)
             }
         },
         {
@@ -162,10 +168,6 @@ export default class SceneMainComponent extends Vue {
 
         const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await ipcRenderer.invoke('add-scene', projectDirectory, sceneKey)
         if (!sceneAdd.success) {
-
-            const tmpdir: string = path.join(this.cwd, sceneKey)
-            await ipcRenderer.invoke('delete', tmpdir, false)
-
             this.isPromptJobDoing = false
             this.$store.dispatch('snackbar', sceneAdd.message)
             return
@@ -186,23 +188,9 @@ export default class SceneMainComponent extends Vue {
             '씬 생성하기',
             '씬의 키 값을 설정해주세요.<br>이 값은 다른 씬과 중복되어선 안됩니다.<br><strong>영문과 숫자, 밑줄만 사용할 수 있으며, 영문으로 시작해야 합니다.</strong>',
             [
-                (v: string) => /^[A-Za-z][A-Za-z\d_]*$/g.test(v) || '유효하지 않은 값입니다.',
-                (v: string) => this.sceneNames.indexOf(v.toLowerCase()) === -1 || '이미 존재하는 값입니다.'
+                (v: string) => /^[A-Za-z][A-Za-z\d_]*$/g.test(v) || '유효하지 않은 값입니다.'
             ]
         )
-    }
-
-    private async setSceneNames(): Promise<void> {
-        const dirRead: Engine.FileSystem.ReadDirectorySuccess|Engine.FileSystem.ReadFileFail = await ipcRenderer.invoke('read-directory', this.cwd, { includeFiles: false })
-        if (!dirRead.success) {
-            this.$store.dispatch('snackbar', dirRead.message)
-            return
-        }
-        this.sceneNames = dirRead.files.map((item: string): string => path.dirname(item).toLowerCase())
-    }
-
-    created(): void {
-        this.setSceneNames()
     }
 }
 </script>

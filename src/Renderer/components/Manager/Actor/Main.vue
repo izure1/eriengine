@@ -39,7 +39,7 @@ export default class AnimationMainComponent extends Vue {
     }
 
     private async add(filePath: string): Promise<void> {
-        const actorAdd: Engine.GameProject.addActorSuccess|Engine.GameProject.addActorFail = await ipcRenderer.invoke('add-actor', filePath)
+        const actorAdd: Engine.GameProject.AddActorSuccess|Engine.GameProject.AddActorFail = await ipcRenderer.invoke('add-actor', filePath)
         if (!actorAdd.success) {
             this.$store.dispatch('snackbar', actorAdd.message)
             return

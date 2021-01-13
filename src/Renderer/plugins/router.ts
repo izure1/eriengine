@@ -8,7 +8,9 @@ import ProjectClose from '@/Renderer/components/Project/Close.vue'
 import Manager from '@/Renderer/components/Manager/Main.vue'
 import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue'
 import ManagerScene from '@/Renderer/components/Manager/Scene/Main.vue'
-import ManagerScript from '@/Renderer/components/Manager/Scene/List/Main.vue'
+import ManagerSceneScript from '@/Renderer/components/Manager/Scene/List/Main.vue'
+import ManagerSceneMap from '@/Renderer/components/Manager/Scene/Map/Main.vue'
+import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue'
 import ManagerActor from '@/Renderer/components/Manager/Actor/Main.vue'
 import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue'
 import ManagerAnimation from '@/Renderer/components/Manager/Animation/Main.vue'
@@ -47,7 +49,11 @@ const routes: Array<RouteConfig> = [
             },
             {
                 path: 'scene/script/:key',
-                component: ManagerScript
+                component: ManagerSceneScript
+            },
+            {
+                path: 'scene/map/:key',
+                component: ManagerSceneMap
             },
             {
                 path: 'actor',
@@ -69,6 +75,10 @@ const routes: Array<RouteConfig> = [
                 path: 'config',
                 component: ManagerConfig
             },
+            {
+                path: 'restructure/:cwd',
+                component: ManagerRestructure
+            }
         ]
     },
     {

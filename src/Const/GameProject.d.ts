@@ -3,26 +3,6 @@ interface GameProjectState extends PathRequired, Engine.ActionState { config: En
 
 declare namespace Engine {
     namespace GameProject {
-        namespace Scene {
-            interface Map {
-                wall: {
-                    [key: string]: [number, number, string]
-                }
-                floor: {
-                    [key: string]: [number, number, string]
-                }
-                actor: {
-                    name: string
-                    x: number
-                    y: number
-                }
-            }
-        }
-    }
-}
-
-declare namespace Engine {
-    namespace GameProject {
         interface Config extends Engine.Type.Json {
             ENGINE_AUTH: string
             ENGINE_VERSION: string
@@ -31,6 +11,12 @@ declare namespace Engine {
             GAME_DISPLAY_SIZE: [number, number]
             GAME_THEME_TEXT_COLOR: string
             GAME_THEME_BACKGROUND_COLOR: string
+        }
+
+        interface SceneMap {
+            walls: [number, number, string][],
+            floors: [number, number, string][],
+            actors: { name: string, x: number, y: number }[]
         }
 
         interface CreateProjectSuccess extends GameProjectState, Engine.ActionSuccessState {}
@@ -54,8 +40,8 @@ declare namespace Engine {
         interface AddSkillSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddSkillFail extends Engine.ActionFailState {}
 
-        interface addActorSuccess extends PathRequired, Engine.ActionSuccessState {}
-        interface addActorFail extends Engine.ActionFailState {}
+        interface AddActorSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddActorFail extends Engine.ActionFailState {}
 
         interface GenerateAnimationListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAnimationListFail extends Engine.ActionFailState {}
@@ -71,5 +57,11 @@ declare namespace Engine {
 
         interface GetEngineAuthSuccess extends Engine.ActionSuccessState { auth: string }
         interface GetEngineAuthFail extends Engine.ActionFailState {}
+
+        interface ReadSceneMapSuccess extends PathRequired, Engine.ActionSuccessState { content: SceneMap }
+        interface ReadSceneMapFail extends Engine.ActionFailState {}
+
+        interface WriteSceneMapSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface WriteSceneMapFail extends Engine.ActionFailState {}
     }
 }

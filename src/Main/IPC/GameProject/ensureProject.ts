@@ -1,7 +1,9 @@
 import path from 'path'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import { handler as readDirectory } from '../FileSystem/readDirectory'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
+import { handler as ensureScene } from './ensureScene'
 import { parseProperty } from '@/Utils/parseProperty'
 import { installModuleFromPackage } from '@/Utils/installModule'
 import {
@@ -73,11 +75,11 @@ async function ensureRequireModules(projectDirPath: string, config: Engine.GameP
 export async function handler(directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
     // 디렉토리 생성하기
     const dirs: string[] = [
-        path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME),
-        path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME),
-        path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME),
-        path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME),
-        path.join(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SKILL_DIRECTORY_NAME),
+        path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME),
+        path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME),
+        path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME),
+        path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME),
+        path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SKILL_DIRECTORY_NAME),
     ]
 
     for (const dirPath of dirs) {
@@ -97,6 +99,19 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     const moduleInstall = await ensureRequireModules(directoryPath, config)
     if (!moduleInstall.success) {
         return moduleInstall as Engine.GameProject.CreateProjectFail
+    }
+
+    // 씬 재설정
+    const sceneRootDir: string = path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
+    const sceneDirRead = await readDirectory(sceneRootDir, { includeFiles: false })
+    if (!sceneDirRead.success) {
+        return sceneDirRead as Engine.GameProject.CreateProjectFail
+    }
+    for (const sceneKey of sceneDirRead.files) {
+        const sceneEnsure = await ensureScene(directoryPath, sceneKey)
+        if (!sceneEnsure.success) {
+            return sceneEnsure as Engine.GameProject.CreateProjectFail
+        }
     }
 
     return {

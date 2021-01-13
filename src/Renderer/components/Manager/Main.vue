@@ -74,7 +74,7 @@ export default class ProjectFileListComponent extends Vue {
     private isDrawerOpen: boolean = false
     private contextmenuGroups: ContextmenuGroup[] = [
         {
-            title: '게임',
+            title: '리소스',
             menus: [
                 {
                     name: '씬',
@@ -109,7 +109,12 @@ export default class ProjectFileListComponent extends Vue {
                 {
                     name: '설정',
                     description: '설정을 변경합니다',
-                    path: `/manager/config`
+                    path: '/manager/config'
+                },
+                {
+                    name: '재구성',
+                    description: '프로젝트를 수동으로 재구축합니다',
+                    path: `/manager/restructure/${this.projectDirectory}`
                 },
                 {
                     name: '종료',
@@ -140,6 +145,10 @@ export default class ProjectFileListComponent extends Vue {
 
     private generateWatchers(): void {
         this.destroyWatchers()
+
+        if (!this.projectDirectory) {
+            return
+        }
         
         // 에셋 디렉토리 감지
         const assetDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
@@ -190,5 +199,6 @@ export default class ProjectFileListComponent extends Vue {
     height: calc(100vh - 64px);
     margin-top: 64px !important;
     overflow: auto;
+    overflow-x: hidden;
 }
 </style>

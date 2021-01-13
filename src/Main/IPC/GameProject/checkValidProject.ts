@@ -23,7 +23,6 @@ export async function handler({ ENGINE_AUTH, APPLICATION_ID }: Engine.GameProjec
             return entryped as Engine.GameProject.CheckValidProjectFail
         }
         if (entryped.auth !== ENGINE_AUTH) {
-            console.log(APPLICATION_ID, ENGINE_AUTH, entryped)
             return {
                 success: false,
                 name: '프로젝트 설정 확인 성공',

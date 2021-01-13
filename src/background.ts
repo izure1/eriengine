@@ -5,7 +5,7 @@ import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
-declare var __static: string
+declare const __static: string
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -33,6 +33,7 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/getEngineAuth')
     yield require('./Main/IPC/GameProject/checkValidProject')
     yield require('./Main/IPC/GameProject/addScene')
+    yield require('./Main/IPC/GameProject/ensureScene')
     yield require('./Main/IPC/GameProject/addScript')
     yield require('./Main/IPC/GameProject/addActor')
     yield require('./Main/IPC/GameProject/addAnimation')
@@ -41,6 +42,8 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/generateAnimationList')
     yield require('./Main/IPC/GameProject/generateAssetList')
     yield require('./Main/IPC/GameProject/generateSkillList')
+    yield require('./Main/IPC/GameProject/readSceneMap')
+    yield require('./Main/IPC/GameProject/writeSceneMap')
 
     yield require('./Main/IPC/Process/check-command-exists')
 }
@@ -61,7 +64,7 @@ async function createWindow() {
     // Create the browser window.
     const win = new BrowserWindow({
         width: 1280,
-        height: 600,
+        height: 640,
         webPreferences: {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info

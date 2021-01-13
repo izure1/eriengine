@@ -355,7 +355,7 @@ export default class NewProjectComponent extends Vue {
     private licenseAgree: boolean = false
     private projectName: string = ''
     private applicationId: string = this.setRefreshedDomain()
-    private gameDisplaySize: number[] = [1280, 720]
+    private gameDisplaySize: [number, number] = [1280, 720]
     private gameThemeTextColor: string = '#FFFFFFFF'
     private gameThemeBackgroundColor: string = '#EF007CAA'
 

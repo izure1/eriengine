@@ -3,6 +3,8 @@ interface Module {
     version: string
 }
 
+export const ENGINE_AUTH_SECRETKEY: string = 'eriengine4'
+
 export const PROJECT_ALLOW_ASSET_EXTENSIONS: string[] = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'ogg', 'mp4', 'webm', 'mp4', 'woff', 'woff2' ]
 
 export const PROJECT_DIRECTORY_NAME: string = 'Eriengine Project_{{ PROJECT_NAME }}'
@@ -16,7 +18,7 @@ export const PROJECT_SRC_ACTORLIST_NAME: string = 'ACTOR_LIST.ts'
 export const PROJECT_SRC_DIRECTORY_NAME: string = 'src'
 export const PROJECT_SRC_SCENE_DIRECTORY_NAME: string = 'Scene'
 export const PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME: string = 'Script'
-export const PROJECT_SRC_SCENE_MAP_DIRECTORY_NAME: string = 'Map'
+export const PROJECT_SRC_SCENE_MAP_NAME: string = 'Map.ts'
 export const PROJECT_SRC_ANIMATION_DIRECTORY_NAME: string = 'Animation'
 export const PROJECT_SRC_SKILL_DIRECTORY_NAME: string = 'Skill'
 export const PROJECT_SRC_ASSET_DIRECTORY_NAME: string = 'Asset'
