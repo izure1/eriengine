@@ -8,57 +8,19 @@
 import path from 'path'
 import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
+import NonReactivity from 'vue-nonreactivity-decorator'
+
 import Phaser from 'phaser'
-import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
-import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
-import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
-import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
+import PreviewScene from './Phaser/PreviewScene'
+import createConfig from './Phaser/createConfig'
+
 import Logo from '@/Renderer/assets/logo.png'
 
-class TestActor extends Actor {
-    start(): void {
-        this.bubble.of('name').setOffset('top').emotion('ANNOY')
-        console.log(1)
-    }
-
-    update(): void {
-    }
-
-    end(): void {
-
-    }
-}
-
-class PreviewScene extends Phaser.Scene {
-    private isometric!: IsometricScenePlugin
-    private cursor!: IsometricCursorPlugin
-    private actor!: ActorPlugin
-    private fow!: FogOfWarPlugin
-    private dialogue!: DialoguePlugin
-
-    private player: TestActor|null = null
-
-    preload(): void {
-        this.load.image('test', Logo)
-    }
-
-    create(): void {
-        this.player = this.actor.addActor(TestActor, this, 300, 300, 'test')
-
-        this.cursor.enable(true)
-        // this.fow.setRevealer(this.player, 0x000000, (object): boolean => {
-        //     return object instanceof Actor
-        // })
-
-        this.dialogue.say(null, 'asdfasdfasdfasdl;kfjas;ldkjf;lkasdjfl;jasl;djf;asdkjlfja;sdjfklaj;sdfkl')
-    }
-}
 
 @Component
 export default class SceneMapEditor extends Vue {
+    @NonReactivity(null) private game!: Phaser.Game|null
     private map!: Engine.GameProject.SceneMap
-    private game: Phaser.Game|null = null
 
     private get sceneKey(): string {
         return this.$route.params.key || ''
@@ -93,60 +55,8 @@ export default class SceneMapEditor extends Vue {
     private async createGame(): Promise<void> {
         const [ width, height ] = this.projectConfig.GAME_DISPLAY_SIZE
 
-        this.game = new Phaser.Game({
-            type: Phaser.WEBGL,
-            width,
-            height,
-            scene: [ PreviewScene ],
-            scale: {
-                parent: this.canvasParent,
-                fullscreenTarget: this.canvasParent,
-                zoom: 1
-            },
-            dom: {
-                createContainer: true
-            },
-            plugins: {
-                global: [
-                    {
-                        key: 'DialoguePlugin',
-                        mapping: 'dialogue',
-                        plugin: DialoguePlugin
-                    }
-                ],
-                scene: [
-                    {
-                        key: 'ActorPlugin',
-                        mapping: 'actor',
-                        plugin: ActorPlugin
-                    },
-                    {
-                        key: 'IsometricScenePlugin',
-                        mapping: 'isometric',
-                        plugin: IsometricScenePlugin
-                    },
-                    {
-                        key: 'IsometricCursorPlugin',
-                        mapping: 'cursor',
-                        plugin: IsometricCursorPlugin,
-                    },
-                    {
-                        key: 'FogOfWarPlugin',
-                        mapping: 'fow',
-                        plugin: FogOfWarPlugin,
-                    }
-                ]
-            },
-            physics: {
-                default: 'matter',
-                matter: {
-                    gravity: {
-                        x: 0,
-                        y: 0
-                    }
-                }
-            }
-        })
+        const config = createConfig(width, height, [ PreviewScene ], this.canvasParent)
+        this.game = new Phaser.Game(config)
 
         this.resizeCanvas()
     }

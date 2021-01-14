@@ -34,8 +34,9 @@ export default class AnimationMainComponent extends Vue {
         PROJECT_SRC_ACTOR_DIRECTORY_NAME
     )
 
-    private openPath(filePath: string): void {
-        shell.openPath(filePath)
+    private showPath(filePath: string): void {
+        filePath = path.resolve(filePath)
+        shell.showItemInFolder(filePath)
     }
 
     private async add(filePath: string): Promise<void> {
@@ -44,7 +45,7 @@ export default class AnimationMainComponent extends Vue {
             this.$store.dispatch('snackbar', actorAdd.message)
             return
         }
-        this.openPath(filePath)
+        this.showPath(filePath)
     }
 }
 </script>

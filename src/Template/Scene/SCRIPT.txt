@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { Actor } from 'eriengine-core-plugin-actor'
+import { Actor } from '@eriengine/plugin-actor'
 import Scene from '@/Scene/{{ KEY }}/Scene'
 
 import Actors from '@/{{ PROJECT_SRC_ACTORLIST_NAME }}'

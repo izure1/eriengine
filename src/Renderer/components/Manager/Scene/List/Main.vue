@@ -52,8 +52,9 @@ export default class ScriptMainComponent extends Vue {
         return this.$route.params.key || ''
     }
 
-    private openPath(filePath: string): void {
-        shell.openPath(filePath)
+    private showPath(filePath: string): void {
+        filePath = path.resolve(filePath)
+        shell.showItemInFolder(filePath)
     }
 
     private async add(filePath: string): Promise<void> {
@@ -66,7 +67,7 @@ export default class ScriptMainComponent extends Vue {
             return
         }
 
-        this.openPath(scriptAdd.path)
+        this.showPath(scriptAdd.path)
     }
 
     private goBack(): void {

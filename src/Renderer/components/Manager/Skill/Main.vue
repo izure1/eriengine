@@ -32,8 +32,9 @@ export default class SkillMainComponent extends Vue {
         PROJECT_SRC_SKILL_DIRECTORY_NAME
     )
 
-    private openPath(filePath: string): void {
-        shell.openPath(filePath)
+    private showPath(filePath: string): void {
+        filePath = path.resolve(filePath)
+        shell.showItemInFolder(filePath)
     }
 
     private async add(filePath: string): Promise<void> {
@@ -43,7 +44,7 @@ export default class SkillMainComponent extends Vue {
             return
         }
 
-        this.openPath(skillAdd.path)
+        this.showPath(skillAdd.path)
     }
 }
 </script>
