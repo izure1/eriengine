@@ -116,6 +116,11 @@
                         <v-stepper-content step="4">
                             <v-card>
                                 <v-card-title>애플리케이션 ID 정하기</v-card-title>
+                                <v-alert type="warning" tile prominent class="caption">
+                                    <strong class="subtitle-1">이 값은 나중에 변경할 수 없습니다.</strong>
+                                    <br>
+                                    원한다면 직접 수정할 수 있지만, 잘 모른다면 건드리지 마십시오.
+                                </v-alert>
                                 <v-card-text>
                                     <p>
                                         애플리케이션 ID는 당신이 만들 게임의 고유한 식별자입니다. 주민등록번호라고 생각해도 좋습니다.
@@ -123,8 +128,6 @@
                                         따라서 애플리케이션 ID는 타인의 것과 중복되어선 안됩니다.
                                         <br>
                                         이러한 중복을 피하기 위해, 에리엔진은 최대한 랜덤한 아이디를 생성합니다.
-                                        <br>
-                                        원한다면 직접 수정할 수 있지만, <strong>잘 모른다면 건드리지 마십시오.</strong>
                                     </p>
                                     <ol class="caption">
                                         <li>이름은 두 개 이상의 세그먼트(한 개 이상의 점)로 구성해야 합니다.</li>
@@ -160,14 +163,16 @@
                                 <v-card-title>해상도 설정하기</v-card-title>
                                 <v-card-text>
                                     <p>
-                                        게임이 기본 크기를 지정합니다.
-                                        <br>
+                                        게임의 기본 크기를 지정합니다.
+                                    </p>
+                                    <p>
                                         해상도가 크면 에셋의 크기 또한 커져야하므로 용량과 사양이 높아지지만 다양한 모니터에서 선명하게 보일 것입니다.
                                         <br>
                                         해상도가 낮으면 용량과 사양은 낮아지지만 보다 높은 해상도를 가진 모니터에서는 늘어나 보일 것입니다.
                                         <br>
                                         플레이어의 디바이스 환경을 생각해, 절충안을 선택하십시오.
-                                        <br>
+                                    </p>
+                                    <p>
                                         이 크기는 나중에 직접 변경할 수 있습니다.
                                     </p>
                                     <div class="text-center">
@@ -430,15 +435,21 @@ export default class NewProjectComponent extends Vue {
 
         this.goNextStep()
 
-        const engineAuth: Engine.GameProject.GetEngineAuthSuccess|Engine.GameProject.GetEngineAuthFail = await ipcRenderer.invoke('get-engine-auth', this.applicationId)
+        const engineAuth: Engine.Process.GetEngineAuthSuccess|Engine.Process.GetEngineAuthFail = await ipcRenderer.invoke('get-engine-auth', this.applicationId)
         if (!engineAuth.success) {
             this.$store.dispatch('snackbar', engineAuth.message)
             return 
         }
 
+        const engineVersion: Engine.Process.GetEngineVersionSuccess|Engine.Process.GetEngineVersionFail = await ipcRenderer.invoke('get-engine-version')
+        if (!engineVersion.success) {
+            this.$store.dispatch('snackbar', engineVersion.message)
+            return
+        }
+
         const config: Engine.GameProject.Config = {
             ENGINE_AUTH: engineAuth.auth,
-            ENGINE_VERSION: remote.app.getVersion(),
+            ENGINE_VERSION: engineVersion.version,
             PROJECT_NAME: this.projectName,
             APPLICATION_ID: this.applicationId,
             GAME_DISPLAY_SIZE: this.gameDisplaySize,

@@ -5,10 +5,10 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { PROJECT_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
-import RAW_SKILL from 'raw-loader!@/Template/Scene/SKILL.txt'
+import RAW_AUDIO from 'raw-loader!@/Template/Scene/AUDIO.txt'
 
-async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_SKILL, {
+async function writeSpriteFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+    const fileContent: string   = parseProperty(RAW_AUDIO, {
         PROJECT_LISTS
     })
 
@@ -19,28 +19,28 @@ async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.Write
 
     return {
         success: true,
-        name: '스킬 생성 성공',
-        message: '스킬 생성에 성공했습니다',
+        name: '오디오 생성 성공',
+        message: '오디오 생성에 성공했습니다',
         path: filePath
     }
 }
 
-export async function handler(filePath: string): Promise<Engine.GameProject.AddSkillSuccess|Engine.GameProject.AddSkillFail> {
+export async function handler(filePath: string): Promise<Engine.GameProject.AddAudioSuccess|Engine.GameProject.AddAudioFail> {
     const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
-        return directoryEnsure as Engine.GameProject.AddSkillFail
+        return directoryEnsure as Engine.GameProject.AddAudioFail
     }
 
-    const fileWrite = await writeSkillFile(filePath)
+    const fileWrite = await writeSpriteFile(filePath)
     if (!fileWrite.success) {
-        return fileWrite as Engine.GameProject.AddSkillFail
+        return fileWrite as Engine.GameProject.AddAudioFail
     }
 
     return fileWrite
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-skill', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddSkillSuccess|Engine.GameProject.AddSkillFail> => {
+    ipcMain.handle('add-audio', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddAudioSuccess|Engine.GameProject.AddAudioFail> => {
         return await handler(filePath)
     })
 }

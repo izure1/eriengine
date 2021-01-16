@@ -6,10 +6,7 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { handler as writeSceneMap } from './writeSceneMap'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ACTORLIST_NAME,
-    PROJECT_SRC_ANIMSLIST_NAME,
-    PROJECT_SRC_ASSETLIST_NAME,
-    PROJECT_SRC_SKILLLIST_NAME,
+    PROJECT_LISTS,
     PROJECT_SRC_SCENE_DIRECTORY_NAME,
     PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME,
     PROJECT_SRC_SCENE_MAP_NAME
@@ -67,12 +64,9 @@ async function ensureFile(projectDirPath: string, key: string): Promise<Engine.F
         {
             path: path.join(sceneDirPath, 'Scene.ts'),
             content: parseProperty(RAW_SCENE, {
-                PROJECT_SRC_ACTORLIST_NAME: path.parse(PROJECT_SRC_ACTORLIST_NAME).name,
-                PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
-                PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
-                PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name,
+                KEY,
+                PROJECT_LISTS,
                 PROJECT_SRC_SCENE_DIRECTORY_NAME,
-                KEY
             })
         },
         {

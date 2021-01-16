@@ -30,7 +30,6 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/createProject')
     yield require('./Main/IPC/GameProject/ensureProject')
     yield require('./Main/IPC/GameProject/readProject')
-    yield require('./Main/IPC/GameProject/getEngineAuth')
     yield require('./Main/IPC/GameProject/checkValidProject')
     yield require('./Main/IPC/GameProject/addScene')
     yield require('./Main/IPC/GameProject/ensureScene')
@@ -38,14 +37,24 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/addActor')
     yield require('./Main/IPC/GameProject/addAnimation')
     yield require('./Main/IPC/GameProject/addSkill')
+    yield require('./Main/IPC/GameProject/addSprite')
+    yield require('./Main/IPC/GameProject/addImage')
+    yield require('./Main/IPC/GameProject/addAudio')
+    yield require('./Main/IPC/GameProject/addVideo')
     yield require('./Main/IPC/GameProject/generateActorList')
     yield require('./Main/IPC/GameProject/generateAnimationList')
     yield require('./Main/IPC/GameProject/generateAssetList')
     yield require('./Main/IPC/GameProject/generateSkillList')
+    yield require('./Main/IPC/GameProject/generateSpriteList')
+    yield require('./Main/IPC/GameProject/generateImageList')
+    yield require('./Main/IPC/GameProject/generateAudioList')
+    yield require('./Main/IPC/GameProject/generateVideoList')
     yield require('./Main/IPC/GameProject/readSceneMap')
     yield require('./Main/IPC/GameProject/writeSceneMap')
-
-    yield require('./Main/IPC/Process/check-command-exists')
+    
+    yield require('./Main/IPC/Process/checkCommandExists')
+    yield require('./Main/IPC/Process/getEngineAuth')
+    yield require('./Main/IPC/Process/getEngineVersion')
 }
 
 // IPC 함수를 실행합니다.
@@ -68,7 +77,8 @@ async function createWindow() {
         webPreferences: {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-            nodeIntegration: true
+            nodeIntegration: true,
+            webSecurity: false
         },
         icon: path.resolve(__static, 'icon-cube.png')
     })

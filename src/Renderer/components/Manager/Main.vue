@@ -54,8 +54,13 @@ import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_ASSETLIST_NAME,
-    PROJECT_SRC_ANIMATION_DIRECTORY_NAME,
-    PROJECT_SRC_SKILL_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME,
     PROJECT_SRC_ACTOR_DIRECTORY_NAME
 } from '@/Const'
 
@@ -74,7 +79,7 @@ export default class ProjectFileListComponent extends Vue {
     private isDrawerOpen: boolean = false
     private contextmenuGroups: ContextmenuGroup[] = [
         {
-            title: '리소스',
+            title: '월드',
             menus: [
                 {
                     name: '씬',
@@ -85,11 +90,36 @@ export default class ProjectFileListComponent extends Vue {
                     name: '액터',
                     description: '액터를 관리합니다',
                     path: '/manager/actor'
-                },
+                }
+            ]
+        },
+        {
+            title: '데이터',
+            menus: [
                 {
                     name: '에셋',
                     description: '에셋을 관리합니다',
                     path: '/manager/asset'
+                },
+                {
+                    name: '이미지',
+                    description: '이미지를 관리합니다',
+                    path: '/manager/image'
+                },
+                {
+                    name: '스프라이트',
+                    description: '스프라이트를 관리합니다',
+                    path: '/manager/sprite'
+                },
+                {
+                    name: '오디오',
+                    description: '오디오를 관리합니다',
+                    path: '/manager/audio'
+                },
+                {
+                    name: '비디오',
+                    description: '비디오를 관리합니다',
+                    path: '/manager/video'
                 },
                 {
                     name: '애니메이션',
@@ -155,22 +185,42 @@ export default class ProjectFileListComponent extends Vue {
         const assetWatcher = new FileWatcher(assetDir).update(() => ipcRenderer.invoke('generate-asset-list', this.projectDirectory)).start().emit()
 
         // 애니메이션 디렉토리 감지
-        const animsDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME)
+        const animsDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME)
         const animsWatcher = new FileWatcher(animsDir).update(() => ipcRenderer.invoke('generate-animation-list', this.projectDirectory)).start().emit()
 
         // 스킬 디렉토리 감지
-        const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SKILL_DIRECTORY_NAME)
+        const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME)
         const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
 
         // 액터 디렉토리 감지
         const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME)
         const actorWatcher = new FileWatcher(actorDir).update(() => ipcRenderer.invoke('generate-actor-list', this.projectDirectory)).start().emit()
 
-        // 애니메이션 디렉토리 감지
+        // 스프라이트 디렉토리 감지
+        const spriteDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME)
+        const spriteWatcher = new FileWatcher(spriteDir).update(() => ipcRenderer.invoke('generate-sprite-list', this.projectDirectory)).start().emit()
+
+        // 이미지 디렉토리 감지
+        const imageDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME)
+        const imageWatcher = new FileWatcher(imageDir).update(() => ipcRenderer.invoke('generate-image-list', this.projectDirectory)).start().emit()
+
+        // 오디오 디렉토리 감지
+        const audioDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME)
+        const audioWatcher = new FileWatcher(audioDir).update(() => ipcRenderer.invoke('generate-audio-list', this.projectDirectory)).start().emit()
+
+        // 비디오 디렉토리 감지
+        const videoDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME)
+        const videoWatcher = new FileWatcher(videoDir).update(() => ipcRenderer.invoke('generate-video-list', this.projectDirectory)).start().emit()
+
+        // 디렉토리 감지
         this.watchers.add(assetWatcher)
         this.watchers.add(animsWatcher)
         this.watchers.add(skillWatcher)
         this.watchers.add(actorWatcher)
+        this.watchers.add(spriteWatcher)
+        this.watchers.add(imageWatcher)
+        this.watchers.add(audioWatcher)
+        this.watchers.add(videoWatcher)
     }
 
     private destroyWatchers(): void {

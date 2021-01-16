@@ -17,7 +17,8 @@ import { Vue, Component } from 'vue-property-decorator'
 import FileGeneratorComponent from '@/Renderer/components/Manager/FileGenerator.vue'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_SKILL_DIRECTORY_NAME
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME
 } from '@/Const'
 
 @Component({
@@ -29,7 +30,8 @@ export default class SkillMainComponent extends Vue {
     private cwd: string = path.resolve(
         this.$store.state.projectDirectory,
         PROJECT_SRC_DIRECTORY_NAME,
-        PROJECT_SRC_SKILL_DIRECTORY_NAME
+        PROJECT_SRC_DATA_DIRECTORY_NAME,
+        PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME
     )
 
     private showPath(filePath: string): void {

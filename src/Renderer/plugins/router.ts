@@ -13,8 +13,12 @@ import ManagerSceneMap from '@/Renderer/components/Manager/Scene/Map/Main.vue'
 import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue'
 import ManagerActor from '@/Renderer/components/Manager/Actor/Main.vue'
 import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue'
-import ManagerAnimation from '@/Renderer/components/Manager/Animation/Main.vue'
-import ManagerSkill from '@/Renderer/components/Manager/Skill/Main.vue'
+import ManagerAnimation from '@/Renderer/components/Manager/Data/Animation/Main.vue'
+import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue'
+import ManagerSprite from '@/Renderer/components/Manager/Data/Sprite/Main.vue'
+import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue'
+import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
+import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
 
 Vue.use(VueRouter)
 
@@ -70,6 +74,22 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'skill',
                 component: ManagerSkill
+            },
+            {
+                path: 'sprite',
+                component: ManagerSprite
+            },
+            {
+                path: 'image',
+                component: ManagerImage
+            },
+            {
+                path: 'audio',
+                component: ManagerAudio
+            },
+            {
+                path: 'video',
+                component: ManagerVideo
             },
             {
                 path: 'config',

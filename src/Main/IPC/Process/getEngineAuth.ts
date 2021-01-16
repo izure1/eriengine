@@ -1,7 +1,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { SHA256 } from 'crypto-js'
 
-export async function handler(applicationId: string): Promise<Engine.GameProject.GetEngineAuthSuccess|Engine.GameProject.GetEngineAuthFail> {
+export async function handler(applicationId: string): Promise<Engine.Process.GetEngineAuthSuccess|Engine.Process.GetEngineAuthFail> {
     try {
         const auth: string = SHA256(applicationId).toString()
         return {
@@ -21,7 +21,7 @@ export async function handler(applicationId: string): Promise<Engine.GameProject
 }
 
 export function ipc(): void {
-    ipcMain.handle('get-engine-auth', async (e: IpcMainInvokeEvent, applicationId: string): Promise<Engine.GameProject.GetEngineAuthSuccess|Engine.GameProject.GetEngineAuthFail> => {
+    ipcMain.handle('get-engine-auth', async (e: IpcMainInvokeEvent, applicationId: string): Promise<Engine.Process.GetEngineAuthSuccess|Engine.Process.GetEngineAuthFail> => {
         return await handler(applicationId)
     })
 }

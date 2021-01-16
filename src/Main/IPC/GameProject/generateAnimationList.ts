@@ -6,12 +6,13 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { getEnumContentFromArray } from '@/Utils/getEnumContentFromArray'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ANIMATION_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME,
     PROJECT_SRC_ANIMSLIST_NAME
 } from '@/Const'
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.GenerateAnimationListSuccess|Engine.GameProject.GenerateAnimationListFail> {
-    const cwd: string       = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMATION_DIRECTORY_NAME))
+    const cwd: string       = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME))
     const listPath: string  = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ANIMSLIST_NAME))
 
     try {

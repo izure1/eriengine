@@ -43,6 +43,18 @@ declare namespace Engine {
         interface AddActorSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddActorFail extends Engine.ActionFailState {}
 
+        interface AddSpriteSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddSpriteFail extends Engine.ActionFailState {}
+
+        interface AddImageSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddImageFail extends Engine.ActionFailState {}
+
+        interface AddAudioSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddAudioFail extends Engine.ActionFailState {}
+
+        interface AddVideoSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddVideoFail extends Engine.ActionFailState {}
+
         interface GenerateAnimationListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAnimationListFail extends Engine.ActionFailState {}
 
@@ -52,11 +64,20 @@ declare namespace Engine {
         interface GenerateActorListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateActorListFail extends Engine.ActionFailState {}
 
+        interface GenerateSpriteListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateSpriteListFail extends Engine.ActionFailState {}
+
+        interface GenerateImageListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateImageListFail extends Engine.ActionFailState {}
+
+        interface GenerateAudioListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateAudioListFail extends Engine.ActionFailState {}
+
+        interface GenerateVideoListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateVideoListFail extends Engine.ActionFailState {}
+
         interface CheckValidProjectSuccess extends Engine.ActionSuccessState {}
         interface CheckValidProjectFail extends Engine.ActionFailState {}
-
-        interface GetEngineAuthSuccess extends Engine.ActionSuccessState { auth: string }
-        interface GetEngineAuthFail extends Engine.ActionFailState {}
 
         interface ReadSceneMapSuccess extends PathRequired, Engine.ActionSuccessState { content: SceneMap }
         interface ReadSceneMapFail extends Engine.ActionFailState {}

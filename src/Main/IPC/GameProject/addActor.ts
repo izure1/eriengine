@@ -2,22 +2,14 @@ import path from 'path'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
-import {
-    PROJECT_SRC_ACTORLIST_NAME,
-    PROJECT_SRC_ANIMSLIST_NAME,
-    PROJECT_SRC_ASSETLIST_NAME,
-    PROJECT_SRC_SKILLLIST_NAME,
-} from '@/Const'
+import { PROJECT_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
 import RAW_ACTOR from 'raw-loader!@/Template/Scene/ACTOR.txt'
 
 async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_ACTOR, {
-        PROJECT_SRC_ACTORLIST_NAME: path.parse(PROJECT_SRC_ACTORLIST_NAME).name,
-        PROJECT_SRC_ASSETLIST_NAME: path.parse(PROJECT_SRC_ASSETLIST_NAME).name,
-        PROJECT_SRC_ANIMSLIST_NAME: path.parse(PROJECT_SRC_ANIMSLIST_NAME).name,
-        PROJECT_SRC_SKILLLIST_NAME: path.parse(PROJECT_SRC_SKILLLIST_NAME).name
+        PROJECT_LISTS
     })
 
     const fileWrite = await writeFile(filePath, fileContent)

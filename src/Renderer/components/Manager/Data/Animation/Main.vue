@@ -19,7 +19,8 @@ import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ANIMATION_DIRECTORY_NAME
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME
 } from '@/Const'
 
 @Component({
@@ -31,7 +32,8 @@ export default class AnimationMainComponent extends Vue {
     private cwd: string = path.resolve(
         this.$store.state.projectDirectory,
         PROJECT_SRC_DIRECTORY_NAME,
-        PROJECT_SRC_ANIMATION_DIRECTORY_NAME
+        PROJECT_SRC_DATA_DIRECTORY_NAME,
+        PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME
     )
 
     private showPath(filePath: string): void {

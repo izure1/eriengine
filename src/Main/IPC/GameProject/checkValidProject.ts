@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { handler as getEngineAuth } from './getEngineAuth'
+import { handler as getEngineAuth } from '../Process/getEngineAuth'
 
 export async function handler({ ENGINE_AUTH, APPLICATION_ID }: Engine.GameProject.Config): Promise<Engine.GameProject.CheckValidProjectSuccess|Engine.GameProject.CheckValidProjectFail> {
     if (!ENGINE_AUTH) {
