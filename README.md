@@ -1,5 +1,6 @@
 # 에리엔진
-에리엔진은 간단한 쿼터뷰 게임을 구현하도록 도와주는 게임 엔진입니다.
+에리엔진은 간단한 쿼터뷰 게임을 구현하도록 도와주는 게임 엔진입니다.  
+[Phaser3](https://github.com/photonstorm/phaser) 라이브러리를 사용하여 HTML 캔버스로 구현됩니다.
 
 ## 지원 프로그래밍 언어
 * [타입스크립트](https://www.typescriptlang.org/) **(권장)**
@@ -20,8 +21,8 @@
 
 1. [Node.js](https://nodejs.org/ko/download/)를 설치합니다.
 2. 본 저장소에서 [에리엔진 소스코드를 다운](https://github.com/izure1/eriengine4/archive/master.zip)받습니다.
-3. 다운받은 소스코드 디렉토리에서 `npm i` 명령어를 호출하여 의존모듈을 다운받습니다.
-4. 이후 `npm run electron:build` 명령어를 호출하여 빌드합니다.
+3. 다운받은 소스코드 디렉토리에서 `npm i` 명령어를 호출하여 의존모듈을 설치합니다.
+4. 이후 `npm run electron:build` 명령어를 호출하여 엔진을 빌드합니다.
 
 다만 에리엔진은 Windows10 환경에서 제작되었으며, 다른 운영체제의 정상적인 작동을 보장하지 않습니다.
 
