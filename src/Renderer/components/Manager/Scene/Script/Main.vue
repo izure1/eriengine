@@ -20,8 +20,8 @@ import { ipcRenderer, shell } from 'electron'
 import FileGeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/FileGenerator.vue'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
+    // PROJECT_SRC_STORAGE_DIRECTORY_NAME,
+    // PROJECT_SRC_STORAGE_SCRIPT_DIRECTORY_NAME
 } from '@/Const'
 
 @Component({
@@ -32,10 +32,10 @@ import {
 export default class ScriptMainComponent extends Vue {
     private cwd: string = path.resolve(
             this.$store.state.projectDirectory,
-            PROJECT_SRC_DIRECTORY_NAME,
-            PROJECT_SRC_SCENE_DIRECTORY_NAME,
+            // PROJECT_SRC_DIRECTORY_NAME,
+            // PROJECT_SRC_STORAGE_DIRECTORY_NAME,
             this.sceneKey,
-            PROJECT_SRC_SCENE_SCRIPT_DIRECTORY_NAME
+            //PROJECT_SRC_STORAGE_SCRIPT_DIRECTORY_NAME
         )
 
     private extraActions: ContextItemAction[] = [

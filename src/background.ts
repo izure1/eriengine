@@ -11,6 +11,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 
 
 function *generateIPC() {
+    // File system
     yield require('./Main/IPC/FileSystem/readDirectory')
     yield require('./Main/IPC/FileSystem/openDirectory')
     yield require('./Main/IPC/FileSystem/openFile')
@@ -27,12 +28,13 @@ function *generateIPC() {
     yield require('./Main/IPC/FileSystem/trash')
     yield require('./Main/IPC/FileSystem/showItem')
 
+    // Game project
     yield require('./Main/IPC/GameProject/createProject')
     yield require('./Main/IPC/GameProject/ensureProject')
     yield require('./Main/IPC/GameProject/readProject')
     yield require('./Main/IPC/GameProject/checkValidProject')
+
     yield require('./Main/IPC/GameProject/addScene')
-    yield require('./Main/IPC/GameProject/ensureScene')
     yield require('./Main/IPC/GameProject/addScript')
     yield require('./Main/IPC/GameProject/addActor')
     yield require('./Main/IPC/GameProject/addAnimation')
@@ -41,7 +43,9 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/addImage')
     yield require('./Main/IPC/GameProject/addAudio')
     yield require('./Main/IPC/GameProject/addVideo')
+
     yield require('./Main/IPC/GameProject/generateActorList')
+    yield require('./Main/IPC/GameProject/generateSceneList')
     yield require('./Main/IPC/GameProject/generateAnimationList')
     yield require('./Main/IPC/GameProject/generateAssetList')
     yield require('./Main/IPC/GameProject/generateSkillList')
@@ -49,9 +53,19 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/generateImageList')
     yield require('./Main/IPC/GameProject/generateAudioList')
     yield require('./Main/IPC/GameProject/generateVideoList')
+
+    yield require('./Main/IPC/GameProject/addStorage')
+    yield require('./Main/IPC/GameProject/addStorageDirectory')
+    yield require('./Main/IPC/GameProject/addStorageFile')
+    yield require('./Main/IPC/GameProject/addStorageJSON')
+    yield require('./Main/IPC/GameProject/readStorageFile')
+    yield require('./Main/IPC/GameProject/readStorageJSON')
+    yield require('./Main/IPC/GameProject/checkStorageExists')
+
     yield require('./Main/IPC/GameProject/readSceneMap')
     yield require('./Main/IPC/GameProject/writeSceneMap')
     
+    // Process
     yield require('./Main/IPC/Process/checkCommandExists')
     yield require('./Main/IPC/Process/getEngineAuth')
     yield require('./Main/IPC/Process/getEngineVersion')
@@ -74,6 +88,7 @@ async function createWindow() {
     const win = new BrowserWindow({
         width: 1280,
         height: 640,
+        show: false,
         webPreferences: {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -92,6 +107,9 @@ async function createWindow() {
         // Load the index.html when not in development
         win.loadURL('app://./index.html')
     }
+
+    win.setMenu(null)
+    win.once('ready-to-show', win.show)
 }
 
 // Quit when all windows are closed.

@@ -53,7 +53,6 @@ import { FileWatcher } from '@/Utils/FileWatcher'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
-    PROJECT_SRC_ASSETLIST_NAME,
     PROJECT_SRC_DATA_DIRECTORY_NAME,
     PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME,
     PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME,
@@ -61,7 +60,8 @@ import {
     PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME,
-    PROJECT_SRC_ACTOR_DIRECTORY_NAME
+    PROJECT_SRC_ACTOR_DIRECTORY_NAME,
+    PROJECT_SRC_SCENE_DIRECTORY_NAME
 } from '@/Const'
 
 interface ContextmenuGroup {
@@ -184,6 +184,14 @@ export default class ProjectFileListComponent extends Vue {
         const assetDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
         const assetWatcher = new FileWatcher(assetDir).update(() => ipcRenderer.invoke('generate-asset-list', this.projectDirectory)).start().emit()
 
+        // 씬 디렉토리 감지
+        const sceneDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
+        const sceneWatcher = new FileWatcher(sceneDir).update(() => ipcRenderer.invoke('generate-scene-list', this.projectDirectory)).start().emit()
+
+        // 액터 디렉토리 감지
+        const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME)
+        const actorWatcher = new FileWatcher(actorDir).update(() => ipcRenderer.invoke('generate-actor-list', this.projectDirectory)).start().emit()
+
         // 애니메이션 디렉토리 감지
         const animsDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME)
         const animsWatcher = new FileWatcher(animsDir).update(() => ipcRenderer.invoke('generate-animation-list', this.projectDirectory)).start().emit()
@@ -191,10 +199,6 @@ export default class ProjectFileListComponent extends Vue {
         // 스킬 디렉토리 감지
         const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME)
         const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
-
-        // 액터 디렉토리 감지
-        const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME)
-        const actorWatcher = new FileWatcher(actorDir).update(() => ipcRenderer.invoke('generate-actor-list', this.projectDirectory)).start().emit()
 
         // 스프라이트 디렉토리 감지
         const spriteDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME)
@@ -214,9 +218,10 @@ export default class ProjectFileListComponent extends Vue {
 
         // 디렉토리 감지
         this.watchers.add(assetWatcher)
+        this.watchers.add(actorWatcher)
+        this.watchers.add(sceneWatcher)
         this.watchers.add(animsWatcher)
         this.watchers.add(skillWatcher)
-        this.watchers.add(actorWatcher)
         this.watchers.add(spriteWatcher)
         this.watchers.add(imageWatcher)
         this.watchers.add(audioWatcher)

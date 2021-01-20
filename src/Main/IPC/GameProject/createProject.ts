@@ -3,12 +3,18 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as ensureProject } from './ensureProject'
 import { handler as addScene } from './addScene'
 import { parseProperty } from '@/Utils/parseProperty'
-import { PROJECT_DIRECTORY_NAME } from '@/Const'
+import {
+    PROJECT_DIRECTORY_NAME,
+    PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_SCENE_DIRECTORY_NAME
+} from '@/Const'
 
 async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> {
-    const scenes: string[] = [ 'main', 'gui_main' ]
+    const scenes: string[] = [ 'main.ts', 'gui_main.ts' ]
+    const sceneRootDir: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
     for (const key of scenes) {
-        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await addScene(projectDirPath, key)
+        const filePath: string = path.resolve(sceneRootDir, key)
+        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await addScene(projectDirPath, filePath)
         if (!sceneAdd.success) {
             return sceneAdd as Engine.GameProject.AddSceneFail
         }
@@ -23,7 +29,7 @@ async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameP
 
 export async function handler(directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
     const projectDirName: string = parseProperty(PROJECT_DIRECTORY_NAME, config)
-    const projectDirPath: string = path.join(directoryPath, projectDirName)
+    const projectDirPath: string = path.resolve(directoryPath, projectDirName)
 
     const projectEnsure = await ensureProject(projectDirPath, config)
     if (!projectEnsure.success) {

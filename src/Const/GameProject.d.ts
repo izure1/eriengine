@@ -31,9 +31,6 @@ declare namespace Engine {
         interface AddScriptSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddScriptFail extends Engine.ActionFailState {}
 
-        interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
-        interface GenerateAssetListFail extends Engine.ActionFailState {}
-
         interface AddAnimationSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddAnimationFail extends Engine.ActionFailState {}
 
@@ -55,6 +52,30 @@ declare namespace Engine {
         interface AddVideoSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddVideoFail extends Engine.ActionFailState {}
 
+        interface AddStorageSuccess extends PathRequired, Engine.ActionSuccessState { key: string }
+        interface AddStorageFail extends Engine.ActionFailState {}
+
+        interface AddStorageDirectorySuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddStorageDirectoryFail extends Engine.ActionFailState {}
+
+        interface AddStorageFileSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddStorageFileFail extends Engine.ActionFailState {}
+
+        interface AddStorageJSONSuccess extends AddStorageFileSuccess {}
+        interface AddStorageJSONFail extends AddStorageFileFail {}
+
+        interface ReadStorageFileSuccess extends PathRequired, Engine.ActionSuccessState { content: string }
+        interface ReadStorageFileFail extends Engine.ActionFailState {}
+
+        interface ReadStorageJSONSuccess extends ReadStorageFileSuccess { content: object }
+        interface ReadStorageJSONFail extends ReadStorageFileFail {}
+
+        interface CheckStorageExistsSuccess extends Engine.ActionSuccessState { path: string }
+        interface CheckStorageExistsFail extends Engine.ActionFailState {}
+
+        interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateAssetListFail extends Engine.ActionFailState {}
+
         interface GenerateAnimationListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAnimationListFail extends Engine.ActionFailState {}
 
@@ -75,6 +96,9 @@ declare namespace Engine {
 
         interface GenerateVideoListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateVideoListFail extends Engine.ActionFailState {}
+
+        interface GenerateSceneListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateSceneListFail extends Engine.ActionFailState {}
 
         interface CheckValidProjectSuccess extends Engine.ActionSuccessState {}
         interface CheckValidProjectFail extends Engine.ActionFailState {}

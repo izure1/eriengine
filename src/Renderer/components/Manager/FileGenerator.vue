@@ -52,6 +52,10 @@ export { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue
             type: Array,
             default: () => []
         },
+        extraContextmenus: {
+            type: Array,
+            default: () => []
+        },
         description: {
             type: Array,
             default: () => []
@@ -62,6 +66,7 @@ export default class GeneratorComponent extends Vue {
     private cwd!: string
     private filename!: string
     private extraActions!: ContextItemAction[]
+    private extraContextmenus!: ContextItemAction[]
     private add!: (filePath: string) => Promise<void>
     private currentPath: string = normalize(this.cwd)
 
@@ -84,6 +89,7 @@ export default class GeneratorComponent extends Vue {
     ]
 
     private contextmenus: ContextItemAction[] = [
+        ...this.extraContextmenus,
         {
             icon: 'mdi-open-in-new',
             description: '파일로 이동합니다',

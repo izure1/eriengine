@@ -1,8 +1,9 @@
+import path from 'path'
 import { ipcMain, shell, IpcMainInvokeEvent } from 'electron'
 
-export async function handler(path: string): Promise<Engine.FileSystem.showItemSuccess|Engine.FileSystem.showItemFail> {
+export async function handler(filePath: string): Promise<Engine.FileSystem.showItemSuccess|Engine.FileSystem.showItemFail> {
     try {
-        shell.showItemInFolder(path.replace(/\//g, '\\'))
+        shell.showItemInFolder(path.resolve(filePath))
     } catch(e) {
         const { name, message } = e
         return {
@@ -16,7 +17,7 @@ export async function handler(path: string): Promise<Engine.FileSystem.showItemS
         success: true,
         name: '요소 선택 성공',
         message: '요소를 선택했습니다',
-        path
+        path: filePath
     }
 }
 

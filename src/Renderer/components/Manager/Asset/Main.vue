@@ -88,7 +88,7 @@ export default class AssetMainComponent extends Vue {
         const fails: string[] = []
         for (const file of filesOpen.path) {
             const name: string = path.basename(file)
-            const dist: string = path.join(directoryPath, name)
+            const dist: string = path.resolve(directoryPath, name)
 
             const fileCopy: Engine.FileSystem.CopySuccess|Engine.FileSystem.CopyFail = await ipcRenderer.invoke('copy', file, dist)
             if (!fileCopy.success) {

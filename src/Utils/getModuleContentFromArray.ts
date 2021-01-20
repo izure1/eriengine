@@ -1,10 +1,10 @@
-export function getModuleContentFromArray(list: string[], mapKey: (modulePath: string) => string = (modulePath: string) => modulePath): string {
+export function getModuleContentFromArray(list: string[], exportKey: string = 'default', mapKey: (modulePath: string) => string = (modulePath: string) => modulePath): string {
     let modules: string = ''
     let exports: string = ''
     for (let i: number = 0, len: number = list.length; i < len; i++) {
         const path: string = list[i]
         const name: string = `M${i}`
-        modules += `import { default as ${name} } from '${path}'\n`
+        modules += `import { ${exportKey} as ${name} } from '${path}'\n`
         exports += `    '${mapKey(path)}': ${name},\n`
     }
 

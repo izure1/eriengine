@@ -1,9 +1,7 @@
 import path from 'path'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { handler as readDirectory } from '../FileSystem/readDirectory'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
-import { handler as ensureScene } from './ensureScene'
 import { parseProperty } from '@/Utils/parseProperty'
 import { installModuleFromPackage } from '@/Utils/installModule'
 import {
@@ -54,7 +52,7 @@ async function ensureConfig(projectDirPath: string, config: Engine.GameProject.C
 
     // config.json
     const configContent: string = parseProperty(RAW_PROJECT_CONFIG, config)
-    const configPath: string    = path.join(projectDirPath, PROJECT_CONFIG_NAME)
+    const configPath: string    = path.resolve(projectDirPath, PROJECT_CONFIG_NAME)
 
     fileWrite = await writeFile(configPath, configContent)
     if (!fileWrite.success) {
@@ -119,19 +117,6 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     const moduleInstall = await ensureRequireModules(directoryPath, config)
     if (!moduleInstall.success) {
         return moduleInstall as Engine.GameProject.CreateProjectFail
-    }
-
-    // 씬 재설정
-    const sceneRootDir: string = path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
-    const sceneDirRead = await readDirectory(sceneRootDir, { includeFiles: false })
-    if (!sceneDirRead.success) {
-        return sceneDirRead as Engine.GameProject.CreateProjectFail
-    }
-    for (const sceneKey of sceneDirRead.files) {
-        const sceneEnsure = await ensureScene(directoryPath, sceneKey)
-        if (!sceneEnsure.success) {
-            return sceneEnsure as Engine.GameProject.CreateProjectFail
-        }
     }
 
     return {

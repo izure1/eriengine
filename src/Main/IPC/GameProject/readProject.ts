@@ -4,8 +4,8 @@ import { PROJECT_CONFIG_NAME } from '@/Const'
 import { handler as readJSON } from '../FileSystem/readJSON'
 import { handler as checkValidProject } from './checkValidProject'
 
-export async function handler(directoryPath: string): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {
-    const configPath: string = path.join(directoryPath, PROJECT_CONFIG_NAME)
+export async function handler(projectDirPath: string): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {
+    const configPath: string = path.resolve(projectDirPath, PROJECT_CONFIG_NAME)
     const raw = await readJSON(configPath)
     if (!raw.success) {
         return raw as Engine.GameProject.ReadProjectFail
@@ -22,13 +22,13 @@ export async function handler(directoryPath: string): Promise<Engine.GameProject
         success: true,
         name: '프로젝트 읽기 성공',
         message: '프로젝트를 성공적으로 읽었습니다',
-        path: directoryPath,
+        path: projectDirPath,
         config
     }
 }
 
 export function ipc(): void {
-    ipcMain.handle('read-project', async (e: IpcMainInvokeEvent, directoryPath: string): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> => {
-        return await handler(directoryPath)
+    ipcMain.handle('read-project', async (e: IpcMainInvokeEvent, projectDirPath: string): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> => {
+        return await handler(projectDirPath)
     })
 }
