@@ -30,7 +30,7 @@ import {
     }
 })
 export default class ScriptMainComponent extends Vue {
-    private cwd: string|null = null
+    private cwd: string = ''
     private extraActions: ContextItemAction[] = [
         {
             icon: 'mdi-arrow-left',
@@ -72,7 +72,7 @@ export default class ScriptMainComponent extends Vue {
     }
 
     private async setCwd(): Promise<void> {
-        const pathGet: Engine.GameProject.GetStoragePathSuccess|Engine.GameProject.GetStoragePathFail = await ipcRenderer.invoke('get-storage-path', this.$store.state.projectDirectory, this.storageKey, PROJECT_SRC_STORAGE_DIRECTORY_NAME, PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME)
+        const pathGet: Engine.GameProject.GetStoragePathSuccess|Engine.GameProject.GetStoragePathFail = await ipcRenderer.invoke('get-storage-path', this.$store.state.projectDirectory, this.storageKey, PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME, '')
         if (!pathGet.success) {
             this.$store.dispatch('snackbar', pathGet.message)
             this.goBack()

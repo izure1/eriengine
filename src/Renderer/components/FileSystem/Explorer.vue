@@ -94,7 +94,7 @@ import path from 'path'
 import normalize from 'normalize-path'
 import fs from 'fs-extra'
 import { ipcRenderer, shell } from 'electron'
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { PropOptions } from 'vue'
 import { FileWatcher } from '@/Utils/FileWatcher'
 
@@ -161,7 +161,7 @@ export default class ExplorerComponent extends Vue {
     private additional!: number
     private additionalReduce: number = 1
     private additionalLoaded: number = 0
-    private currentPath: string = normalize(this.cwd)
+    private currentPath: string = ''
     private openDirectory!: (filePath: string) => void
     private openFile!: (filePath: string) => void
     
@@ -237,14 +237,6 @@ export default class ExplorerComponent extends Vue {
         return normalize(result)
     }
 
-    private async deleteFile(filename: string): Promise<void> {
-        const target: string = this.getAbsolutePath(filename)
-        const fileDel: Engine.FileSystem.TrashSuccess|Engine.FileSystem.TrashFail = await ipcRenderer.invoke('trash', target, true)
-        if (!fileDel.success) {
-            this.$store.dispatch('snackbar', fileDel.message)
-        }
-    }
-
     private async open(filename: string): Promise<void> {
         const dist: string = this.getAbsolutePath(filename)
         const stat: fs.Stats = await fs.lstat(dist)
@@ -290,6 +282,12 @@ export default class ExplorerComponent extends Vue {
         this.startWatcher()
         this.setFiles()
         this.$emit('update:path', this.currentPath)
+    }
+
+    @Watch('cwd', { immediate: true })
+    private onChangeCwd(): void {
+        this.currentPath = normalize(this.cwd)
+        this.onDirectoryPathChange()
     }
 
     created(): void {
