@@ -41,7 +41,7 @@ export { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue
             required: true
         },
         filename: {
-            type: String,
+            type: [ String, Function ],
             required: true
         },
         add: {
@@ -64,7 +64,7 @@ export { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue
 })
 export default class GeneratorComponent extends Vue {
     private cwd!: string
-    private filename!: string
+    private filename!: string|(() => string)
     private extraActions!: ContextItemAction[]
     private extraContextmenus!: ContextItemAction[]
     private add!: (filePath: string) => Promise<void>
@@ -118,8 +118,9 @@ export default class GeneratorComponent extends Vue {
     }
 
     private getNewFilePath(): string {
+        const filename: string = typeof this.filename === 'function' ? this.filename() : this.filename
         return normalize(
-            increment(path.resolve(this.currentPath, this.filename), { fs: true })
+            increment(path.resolve(this.currentPath, filename), { fs: true })
         )
     }
 

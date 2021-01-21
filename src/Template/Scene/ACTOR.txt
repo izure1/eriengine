@@ -20,16 +20,16 @@ export default class SampleActor extends Actor {
     private playMovingAnimation(): void {
 
         if (this.run.isMovingLeft) {
-            // this.play(Animations[''])
+            // this.play(Animations[])
         }
         if (this.run.isMovingRight) {
-            // this.play(Animations[''])
+            // this.play(Animations[])
         }
         if (this.run.isMovingDown) {
-            // this.play(Animations[''])
+            // this.play(Animations[])
         }
         if (this.run.isMovingUp) {
-            // this.play(Animations[''])
+            // this.play(Animations[])
         }
 
     }

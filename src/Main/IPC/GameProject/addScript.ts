@@ -7,18 +7,8 @@ import { PROJECT_LISTS } from '@/Const'
 import { parseProperty } from '@/Utils/parseProperty'
 import RAW_SCRIPT from 'raw-loader!@/Template/Scene/SCRIPT.txt'
 
-function getSceneKey(key: string): string {
-    const chars: string[] = key.split('')
-    if (chars[0]) {
-        chars[0] = chars[0].toUpperCase()
-    }
-    return chars.join('')
-}
-
-async function writeScriptFile(filePath: string, sceneKey: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const KEY:  string          = getSceneKey(sceneKey)
+async function writeScriptFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_SCRIPT, {
-        KEY,
         PROJECT_LISTS
     })
 
@@ -35,13 +25,13 @@ async function writeScriptFile(filePath: string, sceneKey: string): Promise<Engi
     }
 }
 
-export async function handler(filePath: string, sceneKey: string): Promise<Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail> {
+export async function handler(filePath: string): Promise<Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail> {
     const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
         return directoryEnsure as Engine.GameProject.AddSceneFail
     }
 
-    const fileWrite = await writeScriptFile(filePath, sceneKey)
+    const fileWrite = await writeScriptFile(filePath)
     if (!fileWrite.success) {
         return fileWrite as Engine.GameProject.AddScriptFail
     }
@@ -50,7 +40,7 @@ export async function handler(filePath: string, sceneKey: string): Promise<Engin
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-script', async (e: IpcMainInvokeEvent, filePath: string, sceneKey: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddScriptFail> => {
-        return await handler(filePath, sceneKey)
+    ipcMain.handle('add-script', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddScriptFail> => {
+        return await handler(filePath)
     })
 }

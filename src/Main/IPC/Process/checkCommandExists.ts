@@ -6,8 +6,9 @@ export async function handler(commandName: string): Promise<Engine.Process.Check
         await exists(commandName)
         return {
             success: true,
-            name: '명령어 확인 성공',
-            message: `'${commandName}' 명령어가 존재합니다.`
+            name: '명령어 확인',
+            message: `'${commandName}' 명령어가 존재합니다.`,
+            exists: true
         }
     } catch(e) {
         const { name, message } = e as Error

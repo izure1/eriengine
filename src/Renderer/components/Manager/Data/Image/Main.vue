@@ -34,19 +34,12 @@ export default class ImageMainComponent extends Vue {
         PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME
     )
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
-    }
-
     private async add(filePath: string): Promise<void> {
         const imageAdd: Engine.GameProject.AddSpriteSuccess|Engine.GameProject.AddSpriteFail = await ipcRenderer.invoke('add-image', filePath)
         if (!imageAdd.success) {
             this.$store.dispatch('snackbar', imageAdd.message)
             return
         }
-
-        this.showPath(imageAdd.path)
     }
 }
 </script>

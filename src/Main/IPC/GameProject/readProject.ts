@@ -14,7 +14,10 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
     const config: Engine.GameProject.Config = raw.content as Engine.GameProject.Config
     const validConfig: Engine.GameProject.CheckValidProjectSuccess|Engine.GameProject.CheckValidProjectFail = await checkValidProject(config)
 
-    if (!validConfig.success) {
+    if (
+        !validConfig.success ||
+        validConfig.success && !validConfig.valid
+    ) {
         return validConfig as Engine.GameProject.CheckValidProjectFail
     }
 

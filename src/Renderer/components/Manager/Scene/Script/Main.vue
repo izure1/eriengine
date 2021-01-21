@@ -17,11 +17,11 @@ import path from 'path'
 import increment from 'add-filename-increment'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
+import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import FileGeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/FileGenerator.vue'
 import {
-    PROJECT_SRC_DIRECTORY_NAME,
-    // PROJECT_SRC_STORAGE_DIRECTORY_NAME,
-    // PROJECT_SRC_STORAGE_SCRIPT_DIRECTORY_NAME
+    PROJECT_SRC_STORAGE_DIRECTORY_NAME,
+    PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME
 } from '@/Const'
 
 @Component({
@@ -30,14 +30,7 @@ import {
     }
 })
 export default class ScriptMainComponent extends Vue {
-    private cwd: string = path.resolve(
-            this.$store.state.projectDirectory,
-            // PROJECT_SRC_DIRECTORY_NAME,
-            // PROJECT_SRC_STORAGE_DIRECTORY_NAME,
-            this.sceneKey,
-            //PROJECT_SRC_STORAGE_SCRIPT_DIRECTORY_NAME
-        )
-
+    private cwd: string|null = null
     private extraActions: ContextItemAction[] = [
         {
             icon: 'mdi-arrow-left',
@@ -48,30 +41,50 @@ export default class ScriptMainComponent extends Vue {
         }
     ]
 
-    private get sceneKey(): string {
-        return this.$route.params.key || ''
+    private get filePath(): string {
+        return decodeURIComponent(this.$route.params.filePath)
     }
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
+    private get storageKey(): string {
+        return getStorageKeyFromFilename(this.filePath)
     }
 
     private async add(filePath: string): Promise<void> {
-        if (!this.sceneKey) {
+        if (!this.storageKey) {
             return
         }
-        const scriptAdd: Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail = await ipcRenderer.invoke('add-script', filePath, this.sceneKey)
+        const scriptAdd: Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail = await ipcRenderer.invoke('add-script', filePath, this.storageKey)
         if (!scriptAdd.success) {
             this.$store.dispatch('snackbar', scriptAdd.message)
             return
         }
-
-        this.showPath(scriptAdd.path)
     }
 
     private goBack(): void {
         this.$router.replace('/manager/scene')
+    }
+
+    private checkKey(): void {
+        if (this.storageKey) {
+            return
+        }
+        this.goBack()
+    }
+
+    private async setCwd(): Promise<void> {
+        const pathGet: Engine.GameProject.GetStoragePathSuccess|Engine.GameProject.GetStoragePathFail = await ipcRenderer.invoke('get-storage-path', this.$store.state.projectDirectory, this.storageKey, PROJECT_SRC_STORAGE_DIRECTORY_NAME, PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME)
+        if (!pathGet.success) {
+            this.$store.dispatch('snackbar', pathGet.message)
+            this.goBack()
+            return
+        }
+
+        this.cwd = pathGet.path
+    }
+
+    created(): void {
+        this.checkKey()
+        this.setCwd()
     }
 }
 </script>

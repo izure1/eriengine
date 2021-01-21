@@ -52,11 +52,19 @@ const routes: Array<RouteConfig> = [
                 component: ManagerScene
             },
             {
-                path: 'scene/script/:key',
+                path: 'scene/script',
                 component: ManagerSceneScript
             },
             {
-                path: 'scene/map/:key',
+                path: 'scene/script/:filePath',
+                component: ManagerSceneScript
+            },
+            {
+                path: 'scene/map',
+                component: ManagerSceneMap
+            },
+            {
+                path: 'scene/map/:filePath',
                 component: ManagerSceneMap
             },
             {

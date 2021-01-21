@@ -4,16 +4,18 @@ import { handler as getEngineAuth } from '../Process/getEngineAuth'
 export async function handler({ ENGINE_AUTH, APPLICATION_ID }: Engine.GameProject.Config): Promise<Engine.GameProject.CheckValidProjectSuccess|Engine.GameProject.CheckValidProjectFail> {
     if (!ENGINE_AUTH) {
         return {
-            success: false,
-            name: '프로젝트 설정 확인 실패',
-            message: '프로젝트 설정에 \'ENGINE_AUTH\' 값이 없습니다.'
+            success: true,
+            name: '프로젝트 설정 확인',
+            message: '프로젝트 설정에 \'ENGINE_AUTH\' 값이 없습니다.',
+            valid: false
         }
     }
     if (!APPLICATION_ID) {
         return {
-            success: false,
-            name: '프로젝트 설정 확인 실패',
-            message: '프로젝트 설정에 \'APPLICATION_ID\' 값이 없습니다.'
+            success: true,
+            name: '프로젝트 설정 확인',
+            message: '프로젝트 설정에 \'APPLICATION_ID\' 값이 없습니다.',
+            valid: false
         }
     }
 
@@ -24,15 +26,17 @@ export async function handler({ ENGINE_AUTH, APPLICATION_ID }: Engine.GameProjec
         }
         if (entryped.auth !== ENGINE_AUTH) {
             return {
-                success: false,
-                name: '프로젝트 설정 확인 성공',
-                message: '올바르지 않은 프로젝트 설정입니다'
+                success: true,
+                name: '프로젝트 설정 확인',
+                message: '올바르지 않은 프로젝트 설정입니다',
+                valid: false
             }
         }
         return {
             success: true,
             name: '프로젝트 설정 확인 성공',
-            message: '올바른 프로젝트 설정입니다'
+            message: '올바른 프로젝트 설정입니다',
+            valid: true
         }
     } catch(e) {
         const { name, message } = e as Error

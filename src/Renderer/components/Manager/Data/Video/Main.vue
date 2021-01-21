@@ -34,19 +34,12 @@ export default class VideoMainComponent extends Vue {
         PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
     )
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
-    }
-
     private async add(filePath: string): Promise<void> {
         const videoAdd: Engine.GameProject.AddVideoSuccess|Engine.GameProject.AddVideoFail = await ipcRenderer.invoke('add-video', filePath)
         if (!videoAdd.success) {
             this.$store.dispatch('snackbar', videoAdd.message)
             return
         }
-
-        this.showPath(videoAdd.path)
     }
 }
 </script>

@@ -34,18 +34,12 @@ export default class AnimationMainComponent extends Vue {
         PROJECT_SRC_ACTOR_DIRECTORY_NAME
     )
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
-    }
-
     private async add(filePath: string): Promise<void> {
         const actorAdd: Engine.GameProject.AddActorSuccess|Engine.GameProject.AddActorFail = await ipcRenderer.invoke('add-actor', filePath)
         if (!actorAdd.success) {
             this.$store.dispatch('snackbar', actorAdd.message)
             return
         }
-        this.showPath(filePath)
     }
 }
 </script>

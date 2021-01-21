@@ -70,8 +70,11 @@ declare namespace Engine {
         interface ReadStorageJSONSuccess extends ReadStorageFileSuccess { content: object }
         interface ReadStorageJSONFail extends ReadStorageFileFail {}
 
-        interface CheckStorageExistsSuccess extends Engine.ActionSuccessState { path: string }
+        interface CheckStorageExistsSuccess extends Engine.ActionSuccessState { exists: boolean }
         interface CheckStorageExistsFail extends Engine.ActionFailState {}
+
+        interface GetStoragePathSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GetStoragePathFail extends Engine.ActionFailState {}
 
         interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAssetListFail extends Engine.ActionFailState {}
@@ -100,7 +103,7 @@ declare namespace Engine {
         interface GenerateSceneListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateSceneListFail extends Engine.ActionFailState {}
 
-        interface CheckValidProjectSuccess extends Engine.ActionSuccessState {}
+        interface CheckValidProjectSuccess extends Engine.ActionSuccessState { valid: boolean }
         interface CheckValidProjectFail extends Engine.ActionFailState {}
 
         interface ReadSceneMapSuccess extends PathRequired, Engine.ActionSuccessState { content: SceneMap }

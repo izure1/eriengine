@@ -34,19 +34,12 @@ export default class SkillMainComponent extends Vue {
         PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME
     )
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
-    }
-
     private async add(filePath: string): Promise<void> {
         const skillAdd: Engine.GameProject.AddSkillSuccess|Engine.GameProject.AddSkillFail = await ipcRenderer.invoke('add-skill', filePath)
         if (!skillAdd.success) {
             this.$store.dispatch('snackbar', skillAdd.message)
             return
         }
-
-        this.showPath(skillAdd.path)
     }
 }
 </script>

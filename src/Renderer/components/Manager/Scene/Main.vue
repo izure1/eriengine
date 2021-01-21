@@ -6,12 +6,13 @@
         :description="[
             '씬은 플레이어가 게임 내에서 보는 공간입니다.<br>액터가 활보하는 공간으로도, GUI 화면으로도 사용할 수도 있습니다.'
         ]"
-        filename="scene.ts"
+        :filename="getSceneName"
     />
 </template>
 
 <script lang="ts">
 import path from 'path'
+import { nanoid } from 'nanoid'
 import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import FileGeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/FileGenerator.vue'
@@ -37,14 +38,14 @@ export default class SkillMainComponent extends Vue {
             icon: 'mdi-script-text-outline',
             description: '스크립트 파일을 찾습니다',
             action: (filePath: string): void => {
-
+                this.$router.replace(`/manager/scene/script/${encodeURIComponent(filePath)}`)
             }
         },
         {
             icon: 'mdi-pencil-ruler',
             description: '씬을 꾸밉니다',
             action: (filePath: string): void => {
-
+                this.$router.replace(`/manager/scene/map/${encodeURIComponent(filePath)}`)
             }
         }
     ]
@@ -53,9 +54,8 @@ export default class SkillMainComponent extends Vue {
         return this.$store.state.projectDirectory
     }
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
+    private getSceneName(): string {
+        return `scene.${nanoid(10)}.ts`
     }
 
     private async add(filePath: string): Promise<void> {
@@ -64,8 +64,6 @@ export default class SkillMainComponent extends Vue {
             this.$store.dispatch('snackbar', sceneAdd.message)
             return
         }
-
-        this.showPath(sceneAdd.path)
     }
 }
 </script>

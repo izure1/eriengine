@@ -34,19 +34,12 @@ export default class SpriteMainComponent extends Vue {
         PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME
     )
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
-    }
-
     private async add(filePath: string): Promise<void> {
         const spriteAdd: Engine.GameProject.AddSpriteSuccess|Engine.GameProject.AddSpriteFail = await ipcRenderer.invoke('add-sprite', filePath)
         if (!spriteAdd.success) {
             this.$store.dispatch('snackbar', spriteAdd.message)
             return
         }
-
-        this.showPath(spriteAdd.path)
     }
 }
 </script>

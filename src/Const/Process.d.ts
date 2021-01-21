@@ -1,6 +1,6 @@
 declare namespace Engine {
     namespace Process {
-        interface CheckCommandExistsSuccess extends Engine.ActionSuccessState {}
+        interface CheckCommandExistsSuccess extends Engine.ActionSuccessState { exists: boolean }
         interface CheckCommandExistsFail extends Engine.ActionFailState {}
 
         interface GetEngineAuthSuccess extends Engine.ActionSuccessState { auth: string }

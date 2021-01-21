@@ -4,7 +4,7 @@ import Phaser from 'phaser'
 
 
 // 스프라이트에 사용할 에셋입니다.
-export const key: string      = Assets['']
+export const key: string      = Assets[]
 
 // 스프라이트 프레임의 가로 크기입니다
 export const frameWidth: number    = ?

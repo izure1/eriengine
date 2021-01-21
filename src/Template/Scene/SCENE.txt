@@ -11,21 +11,21 @@ import BaseScene from '@/BaseScene'
 
 
 
-/**
+/*
  *
  *  주의!
  *  씬 파일 이름의 뒷 부분은 절대 변경하지 마십시오.
  *  이 뒷 부분은 씬이 참조해야할 스크립트와 맵의 정보를 담고 있습니다.
  *
- *  가령 파일명이 scene.gS2icaOqrRggyUKYJ0mDh.ts 일 경우, gS2icaOqrRggyUKYJ0mDh 부분은 절대 변경되어선 안됩니다.
- *  씬 파일의 이름을 변경하고 싶다면, newName.gS2icaOqrRggyUKYJ0mDh.ts 의 방식으로 뒷 부분을 제외하고 변경하십시오.
+ *  가령 파일명이 scene.ABCDE.ts 일 경우, ABCDE 부분은 절대 변경되어선 안됩니다.
+ *  씬 파일의 이름을 변경하고 싶다면, newName.ABCDE.ts 의 방식으로 뒷 부분을 제외하고 변경하십시오.
  *
  */
 
 // 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다.
-export const KEY: string = '{{ KEY }}'
+const KEY: string = '{{ KEY }}'
 
-/**
+/*
  *
  *  이곳에서 씬의 기본적인 설정을 변경할 수 있습니다.
  *  기본적인 작동을 위한 코드가 이미 작성되어 있습니다만,
@@ -36,6 +36,8 @@ export const KEY: string = '{{ KEY }}'
  *
  */
 export default class NewScene extends BaseScene {
+    static KEY: string = KEY
+
     protected actor!: ActorPlugin
     protected isometric!: IsometricScenePlugin
     protected cursor!: IsometricCursorPlugin

@@ -1,42 +1,27 @@
-import path from 'path'
 import fs from 'fs-extra'
-import normalize from 'normalize-path'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import {
-    PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_STORAGE_DIRECTORY_NAME
-} from '@/Const'
+import { handler as getStoragePath } from './getStoragePath'
 
 export async function handler(projectDirPath: string, key: string, dirname: string, filename: string): Promise<Engine.GameProject.CheckStorageExistsSuccess|Engine.GameProject.CheckStorageExistsFail> {
-    const storageDirPath: string = normalize(
-        path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key, dirname)
-    )
-
-    if (!fs.existsSync(storageDirPath)) {
-        return {
-            success: false,
-            name: '스토리지 디렉토리 없음',
-            message: '디렉토리가 존재하지 않습니다'
-        }
+    const pathGet = await getStoragePath(projectDirPath, key, dirname, filename)
+    if (!pathGet.success) {
+        return pathGet as Engine.GameProject.CheckStorageExistsFail
     }
 
-    const filePath: string = normalize(
-        path.resolve(storageDirPath, filename)
-    )
-
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(pathGet.path)) {
         return {
-            success: false,
-            name: '스토리지 파일 없음',
-            message: '파일이 존재하지 않습니다'
+            success: true,
+            name: '스토리지 확인',
+            message: '스토리지 파일이 존재하지 않습니다',
+            exists: false
         }
     }
 
     return {
         success: true,
-        name: '스토리지 확인 성공',
+        name: '스토리지 확인',
         message: '스토리지 확인에 성공했습니다',
-        path: filePath
+        exists: true
     }
 }
 

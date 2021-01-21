@@ -1,22 +1,51 @@
 import Phaser from 'phaser'
 import { Actor } from '@eriengine/plugin-actor'
-import Scene from '@/Scene/{{ KEY }}/Scene'
 
 {{ PROJECT_LISTS }}
+// 타입 추론을 위한 클래스 타입이므로 별도의 멤버변수나, 메서드를 추가하지 마십시오.
+declare class Scene extends Scenes[] {}
 
+/*
+ *  스크립트로 씬의 라이프사이클을 좀 더 쉽게 관리할 수 있습니다.
+ *  라이프사이클에 대한 자세한 설명은 아래 링크의 문서를 확인하십시오
+ *  https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scene/#flow-chart
+ */
 
+/**
+ *  씬이 에셋을 준비하기 위해 로드될 때 호출될 함수입니다.
+ *  이 단계에선 아직 액터와 일부 게임오브젝트를 생성할 수 없습니다.
+ *
+ *  필요한 에셋을 로드하는 용도로 사용하십시오.
+ *  다만 에셋과 데이터로 관리한 이미지, 스프라이트, 오디오, 비디오, 애니메이션 등은 자동으로 로드됩니다. 따라서 추가로 로드할 필요가 없습니다.
+ */
 export function onScenePreload(this: Scene): void {
 
 }
 
+/**
+ *  씬이 생성되었을 때 호출될 함수입니다.
+ *  이 단계에서 액터와 게임 오브젝트를 생성할 수 있습니다.
+ *
+ *  가령 플레이어 객체를 만들고 싶다면, 플레이어 액터 클래스를 만들고, 씬에 플레이어 멤버변수를 추가한 뒤, 이곳에서 생성하십시오.
+ */
 export function OnSceneCreate(this: Scene): void {
 
 }
 
-export function onSceneUpdate(this: Scene): void {
+/**
+ *  씬이 업데이트 될 때 마다 호출될 함수입니다.
+ *  매 프레임마다 작동하므로 무거운 작업을 사용하지 마십시오.
+ *  @param time     씬이 시작하고 지나간 시간(ms)입니다.
+ *  @param delta    이전 프레임과 현재 프레임 사이에 흐른 시간(ms)입니다. 60프레임이므로, 일반적으로 16ms입니다.
+ */
+export function onSceneUpdate(this: Scene, time: number, delta: number): void {
 
 }
 
+/**
+ *  씬이 파괴될 대 호출될 함수입니다.
+ *  씬에서 생성한 오브젝트는 자동으로 파괴됩니다. 하지만 직접 파괴할 데이터가 있다면 이곳에서 처리하십시오.
+ */
 export function OnSceneDestroy(this: Scene): void {
 
 }

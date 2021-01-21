@@ -6,12 +6,15 @@ type WatcherCallback = (filePath: string) => void
 export class FileWatcher {
     protected cwd: string
     private recursive: boolean
+    private interval: number
+    private intervalId: number = NaN
     private watcher: fs.FSWatcher|null = null
     private callbacks: WatcherCallback[] = []
 
-    constructor(cwd: string, recursive: boolean = true) {
+    constructor(cwd: string, recursive: boolean = true, interval: number = 1000) {
         this.cwd = cwd
         this.recursive = recursive
+        this.interval = interval
     }
 
     private destroyWatcher(): void {
@@ -38,6 +41,21 @@ export class FileWatcher {
         }
     }
 
+    private startCheckInterval(): void {
+        if (this.watcher && !fs.existsSync(this.cwd)) {
+            this.destroyWatcher()
+            this.onUpdate('change', this.cwd)
+        }
+        if (!this.watcher && fs.existsSync(this.cwd)) {
+            this.setWatcher()
+            this.onUpdate('change', this.cwd)
+        }
+    }
+
+    private destroyInterval(): void {
+        window.clearInterval(this.intervalId)
+    }
+
     update(callback: WatcherCallback): this {
         this.callbacks.push(callback)
         return this
@@ -45,6 +63,7 @@ export class FileWatcher {
 
     start(): this {
         this.setWatcher()
+        this.intervalId = window.setInterval(this.startCheckInterval.bind(this), this.interval)
         return this
     }
 
@@ -55,6 +74,7 @@ export class FileWatcher {
 
     destroy(): this {
         this.destroyWatcher()
+        this.destroyInterval()
         this.callbacks.length = 0
         return this
     }

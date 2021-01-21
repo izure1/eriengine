@@ -8,6 +8,7 @@
 import path from 'path'
 import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
+import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import NonReactivity from 'vue-nonreactivity-decorator'
 
 import Phaser from 'phaser'
@@ -22,8 +23,12 @@ export default class SceneMapEditor extends Vue {
     @NonReactivity(null) private game!: Phaser.Game|null
     private map!: Engine.GameProject.SceneMap
 
-    private get sceneKey(): string {
-        return this.$route.params.key || ''
+    private get filePath(): string {
+        return decodeURIComponent(this.$route.params.filePath)
+    }
+
+    private get storageKey(): string {
+        return getStorageKeyFromFilename(this.filePath)
     }
 
     private get projectDirectory(): string {
@@ -38,18 +43,20 @@ export default class SceneMapEditor extends Vue {
         return this.$refs['game-canvas'] as HTMLElement
     }
 
-    private async getMap(): Promise<Engine.GameProject.SceneMap> {
-        const defaultMap: Engine.GameProject.SceneMap = { walls: [], floors: [], actors: [] }
-        if (!this.sceneKey) {
-            return defaultMap
+    private async setMap(): Promise<void> {
+        if (!this.storageKey) {
+            this.$store.dispatch('snackbar', '씬 파일 이름에 스토리지 정보가 없습니다')
+            this.$router.replace('/manager/scene')
+            return
         }
-        const jsonRead: Engine.GameProject.ReadSceneMapSuccess|Engine.GameProject.ReadSceneMapFail = await ipcRenderer.invoke('read-scene-map', this.projectDirectory, this.sceneKey)
-        if (!jsonRead.success) {
-            this.$store.dispatch('snackbar', jsonRead.message)
-            return defaultMap
+        const sceneMapRead: Engine.GameProject.ReadSceneMapSuccess|Engine.GameProject.ReadSceneMapFail = await ipcRenderer.invoke('read-scene-map', this.projectDirectory, this.storageKey)
+        if (!sceneMapRead.success) {
+            this.$store.dispatch('snackbar', sceneMapRead.message)
+            this.$router.replace('/manager/scene')
+            return
         }
 
-        return jsonRead.content
+        this.map = sceneMapRead.content
     }
 
     private async createGame(): Promise<void> {
@@ -58,6 +65,7 @@ export default class SceneMapEditor extends Vue {
         const config = createConfig(width, height, [ PreviewScene ], this.canvasParent)
         this.game = new Phaser.Game(config)
 
+        await this.setMap()
         this.resizeCanvas()
     }
 
@@ -98,6 +106,17 @@ export default class SceneMapEditor extends Vue {
 
     private unwatchResizeWindow(): void {
         window.removeEventListener('resize', this.resizeCanvas)
+    }
+
+    private checkKey(): void {
+        if (this.storageKey) {
+            return
+        }
+        this.$router.replace('/manager/scene')
+    }
+
+    created(): void {
+        this.checkKey()
     }
 
     mounted(): void {

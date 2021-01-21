@@ -34,19 +34,12 @@ export default class AudioMainComponent extends Vue {
         PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME
     )
 
-    private showPath(filePath: string): void {
-        filePath = path.resolve(filePath)
-        shell.showItemInFolder(filePath)
-    }
-
     private async add(filePath: string): Promise<void> {
         const audioAdd: Engine.GameProject.AddAudioSuccess|Engine.GameProject.AddAudioFail = await ipcRenderer.invoke('add-audio', filePath)
         if (!audioAdd.success) {
             this.$store.dispatch('snackbar', audioAdd.message)
             return
         }
-
-        this.showPath(audioAdd.path)
     }
 }
 </script>

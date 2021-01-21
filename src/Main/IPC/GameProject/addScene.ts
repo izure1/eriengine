@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
+import { handler as writeSceneMap } from './writeSceneMap'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_LISTS
@@ -74,7 +75,33 @@ export async function handler(projectDirPath: string, filePath: string): Promise
         return fileWrite as Engine.GameProject.AddSceneFail
     }
 
-    return fileWrite
+    const [ sceneName, storageKey ] = path.parse(filePath).name.split('.')
+    if (!sceneName) {
+        return {
+            success: false,
+            name: '씬 생성 실패',
+            message: '씬 파일 이름 정보가 없습니다'
+        }
+    }
+    if (!storageKey) {
+        return {
+            success: false,
+            name: '씬 생성 실패',
+            message: '스토리지 키 정보가 없습니다'
+        }
+    }
+    
+    const sceneMapWrite = await writeSceneMap(projectDirPath, storageKey)
+    if (!sceneMapWrite.success) {
+        return sceneMapWrite as Engine.GameProject.AddSceneFail
+    }
+
+    return {
+        success: true,
+        name: '씬 파일 생성 성공',
+        message: '씬 파일 생성에 성공했습니다',
+        path: filePath
+    }
 }
 
 export function ipc(): void {
