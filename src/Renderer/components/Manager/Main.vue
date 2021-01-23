@@ -89,6 +89,11 @@ export default class ProjectFileListComponent extends Vue {
                     name: '액터',
                     description: '액터를 관리합니다',
                     path: '/manager/actor'
+                },
+                {
+                    name: '스킬',
+                    description: '스킬을 관리합니다',
+                    path: '/manager/skill'
                 }
             ]
         },
@@ -119,11 +124,6 @@ export default class ProjectFileListComponent extends Vue {
                     name: '비디오',
                     description: '비디오를 관리합니다',
                     path: '/manager/video'
-                },
-                {
-                    name: '스킬',
-                    description: '스킬을 관리합니다',
-                    path: '/manager/skill'
                 }
             ]
         },
