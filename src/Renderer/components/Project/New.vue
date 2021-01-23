@@ -92,7 +92,7 @@
                                 <v-card-text>
                                     <p>
                                         프로젝트 이름을 입력하세요.
-                                        영소문자만 입력할 수 있습니다.
+                                        숫자와 영소문자만 입력할 수 있습니다.
                                     </p>
                                     <div>
                                         <v-text-field v-model="projectName" :rules="[projectNameRule, projectNameRequiredRule]"></v-text-field>
