@@ -1,5 +1,2 @@
 @import "{{ site.theme }}";
-.main-content p {
-  font-size: initial !important;
-  line-height: 1.8 !important;
-}
+@import "./custom.scss"
