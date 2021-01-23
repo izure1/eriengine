@@ -22,9 +22,9 @@
     <link rel="stylesheet" href="{{ '/assets/css/custom.css?v=' | append: site.github.build_revision | relative_url }}">
   </head>
   <body>
-    <a id="skip-to-content" href="#content">Skip to the content.</a>
+    <!-- <a id="skip-to-content" href="#content">Skip to the content.</a>
 
-    <!-- <header class="page-header" role="banner">
+    <header class="page-header" role="banner">
       <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
       <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
       {% if site.github.is_project_page %}
@@ -39,6 +39,10 @@
     <main id="content" class="main-content" role="main">
       {{ content }}
 
+      <div class="main-content-action">
+          <a href="{{ page.dir }}">홈으로</a>
+          <a href="javascript:history.go(-1)">뒤로가기</a>
+      </div>
       <footer class="site-footer">
         {% if site.github.is_project_page %}
           <span class="site-footer-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a> is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>.</span>
