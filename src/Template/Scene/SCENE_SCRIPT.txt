@@ -3,6 +3,7 @@ import { Actor } from '@eriengine/plugin-actor'
 
 {{ PROJECT_LISTS }}
 // 타입 추론을 위한 클래스 타입이므로 별도의 멤버변수나, 메서드를 추가하지 마십시오.
+// 해당하는 올바른 씬을 선택하여 주십시오.
 declare class Scene extends Scenes[] {}
 
 /*
@@ -43,7 +44,7 @@ export function onSceneUpdate(this: Scene, time: number, delta: number): void {
 }
 
 /**
- *  씬이 파괴될 대 호출될 함수입니다.
+ *  씬이 파괴될 때 호출될 함수입니다.
  *  씬에서 생성한 오브젝트는 자동으로 파괴됩니다. 하지만 직접 파괴할 데이터가 있다면 이곳에서 처리하십시오.
  */
 export function OnSceneDestroy(this: Scene): void {

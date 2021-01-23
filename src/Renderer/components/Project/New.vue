@@ -218,7 +218,7 @@
                                         <v-col>
                                             <v-card flat>
                                                 <v-card-title><v-spacer />글자 색상<v-spacer /></v-card-title>
-                                                <v-card-subtitle>GUI의 글자 색상을 선택합니다</v-card-subtitle>
+                                                <v-card-subtitle class="text-center">GUI의 글자 색상을 선택합니다</v-card-subtitle>
                                                 <v-card-actions>
                                                     <v-spacer />
                                                     <v-color-picker hide-canvas show-swatches v-model="gameThemeTextColor" />
@@ -229,7 +229,7 @@
                                         <v-col>
                                             <v-card flat>
                                                 <v-card-title><v-spacer />배경 색상<v-spacer /></v-card-title>
-                                                <v-card-subtitle>GUI의 배경 색상을 선택합니다</v-card-subtitle>
+                                                <v-card-subtitle class="text-center">GUI의 배경 색상을 선택합니다</v-card-subtitle>
                                                 <v-card-actions>
                                                     <v-spacer />
                                                     <v-color-picker hide-canvas show-swatches v-model="gameThemeBackgroundColor" />

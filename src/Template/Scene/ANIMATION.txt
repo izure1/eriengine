@@ -15,7 +15,13 @@ import Phaser from 'phaser'
  */
 
 // 애니메이션에 사용될 스프라이트에셋입니다.
-export const key: string      = Sprites[]
+export const key: string      = Assets[]
+
+// 스프라이트에셋의 가로 프레임 크기입니다
+export const frameWidth: number    = ?
+
+// 스프라이트에셋의 세로 프레임 크기입니다
+export const frameHeight: number   = ?
 
 // 스프라이트에셋에서 프레임 범위를 지정합니다.
 // 프레임은 0부터 시작합니다. 가령 10개의 프레임이 있을 경우, start: 0, end: 9가 됩니다.

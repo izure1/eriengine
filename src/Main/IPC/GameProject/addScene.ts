@@ -4,13 +4,16 @@ import { nanoid } from 'nanoid'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
+import { handler as addStorageDirectory } from './addStorageDirectory'
 import { handler as writeSceneMap } from './writeSceneMap'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME,
     PROJECT_LISTS
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
+import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import RAW_BASE_SCENE from 'raw-loader!@/Template/Scene/BASE_SCENE.txt'
 import RAW_SCENE from 'raw-loader!@/Template/Scene/SCENE.txt'
 
@@ -75,20 +78,18 @@ export async function handler(projectDirPath: string, filePath: string): Promise
         return fileWrite as Engine.GameProject.AddSceneFail
     }
 
-    const [ sceneName, storageKey ] = path.parse(filePath).name.split('.')
-    if (!sceneName) {
-        return {
-            success: false,
-            name: '씬 생성 실패',
-            message: '씬 파일 이름 정보가 없습니다'
-        }
-    }
+    const storageKey: string = getStorageKeyFromFilename(filePath)
     if (!storageKey) {
         return {
             success: false,
             name: '씬 생성 실패',
             message: '스토리지 키 정보가 없습니다'
         }
+    }
+
+    const storageDirAdd = await addStorageDirectory(projectDirPath, storageKey, PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME)
+    if (!storageDirAdd.success) {
+        return storageDirAdd as Engine.GameProject.AddSceneFail
     }
     
     const sceneMapWrite = await writeSceneMap(projectDirPath, storageKey)

@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import path from 'path'
-import { ipcRenderer, shell } from 'electron'
+import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import FileGeneratorComponent from '@/Renderer/components/Manager/FileGenerator.vue'
 import {

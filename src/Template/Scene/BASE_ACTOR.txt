@@ -1,0 +1,28 @@
+import Phaser from 'phaser'
+import { Actor } from '@eriengine/plugin-actor'
+
+type ScriptCallback = (actor: Actor) => void
+interface EriengineScript {
+    starts: ScriptCallback[]
+    updates: ScriptCallback[]
+    ends: ScriptCallback[]
+}
+
+export default abstract class EriengineActor extends Actor {
+
+    protected __starts!:   ScriptCallback[]
+    protected __updates!:   ScriptCallback[]
+    protected __ends!:  ScriptCallback[]
+
+    init(script: EriengineScript): void {
+        const { starts, updates, ends } = script
+        this.__starts  = starts
+        this.__updates  = updates
+        this.__ends = ends
+    }
+
+    protected runScript(callbacks: ((actor: this) => void)[]): void {
+        callbacks.forEach((callback): void => callback(this))
+    }
+
+}

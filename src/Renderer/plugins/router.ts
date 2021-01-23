@@ -7,15 +7,15 @@ import ProjectOpen from '@/Renderer/components/Project/Open.vue'
 import ProjectClose from '@/Renderer/components/Project/Close.vue'
 import Manager from '@/Renderer/components/Manager/Main.vue'
 import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue'
-import ManagerScene from '@/Renderer/components/Manager/Scene/Main.vue'
-import ManagerSceneScript from '@/Renderer/components/Manager/Scene/Script/Main.vue'
-import ManagerSceneMap from '@/Renderer/components/Manager/Scene/Map/Main.vue'
 import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue'
-import ManagerActor from '@/Renderer/components/Manager/Actor/Main.vue'
 import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue'
+import ManagerScene from '@/Renderer/components/Manager/Data/Scene/Main.vue'
+import ManagerSceneScript from '@/Renderer/components/Manager/Data/Scene/Script/Main.vue'
+import ManagerSceneMap from '@/Renderer/components/Manager/Data/Scene/Map/Main.vue'
+import ManagerActor from '@/Renderer/components/Manager/Data/Actor/Main.vue'
+import ManagerActorScript from '@/Renderer/components/Manager/Data/Actor/Script/Main.vue'
 import ManagerAnimation from '@/Renderer/components/Manager/Data/Animation/Main.vue'
 import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue'
-import ManagerSprite from '@/Renderer/components/Manager/Data/Sprite/Main.vue'
 import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue'
 import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
@@ -72,6 +72,14 @@ const routes: Array<RouteConfig> = [
                 component: ManagerActor
             },
             {
+                path: 'actor/script',
+                component: ManagerActorScript
+            },
+            {
+                path: 'actor/script/:filePath',
+                component: ManagerActorScript
+            },
+            {
                 path: 'asset',
                 component: ManagerAsset
             },
@@ -82,10 +90,6 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'skill',
                 component: ManagerSkill
-            },
-            {
-                path: 'sprite',
-                component: ManagerSprite
             },
             {
                 path: 'image',

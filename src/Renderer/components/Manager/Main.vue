@@ -46,7 +46,6 @@
 
 <script lang="ts">
 import path from 'path'
-import fs from 'fs-extra'
 import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
@@ -54,14 +53,14 @@ import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME,
     PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME,
     PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME,
-    PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME,
-    PROJECT_SRC_ACTOR_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_DIRECTORY_NAME
+    PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
 } from '@/Const'
 
 interface ContextmenuGroup {
@@ -107,9 +106,9 @@ export default class ProjectFileListComponent extends Vue {
                     path: '/manager/image'
                 },
                 {
-                    name: '스프라이트',
-                    description: '스프라이트를 관리합니다',
-                    path: '/manager/sprite'
+                    name: '애니메이션',
+                    description: '애니메이션을 관리합니다',
+                    path: '/manager/animation'
                 },
                 {
                     name: '오디오',
@@ -120,11 +119,6 @@ export default class ProjectFileListComponent extends Vue {
                     name: '비디오',
                     description: '비디오를 관리합니다',
                     path: '/manager/video'
-                },
-                {
-                    name: '애니메이션',
-                    description: '애니메이션을 관리합니다',
-                    path: '/manager/animation'
                 },
                 {
                     name: '스킬',
@@ -185,11 +179,11 @@ export default class ProjectFileListComponent extends Vue {
         const assetWatcher = new FileWatcher(assetDir).update(() => ipcRenderer.invoke('generate-asset-list', this.projectDirectory)).start().emit()
 
         // 씬 디렉토리 감지
-        const sceneDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
+        const sceneDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME)
         const sceneWatcher = new FileWatcher(sceneDir).update(() => ipcRenderer.invoke('generate-scene-list', this.projectDirectory)).start().emit()
 
         // 액터 디렉토리 감지
-        const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME)
+        const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME)
         const actorWatcher = new FileWatcher(actorDir).update(() => ipcRenderer.invoke('generate-actor-list', this.projectDirectory)).start().emit()
 
         // 애니메이션 디렉토리 감지
@@ -199,10 +193,6 @@ export default class ProjectFileListComponent extends Vue {
         // 스킬 디렉토리 감지
         const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME)
         const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
-
-        // 스프라이트 디렉토리 감지
-        const spriteDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME)
-        const spriteWatcher = new FileWatcher(spriteDir).update(() => ipcRenderer.invoke('generate-sprite-list', this.projectDirectory)).start().emit()
 
         // 이미지 디렉토리 감지
         const imageDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME)
@@ -222,7 +212,6 @@ export default class ProjectFileListComponent extends Vue {
         this.watchers.add(sceneWatcher)
         this.watchers.add(animsWatcher)
         this.watchers.add(skillWatcher)
-        this.watchers.add(spriteWatcher)
         this.watchers.add(imageWatcher)
         this.watchers.add(audioWatcher)
         this.watchers.add(videoWatcher)

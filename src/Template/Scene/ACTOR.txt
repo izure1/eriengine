@@ -1,20 +1,35 @@
-import { Actor } from '@eriengine/plugin-actor'
+import BaseActor from '@/BaseActor'
 
 {{ PROJECT_LISTS }}
 
 
-export default class SampleActor extends Actor {
+/*
+ *
+ *  주의!
+ *  액터 파일 이름의 뒷 부분은 절대 변경하지 마십시오.
+ *  이 뒷 부분은 액터가 참조해야할 스크립트의 정보를 담고 있습니다.
+ *
+ *  가령 파일명이 actor.ABCDE.ts 일 경우, ABCDE 부분은 절대 변경되어선 안됩니다.
+ *  액터 파일의 이름을 변경하고 싶다면, newName.ABCDE.ts 의 방식으로 뒷 부분을 제외하고 변경하십시오.
+ *
+ */
+
+export default class SampleActor extends BaseActor {
     start(): void {
+        this.runScript(this.__starts)
+
         // this.run.useMoveKey('arrow') /* 커서로 액터를 움직일 수 있도록 만듭니다. wasd, arrow 둘 중 택할 수 있습니다. */
     }
 
     update(): void {
+        this.runScript(this.__updates)
+
         // this.run.stop()
         // this.playMovingAnimation()
     }
 
     end(): void {
-
+        this.runScript(this.__ends)
     }
 
     private playMovingAnimation(): void {

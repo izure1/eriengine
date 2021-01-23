@@ -13,12 +13,13 @@
 <script lang="ts">
 import path from 'path'
 import { nanoid } from 'nanoid'
-import { ipcRenderer, shell } from 'electron'
+import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import FileGeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/FileGenerator.vue'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_DIRECTORY_NAME
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME
 } from '@/Const'
 
 @Component({
@@ -30,7 +31,8 @@ export default class SkillMainComponent extends Vue {
     private cwd: string = path.resolve(
         this.$store.state.projectDirectory,
         PROJECT_SRC_DIRECTORY_NAME,
-        PROJECT_SRC_SCENE_DIRECTORY_NAME,
+        PROJECT_SRC_DATA_DIRECTORY_NAME,
+        PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME,
     )
 
     private contextmenus: ContextItemAction[] = [

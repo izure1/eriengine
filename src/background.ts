@@ -35,8 +35,9 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/checkValidProject')
 
     yield require('./Main/IPC/GameProject/addScene')
-    yield require('./Main/IPC/GameProject/addScript')
+    yield require('./Main/IPC/GameProject/addSceneScript')
     yield require('./Main/IPC/GameProject/addActor')
+    yield require('./Main/IPC/GameProject/addActorScript')
     yield require('./Main/IPC/GameProject/addAnimation')
     yield require('./Main/IPC/GameProject/addSkill')
     yield require('./Main/IPC/GameProject/addSprite')

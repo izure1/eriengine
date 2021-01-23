@@ -3,7 +3,8 @@
         :cwd="cwd"
         :add="add"
         :description="[
-            '스프라이트시트에서 프레임 범위를 지정하여 스프라이트 이미지를 재생할 수 있는 기능입니다.<br>애니메이션은 동적인 게임에서 거의 필수적인 요소입니다.',
+            '스프라이트 에셋을 이용하여 애니메이션을 생성합니다.<br>움직이지 않는 이미지와 달리, 애니메이션은 움직임을 표현하는 이미지입니다. 카메라의 필름이라 생각해도 좋습니다.',
+            '스프라이트 에셋에 몇 개의 프레임이 들어있고, 한 프레임의 가로세로 크기는 몇인지를 설정해야 합니다.<br>그리고 재생 속도와 반복여부를 설정하십시오.',
             '이곳에서 추가한 애니메이션은 자동으로 모든 씬에 등록됩니다.'
         ]"
         filename="animation.ts"
@@ -12,10 +13,8 @@
 
 <script lang="ts">
 import path from 'path'
-import normalize from 'normalize-path'
-import increment from 'add-filename-increment'
 import FileGeneratorComponent from '@/Renderer/components/Manager/FileGenerator.vue'
-import { ipcRenderer, shell } from 'electron'
+import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import {
     PROJECT_SRC_DIRECTORY_NAME,

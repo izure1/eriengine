@@ -23,8 +23,6 @@ import { Vue, Component } from 'vue-property-decorator'
 
 @Component
 export default class RestructureComponent extends Vue {
-    private config: Engine.GameProject.Config|null = null
-
     private get cwd(): string {
         return this.$route.params.cwd
     }

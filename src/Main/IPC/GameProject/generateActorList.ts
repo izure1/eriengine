@@ -6,16 +6,17 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { getModuleContentFromArray } from '@/Utils/getModuleContentFromArray'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ACTOR_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME,
     PROJECT_SRC_ACTORLIST_NAME
 } from '@/Const'
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.GenerateActorListSuccess|Engine.GameProject.GenerateActorListFail> {
-    const cwd: string       = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTOR_DIRECTORY_NAME))
+    const cwd: string       = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME))
     const listPath: string  = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTORLIST_NAME))
 
     try {
-        const aliasCwd: string          = normalize(path.join('@', PROJECT_SRC_ACTOR_DIRECTORY_NAME))
+        const aliasCwd: string          = normalize(path.join('@', PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME))
         const list: string[]            = await glob('**/*.ts', { cwd, absolute: false })
         const jsonWrite                 = await writeFile(listPath,
             getModuleContentFromArray(

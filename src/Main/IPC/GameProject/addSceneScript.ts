@@ -5,7 +5,7 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { PROJECT_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
-import RAW_SCRIPT from 'raw-loader!@/Template/Scene/SCRIPT.txt'
+import RAW_SCRIPT from 'raw-loader!@/Template/Scene/SCENE_SCRIPT.txt'
 
 async function writeScriptFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_SCRIPT, {
@@ -25,22 +25,22 @@ async function writeScriptFile(filePath: string): Promise<Engine.FileSystem.Writ
     }
 }
 
-export async function handler(filePath: string): Promise<Engine.GameProject.AddScriptSuccess|Engine.GameProject.AddScriptFail> {
+export async function handler(filePath: string): Promise<Engine.GameProject.AddSceneScriptSuccess|Engine.GameProject.AddSceneScriptFail> {
     const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
-        return directoryEnsure as Engine.GameProject.AddSceneFail
+        return directoryEnsure as Engine.GameProject.AddSceneScriptFail
     }
 
     const fileWrite = await writeScriptFile(filePath)
     if (!fileWrite.success) {
-        return fileWrite as Engine.GameProject.AddScriptFail
+        return fileWrite as Engine.GameProject.AddSceneScriptFail
     }
 
     return fileWrite
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-script', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddScriptFail> => {
+    ipcMain.handle('add-scene-script', async (e: IpcMainInvokeEvent, filePath: string): Promise<Engine.GameProject.AddSceneScriptSuccess|Engine.GameProject.AddSceneScriptFail> => {
         return await handler(filePath)
     })
 }

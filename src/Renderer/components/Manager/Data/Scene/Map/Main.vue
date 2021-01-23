@@ -1,11 +1,56 @@
 <template>
-    <v-card flat tile>
+    <section>
         <section ref="game-canvas"></section>
-    </v-card>
+        <v-dialog
+            v-model="isTooltipOpen"
+            persistent
+            max-width="800"
+        >
+            <v-card>
+                <v-card-title>사용법</v-card-title>
+                <v-card-subtitle>
+                    씬 에디터를 이용하여 씬을 GUI 환경에서 디자인할 수 있습니다.
+                    <br>
+                    만들어둔 스프라이트나 이미지, 액터 데이터를 사용합니다.
+                </v-card-subtitle>
+                <v-card-text>
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>화면 이동</v-list-item-title>
+                                <v-list-item-subtitle>키보드 W, A, S, D 키를 이용하여 화면을 움직이세요</v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>확대/축소</v-list-item-title>
+                                <v-list-item-subtitle>키보드 Q, R 키를 이용하여 확대/축소할 수 있습니다</v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>맵의 경계</v-list-item-title>
+                                <v-list-item-subtitle>
+                                    씬의 맵 크기에는 한계가 있습니다. 큰 맵은 성능 저하를 유발합니다.
+                                    <br>
+                                    일반적으로 1000 ~ 3000이 적당합니다.
+                                    <br>
+                                    경계는 파란선으로 보이며, 다이아몬드(◇) 모양으로 되어 있습니다. 이 내부를 꾸미세요.
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn text @click="isTooltipOpen = false">알겠습니다</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </section>
 </template>
 
 <script lang="ts">
-import path from 'path'
 import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
@@ -15,13 +60,11 @@ import Phaser from 'phaser'
 import PreviewScene from './Phaser/PreviewScene'
 import createConfig from './Phaser/createConfig'
 
-import Logo from '@/Renderer/assets/logo.png'
-
-
 @Component
 export default class SceneMapEditor extends Vue {
     @NonReactivity(null) private game!: Phaser.Game|null
     private map!: Engine.GameProject.SceneMap
+    private isTooltipOpen: boolean = true
 
     private get filePath(): string {
         return decodeURIComponent(this.$route.params.filePath)

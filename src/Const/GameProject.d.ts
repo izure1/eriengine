@@ -28,8 +28,11 @@ declare namespace Engine {
         interface AddSceneSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddSceneFail extends Engine.ActionFailState {}
 
-        interface AddScriptSuccess extends PathRequired, Engine.ActionSuccessState {}
-        interface AddScriptFail extends Engine.ActionFailState {}
+        interface AddSceneScriptSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddSceneScriptFail extends Engine.ActionFailState {}
+
+        interface AddActorScriptSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface AddActorScriptFail extends Engine.ActionFailState {}
 
         interface AddAnimationSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface AddAnimationFail extends Engine.ActionFailState {}

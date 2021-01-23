@@ -1,4 +1,5 @@
 import path from 'path'
+import { nanoid } from 'nanoid'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as ensureProject } from './ensureProject'
 import { handler as addScene } from './addScene'
@@ -6,12 +7,20 @@ import { parseProperty } from '@/Utils/parseProperty'
 import {
     PROJECT_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_SCENE_DIRECTORY_NAME
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME
 } from '@/Const'
 
+function createSceneName(name: string): string {
+    return `${name}.${nanoid(10)}.ts`
+}
+
 async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> {
-    const scenes: string[] = [ 'main.ts', 'gui_main.ts' ]
-    const sceneRootDir: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SCENE_DIRECTORY_NAME)
+    const scenes: string[] = [
+        createSceneName('main'),
+        createSceneName('gui')
+    ]
+    const sceneRootDir: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME)
     for (const key of scenes) {
         const filePath: string = path.resolve(sceneRootDir, key)
         const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await addScene(projectDirPath, filePath)

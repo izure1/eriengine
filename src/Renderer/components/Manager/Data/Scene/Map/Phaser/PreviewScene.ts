@@ -50,10 +50,7 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     private updateCamera(delta: number): void {
-        if (!this.cameraControl) {
-            return
-        }
-        this.cameraControl.update(delta)
+        this.cameraControl?.update(delta)
         
         // 카메라 축소/확대 최대치 설정
         if (this.cameras.main.zoom < 0.25)  this.cameras.main.zoom = 0.25
@@ -61,6 +58,8 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     private onMouseLeftDown(): void {
+        const { x, y } = this.cursor.pointer
+        this.isometric.setWalltile(x, y, 100, 'logo')
         console.log(1)
     }
     
@@ -74,7 +73,7 @@ export default class PreviewScene extends Phaser.Scene {
 
     create(): void {
         this.setCameraMoving()
-        this.setDisposeMode(false)
+        this.setDisposeMode(true)
 
         this.add.image(0, 0, 'logo')
 
