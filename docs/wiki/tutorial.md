@@ -23,4 +23,4 @@
 
 만일 튜토리얼에서 이해가 되지 않는 부분이 있다면, [에리엔진 저장소의 이슈](https://github.com/izure1/eriengine4/issues)에서 질문글을 올려주세요.
 
-[→ 프로젝트 만들기](./how-to-make-new-project)
+[→ 처음으로 뭘 해야하죠?](./what-should-i-do-first)
