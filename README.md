@@ -2,6 +2,9 @@
 에리엔진은 간단한 쿼터뷰 게임을 구현하도록 도와주는 게임 엔진입니다.  
 [Phaser3](https://github.com/photonstorm/phaser) 라이브러리를 사용하여 HTML 캔버스로 구현됩니다.
 
+공식 문서는 아래 링크를 참조해주세요.  
+[https://eriengine.izure.org](https://eriengine.izure.org)
+
 ## 지원 프로그래밍 언어
 * [타입스크립트](https://www.typescriptlang.org/) **(권장)**
 * 자바스크립트
