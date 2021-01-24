@@ -11,9 +11,9 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@eriengine/plugin-actor": "^1.0.3",
+    "@eriengine/plugin-actor": "^1.0.4",
     "@eriengine/plugin-dialogue": "^1.0.2",
-    "@eriengine/plugin-fog-of-war": "^1.0.1",
+    "@eriengine/plugin-fog-of-war": "^1.0.2",
     "@eriengine/plugin-isometric-cursor": "^1.0.6",
     "@eriengine/plugin-isometric-scene": "^1.0.3",
     "add-filename-increment": "^1.0.0",
