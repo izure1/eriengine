@@ -11,7 +11,7 @@ node.js는 자바스크립트를 실행시켜주는 런타임 프로그램입니
 
 [https://nodejs.org/en/](https://nodejs.org/en/)
 
-![node.js 설치](../assets/img/a6b856fc-d91f-4fdc-8b94-13960fd59d7c.png)
+![node.js 설치](../assets/img/wiki/a6b856fc-d91f-4fdc-8b94-13960fd59d7c.png)
 
 다운로드는 좌측의 Recommand, 권장 버전을 설치하여 주시면 됩니다.  
 위 이미지에서는 14.15.4 버전으로 표시되어 있지만, 여러분이 다운로드 받을 때는 더 높은 버전이 있을 수도 있습니다. 상관하지 않고 설치하시면 됩니다.
