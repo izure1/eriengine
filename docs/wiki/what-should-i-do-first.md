@@ -5,6 +5,7 @@
 1. [프로젝트 만들기](./how-to-make-new-project)
 1. [에셋 추가하기](./add-assets)
 1. [애니메이션 만들기](./add-animations)
+1. [프로그래밍의 기초 배우기](./lets-learn-programming)
 1. [액터 만들기](./add-actors)
 1. 씬 만들기
 

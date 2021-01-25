@@ -16,8 +16,4 @@
 따라서 프로그래밍에 익숙하시다면 아래 내용은 뛰어 넘으셔도 됩니다.  
 프로그래밍에 대한 용어를 알고 싶으시다면 아래 링크를 참고해주세요.
 
-### 프로그래밍 지식 다지기
-
-1. [변수(variable)란?](./what-is-variable)
-1. [추상화(Abstract)란?](./what-is-abstract)
-1. [상속(Inherit)이란?](./what-is-inherit)
+{% include_relative lets-learn-programming.md %}
