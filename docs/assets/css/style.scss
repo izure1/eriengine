@@ -5,6 +5,9 @@ $section-headings-color: #efdab9 !default;
 $body-text-color: #d0d0d0 !default;
 $body-link-color: #ffd152 !default;
 
+$code-bg-color: #222 !default;
+$code-text-color: grey !default;
+
 @import "{{ site.theme }}";
 
 body {
@@ -15,16 +18,21 @@ body {
     font-size: 14px;
     font-family: "Nanum Gothic", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 1.8;
+
+    pre {
+        border: 0 !important;
+        border-radius: 0 !important;
+    }
 }
 
 .main-content-action {
     text-align: right;
     margin-top: 50px;
-}
 
-.main-content-action > a {
-    margin: 0 5px;
-    display: inline-block;
+    > a {
+        margin: 0 5px;
+        display: inline-block;
+    }
 }
 
 code.language-plaintext.highlighter-rouge {
