@@ -1,10 +1,17 @@
 ## 처음으로 뭘 해야하죠?
 
+### 프로그램 기초 설정하기
+
 1. [개발도구 설치하기](./install-ide)
 1. [종속성 프로그램 설치하기](./install-dependencies)
-1. [프로젝트 만들기](./how-to-make-new-project)
+
+### 프로젝트 준비
+
+1. [프로젝트 만들기](./make-new-project)
 1. [에셋 추가하기](./add-assets)
 1. [애니메이션 만들기](./add-animations)
+
+### 프로그래밍 심화
 1. [프로그래밍의 기초 배우기](./lets-learn-programming)
 1. [액터 만들기](./add-actors)
 1. 씬 만들기

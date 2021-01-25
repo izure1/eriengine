@@ -39,5 +39,3 @@
 
 그럴 때는 위키와 [저장소 이슈](https://github.com/izure1/eriengine4/issues)에 질문 기능을 의지해주세요.  
 그리고 여러분과 같은 고민에 빠진 사람들을 도와주세요.
-
-[→ 처음으로 뭘 해야하죠?](./what-should-i-do-first)
