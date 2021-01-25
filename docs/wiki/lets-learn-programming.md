@@ -1,4 +1,6 @@
-### 프로그래밍의 기초 배우기
+## 프로그래밍의 기초 배우기
+
+에리엔진은 프로그래밍을 
 
 1. [변수(variable)란?](./what-is-variable)
 1. [추상화(Abstract)란?](./what-is-abstract)
