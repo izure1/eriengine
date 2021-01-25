@@ -8,5 +8,6 @@
 
 1. [프로그래밍 언어란?](./select-your-programming-language)
 1. [변수(variable)란?](./what-is-variable)
+1. [타입(type)이란?](./what-is-type)
 1. [추상화(Abstract)란?](./what-is-abstract)
 1. [상속(Inherit)이란?](./what-is-inherit)
