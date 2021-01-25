@@ -21,10 +21,10 @@
 
 ```
 class Unit {
-    name: string;
-    hp: number;
-    color: string;
-    controlable: boolean;
+    name: string
+    hp: number
+    color: string
+    controlable: boolean
 }
 ```
 
@@ -50,7 +50,7 @@ class Unit {
 
 ```
 class Unit {
-    나열할 이름: 타입;
+    나열할 이름: 타입
 }
 ```
 
@@ -59,7 +59,7 @@ class Unit {
 
 ```
 class Unit {
-    hp: number;
+    hp: number
 }
 ```
 
@@ -70,10 +70,10 @@ class Unit {
 
 ```
 class Unit {
-    name: string;
-    hp: number;
-    color: string;
-    controlable: boolean;
+    name: string
+    hp: number
+    color: string
+    controlable: boolean
 }
 ```
 
@@ -86,15 +86,15 @@ class Unit {
 
 ```
 class Unit {
-    name: string;
+    name: string
     hp: number
-    color: string,
-    controlable: boolean;
+    color: string
+    controlable: boolean
 
     getHeal() {
 
         // 힐을 받았습니다
-        this.say(this.name + '는 힐을 받았다! 고맙네!');
+        this.say(this.name + '는 힐을 받았다! 고맙네!')
         this.hp = this.hp + 10 // 자신의 hp가 10만큼 증가합니다.
 
     }
