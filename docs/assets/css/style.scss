@@ -1,5 +1,8 @@
+---
+---
+
 $section-headings-color: #efdab9 !default;
 $body-text-color: #d0d0d0 !default;
 $body-link-color: #ffd152 !default;
 
-@import "jekyll-theme-cayman";
+@import "{{ site.theme }}";
