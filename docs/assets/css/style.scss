@@ -11,7 +11,7 @@ $code-text-color: grey !default;
 @import "{{ site.theme }}";
 
 body {
-    background-color: #343233;
+    background: linear-gradient(180deg, #343233, #222);
 }
 
 .main-content {
