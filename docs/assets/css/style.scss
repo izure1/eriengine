@@ -6,3 +6,28 @@ $body-text-color: #d0d0d0 !default;
 $body-link-color: #ffd152 !default;
 
 @import "{{ site.theme }}";
+
+body {
+    background-color: #343233;
+}
+
+.main-content {
+    font-size: 14px;
+    font-family: "Nanum Gothic", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.8;
+}
+
+.main-content-action {
+    text-align: right;
+    margin-top: 50px;
+}
+
+.main-content-action > a {
+    margin: 0 5px;
+    display: inline-block;
+}
+
+code.language-plaintext.highlighter-rouge {
+    color: #d2691e;
+    background-color: transparent;
+}
