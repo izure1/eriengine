@@ -48,3 +48,10 @@
 그리고 서로 싸워야하니, HP(Hit Point)의 정보도 필요합니다.
 
 공통된 조상, 이 정보는 **Character**에서 프로그래밍하면 될 것입니다.
+
+```
+class Character extends BaseActor {
+    protected hp: number
+    protected colony: string
+}
+```

@@ -22,4 +22,5 @@
 [에리엔진 Github](https://github.com/izure1/eriengine4)의 [Code/docs/wiki 디렉토리](https://github.com/izure1/eriengine4/tree/master/docs/wiki)의 내용을 수정하세요.
 
 이것은 새로운 브랜치를 요청하게 될 것이고,  
-관리자가 내용을 확인한 뒤 올바르다고 판단되면 병합될 것입니다.
+관리자가 내용을 확인한 뒤 올바르다고 판단되면 병합될 것입니다.  
+요컨데 즉시 반영되지 않습니다. 따라서 제출 전 오탈자가 없는지 신중하게 확인해주세요.
