@@ -5,7 +5,7 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { PROJECT_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
-import RAW_VIDEO from 'raw-loader!@/Template/Scene/VIDEO.txt'
+import RAW_VIDEO from 'raw-loader!@/Template/Game/VIDEO.txt'
 
 async function writeSpriteFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_VIDEO, {

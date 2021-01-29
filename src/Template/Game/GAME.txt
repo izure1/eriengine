@@ -1,0 +1,67 @@
+import Phaser from 'phaser'
+import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
+import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
+import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+
+import Scenes from './{{ PROJECT_SRC_SCENELIST_NAME }}'
+import { GAME_DISPLAY_SIZE } from '../config.json'
+
+
+new Phaser.Game({
+    width: GAME_DISPLAY_SIZE[0],
+    height: GAME_DISPLAY_SIZE[1],
+    scene: [
+        ...Object.values(Scenes).map((scene) => scene.default)
+    ]
+    scale: {
+        parent: '#canvas-wrapper',
+        expandParent: true,
+        zoom: 1
+    },
+    dom: {
+        createContainer: true
+    },
+    plugins: {
+        global: [
+            {
+                key: 'DialoguePlugin',
+                mapping: 'dialogue',
+                plugin: DialoguePlugin
+            }
+        ],
+        scene: [
+            {
+                key: 'ActorPlugin',
+                mapping: 'actor',
+                plugin: ActorPlugin
+            },
+            {
+                key: 'IsometricScenePlugin',
+                mapping: 'isometric',
+                plugin: IsometricScenePlugin
+            },
+            {
+                key: 'IsometricCursorPlugin',
+                mapping: 'cursor',
+                plugin: IsometricCursorPlugin
+            },
+            {
+                key: 'FogOfWarPlugin',
+                mapping: 'fow',
+                plugin: FogOfWarPlugin
+            }
+        ]
+    },
+    physics: {
+        default: 'matter',
+        matter: {
+            debug: false,
+            gravity: {
+                x: 0,
+                y: 0
+            }
+        }
+    }
+})

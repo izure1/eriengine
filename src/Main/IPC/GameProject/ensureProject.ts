@@ -8,6 +8,7 @@ import {
     PROJECT_CONFIG_NAME,
     PROJECT_TSCONFIG_NAME,
     PROJECT_PACAKGE_NAME,
+    PROJECT_WEBPACK_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_AUDIO_DIRECTORY_NAME,
@@ -22,12 +23,12 @@ import {
     PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME, 
     PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
-    PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
 } from '@/Const'
 import RAW_PROJECT_PACKAGE from 'raw-loader!@/Template/Project/PACKAGE.txt'
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
 import RAW_PROJECT_CONFIG from 'raw-loader!@/Template/Project/CONFIG.txt'
+import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
 
 async function ensureConfig(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     let fileWrite: Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail
@@ -46,6 +47,15 @@ async function ensureConfig(projectDirPath: string, config: Engine.GameProject.C
     const tsPath: string        = path.resolve(projectDirPath, PROJECT_TSCONFIG_NAME)
 
     fileWrite = await writeFile(tsPath, tsContent)
+    if (!fileWrite.success) {
+        return fileWrite as Engine.FileSystem.WriteFileFail
+    }
+
+    // webpack.config.js
+    const wpContent: string     = parseProperty(RAW_PROJECT_WEBPACK, {})
+    const wpPath: string        = path.resolve(projectDirPath, PROJECT_WEBPACK_NAME)
+
+    fileWrite = await writeFile(wpPath, wpContent)
     if (!fileWrite.success) {
         return fileWrite as Engine.FileSystem.WriteFileFail
     }

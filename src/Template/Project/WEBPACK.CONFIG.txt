@@ -1,0 +1,27 @@
+const path = require('path')
+const glob = require('fast-glob')
+const mode = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'production'
+
+module.exports = {
+    mode,
+    target: 'web',
+    entry: {
+        Main: path.resolve(__dirname, 'src', 'Game.ts')
+    },
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+        library: 'Eriengine[name]',
+        libraryTarget: 'umd'
+    },
+    resolve: {
+        extensions: ['.ts', '.js', '.json'],
+        alias: {
+            '@': path.resolve(__dirname, 'src')
+        }
+    },
+    devServer: {
+        port: 9002,
+        hot: true
+    }
+}

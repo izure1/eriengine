@@ -5,7 +5,7 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { PROJECT_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
-import RAW_AUDIO from 'raw-loader!@/Template/Scene/AUDIO.txt'
+import RAW_AUDIO from 'raw-loader!@/Template/Game/AUDIO.txt'
 
 async function writeSpriteFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_AUDIO, {

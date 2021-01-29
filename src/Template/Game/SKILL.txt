@@ -4,6 +4,8 @@ import { ActorDot } from '@eriengine/plugin-actor/dist/actor/src/Actor/ActorDot'
 
 {{ PROJECT_LISTS }}
 
+// 스킬명으로 사용할 이름입니다. 다른 스킬명과 중복되어선 안됩니다.
+export const key: string = '{{ KEY }}'
 
 /**
  * 

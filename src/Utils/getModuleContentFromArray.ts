@@ -4,7 +4,10 @@ export function getModuleContentFromArray(list: string[], exportKey: string = ''
     for (let i: number = 0, len: number = list.length; i < len; i++) {
         const path: string = list[i]
         const name: string = `M${i}`
-        if (exportKey === '*') {
+        if (exportKey === '') {
+            modules += `import ${name} from '${path}'\n`
+        }
+        else if (exportKey === '*') {
             modules += `import * as ${name} from '${path}'\n`
         }
         else {

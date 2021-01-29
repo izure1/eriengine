@@ -5,7 +5,7 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { PROJECT_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
-import RAW_SCRIPT from 'raw-loader!@/Template/Scene/ACTOR_SCRIPT.txt'
+import RAW_SCRIPT from 'raw-loader!@/Template/Game/ACTOR_SCRIPT.txt'
 
 async function writeScriptFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_SCRIPT, {

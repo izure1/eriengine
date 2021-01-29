@@ -13,7 +13,9 @@ export const PROJECT_DIRECTORY_NAME: string = 'Eriengine Project_{{ PROJECT_NAME
 export const PROJECT_CONFIG_NAME: string = 'config.json'
 export const PROJECT_PACAKGE_NAME: string = 'package.json'
 export const PROJECT_TSCONFIG_NAME: string = 'tsconfig.json'
+export const PROJECT_WEBPACK_NAME: string = 'webpack.config.js'
 
+export const PROJECT_SRC_GAME_NAME: string      = 'Game.ts'
 export const PROJECT_SRC_ACTORLIST_NAME: string = 'ACTOR_LIST.ts'
 export const PROJECT_SRC_ANIMSLIST_NAME: string = 'ANIMS_LIST.ts'
 export const PROJECT_SRC_ASSETLIST_NAME: string = 'ASSET_LIST.ts'

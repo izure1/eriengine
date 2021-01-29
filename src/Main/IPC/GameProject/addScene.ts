@@ -14,8 +14,8 @@ import {
 
 import { parseProperty } from '@/Utils/parseProperty'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
-import RAW_BASE_SCENE from 'raw-loader!@/Template/Scene/BASE_SCENE.txt'
-import RAW_SCENE from 'raw-loader!@/Template/Scene/SCENE.txt'
+import RAW_BASE_SCENE from 'raw-loader!@/Template/Game/BASE_SCENE.txt'
+import RAW_SCENE from 'raw-loader!@/Template/Game/SCENE.txt'
 
 interface FileWriteQueue {
     path: string

@@ -23,7 +23,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
                 list.map((filePath: string): string => {
                     return normalize(path.join(aliasCwd, filePath))
                 }),
-                'default',
+                '*',
                 (modulePath: string) => normalize(path.relative(aliasCwd, modulePath))
             ))
             

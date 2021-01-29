@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 {{ PROJECT_LISTS }}
 // 타입 추론을 위한 클래스 타입이므로 별도의 멤버변수나, 메서드를 추가하지 마십시오.
 // 해당하는 올바른 액터를 선택하여 주십시오.
-declare class Actor extends Actors[] {}
+declare class Actor extends Actors[].default {}
 
 
 
@@ -22,8 +22,8 @@ declare class Actor extends Actors[] {}
 /**
  *  액터가 생성되었을 때 호출될 함수입니다.
  */
-export function OnActorStart(this: Actor): void {
-
+export function onActorStart(this: Actor): void {
+    {{ onActorStart }}
 }
 
 /**
@@ -33,14 +33,14 @@ export function OnActorStart(this: Actor): void {
  *  @param delta    이전 프레임과 현재 프레임 사이에 흐른 시간(ms)입니다. 60프레임이므로, 일반적으로 16ms입니다.
  */
 export function onActorUpdate(this: Actor, time: number, delta: number): void {
-
+    {{ onActorUpdate }}
 }
 
 /**
  *  액터가 파괴될 때 호출될 함수입니다.
  */
 export function onActorEnd(this: Actor): void {
-
+    {{ onActorEnd }}
 }
 
 
@@ -60,7 +60,7 @@ export function onActorEnd(this: Actor): void {
  *  @param information  적중시킨 스킬에 대한 정보입니다.
  */
 export function onActorHit(this: Actor, target: Actor, information: object): void {
-
+    {{ onActorHit }}
 }
 
 /**
@@ -69,7 +69,7 @@ export function onActorHit(this: Actor, target: Actor, information: object): voi
  *  @param information  적중당한 스킬에 대한 정보입니다.
  */
 export function onActorGetHit(this: Actor, from: Actor, information: object): void {
-
+    {{ onActorGetHit }}
 }
 
 /**
@@ -79,7 +79,7 @@ export function onActorGetHit(this: Actor, from: Actor, information: object): vo
  *  @param from  액터와 교전하고 있던 대상 액터들입니다.
  */
 export function onActorDefeat(this: Actor, ...from: Actor[]): void {
-
+    {{ onActorDefeat }}
 }
 
 /**
@@ -88,5 +88,5 @@ export function onActorDefeat(this: Actor, ...from: Actor[]): void {
  *  @param from  패배를 선언한 대상 액터입니다.
  */
 export function onActorWin(this: Actor, from: Actor): void {
-
+    {{ onActorWin }}
 }
