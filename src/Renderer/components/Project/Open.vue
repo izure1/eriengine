@@ -16,7 +16,7 @@
                             <br>
                             잠시만 기다려주세요.
                         </p>
-                        <pre>{{ streamMessage }}</pre>
+                        <shell-channel-component channel="ensure-require-modules" />
                     </div>
                     <span v-else>프로젝트 디렉토리를 선택하세요.</span>
                 </v-card-text>
@@ -44,12 +44,16 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
-import { readFromMain } from '@/Utils/stream'
 
-@Component
+import ShellChannelComponent from '@/Renderer/components/Shell/Channel.vue'
+
+@Component({
+    components: {
+        ShellChannelComponent
+    }
+})
 export default class OpenProjectComponent extends Vue {
     private isLoading: boolean = false
-    private streamMessage: string = ''
 
     private async selectDirectory(): Promise<void> {
         const directoryOpen: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
@@ -67,14 +71,7 @@ export default class OpenProjectComponent extends Vue {
             return
         }
 
-        const streamReader = readFromMain('ensure-require-modules')
-        streamReader.setEncoding('utf-8').on('data', (data: string): void => {
-            this.streamMessage += data
-        })
-
         const projectEnsure: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('ensure-project', directoryOpen.path, projectRead.config)
-
-        streamReader.destroy()
         if (!projectEnsure.success) {
             this.isLoading = false
             this.$store.dispatch('snackbar', projectEnsure.message)

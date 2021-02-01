@@ -8,6 +8,7 @@ import ProjectClose from '@/Renderer/components/Project/Close.vue'
 import Manager from '@/Renderer/components/Manager/Main.vue'
 import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue'
 import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue'
+import ManagerBuild from '@/Renderer/components/Manager/Build/Main.vue'
 import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue'
 import ManagerScene from '@/Renderer/components/Manager/Data/Scene/Main.vue'
 import ManagerSceneScript from '@/Renderer/components/Manager/Data/Scene/Script/Main.vue'
@@ -110,6 +111,10 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'restructure/:cwd',
                 component: ManagerRestructure
+            },
+            {
+                path: 'build',
+                component: ManagerBuild
             }
         ]
     },

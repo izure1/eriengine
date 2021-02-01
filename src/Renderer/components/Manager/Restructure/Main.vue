@@ -13,7 +13,7 @@
                 <br>
                 프로젝트 디렉토리의 구조를 임의로 변경하지 마십시오. 어디까지나 관리부주의는 사용자의 책임에 있습니다.
             </p>
-            <pre>{{ streamMessage }}</pre>
+            <shell-channel-component channel="ensure-require-modules" />
         </v-card-text>
     </v-card>
 </template>
@@ -21,12 +21,15 @@
 <script lang="ts">
 import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
-import { readFromMain } from '@/Utils/stream'
 
-@Component
+import ShellChannelComponent from '@/Renderer/components/Shell/Channel.vue'
+
+@Component({
+    components: {
+        ShellChannelComponent
+    }
+})
 export default class RestructureComponent extends Vue {
-    private streamMessage: string = ''
-
     private get cwd(): string {
         return this.$route.params.cwd
     }
@@ -59,13 +62,7 @@ export default class RestructureComponent extends Vue {
             return
         }
 
-        const streamReader = readFromMain('ensure-require-modules').setEncoding('utf-8').on('data', (data: string): void => {
-            this.streamMessage += data
-        })
-
         const projectRestructure = await this.restructureProject(projectRead.config)
-
-        streamReader.destroy()
         if (!projectRestructure.success) {
             this.finally(projectRestructure.message)
             return

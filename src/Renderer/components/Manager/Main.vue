@@ -59,7 +59,6 @@ import {
     PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME,
     PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
-    PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
 } from '@/Const'
 
@@ -130,6 +129,11 @@ export default class ProjectFileListComponent extends Vue {
         {
             title: '프로젝트',
             menus: [
+                {
+                    name: '빌드',
+                    description: '게임으로 빌드합니다',
+                    path: '/manager/build'
+                },
                 {
                     name: '설정',
                     description: '설정을 변경합니다',

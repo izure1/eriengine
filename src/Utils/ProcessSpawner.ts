@@ -32,11 +32,11 @@ export class ProcessSpawner {
 
             spawner.on('exit', (code: number|null, signal): void => {
                 if (!spawner) {
-                    reject('The spawner could not be created with an unknown error.')
+                    reject(new Error('The spawner could not be created with an unknown error.'))
                 }
                 else {
                     if (code === 0) resolve()
-                    else            reject(`The following error occurred. CODE: ${code}, ERR: ${err}`)
+                    else            reject(new Error(`The following error occurred. CODE: ${code}, ERR: ${err}`))
                 }
                 destination.end()
                 destination.destroy()

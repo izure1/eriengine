@@ -67,6 +67,8 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/readSceneMap')
     yield require('./Main/IPC/GameProject/ensureSceneMap')
     yield require('./Main/IPC/GameProject/writeSceneMap')
+
+    yield require('./Main/IPC/GameProject/buildToWeb')
     
     // Process
     yield require('./Main/IPC/Process/checkCommandExists')

@@ -114,5 +114,8 @@ declare namespace Engine {
 
         interface WriteSceneMapSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface WriteSceneMapFail extends Engine.ActionFailState {}
+
+        interface BuildToWebSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface BuildToWebFail extends Engine.ActionFailState {}
     }
 }

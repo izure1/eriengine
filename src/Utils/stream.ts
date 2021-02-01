@@ -14,11 +14,10 @@ class MainWriteStream extends Stream.Writable {
     constructor(channel: string) {
         super()
         this.channel = channel
-        this.win = BrowserWindow.getFocusedWindow()
+        this.win = BrowserWindow.getAllWindows()[0]
     }
 
     _write(chunk: Buffer|string|any, encoding: string, callback: (err?: Error|null) => void): void {
-        this.win = BrowserWindow.getFocusedWindow()
         if (!this.win) {
             callback(new Error('Browser window not exists.'))
             return
