@@ -7,7 +7,7 @@ interface Module {
 
 export const ENGINE_AUTH_SECRETKEY: string = 'eriengine4'
 
-export const PROJECT_ALLOW_ASSET_EXTENSIONS: string[] = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'ogg', 'mp4', 'webm', 'mp4', 'woff', 'woff2' ]
+export const PROJECT_ALLOW_ASSET_EXTENSIONS: string[] = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'ogg', 'mp3', 'webm', 'mp4', 'woff', 'woff2' ]
 
 export const PROJECT_DIRECTORY_NAME: string = 'Eriengine Project_{{ PROJECT_NAME }}'
 export const PROJECT_CONFIG_NAME: string = 'config.json'

@@ -1,5 +1,6 @@
 const path = require('path')
 const glob = require('fast-glob')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const mode = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'production'
 
 module.exports = {
@@ -18,7 +19,8 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/,
-                loader: 'ts-loader'
+                loader: 'ts-loader',
+                exclude: path.resolve(__dirname, 'node_modules')
             }
         ]
     },
@@ -28,6 +30,19 @@ module.exports = {
             '@': path.resolve(__dirname, 'src')
         }
     },
+    performance: {
+        hints: false
+    },
+    plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, 'src', 'Asset'),
+                    to: path.resolve(__dirname, 'dist', 'Asset')
+                }
+            ]
+        })
+    ],
     devServer: {
         port: 9002,
         hot: true

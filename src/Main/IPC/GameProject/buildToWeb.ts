@@ -8,7 +8,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
 
     try {
         const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
-        await spawner.spawn('npm run serve', writeToRenderer('build-to-web'))
+        await spawner.spawn('npm run build', writeToRenderer('build-to-web'))
     } catch(reason) {
         const { name, message } = reason as Error
         return {

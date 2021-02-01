@@ -1,31 +1,34 @@
 import Phaser from 'phaser'
 {{ PROJECT_LISTS }}
 
-type ScriptCallback = (scene: Phaser.Scene) => void
+type ScriptCallback = (this: Phaser.Scene, ...args: any) => void
 interface EriengineScript {
-    preloads: ScriptCallback[]
-    creates: ScriptCallback[]
-    updates: ScriptCallback[]
-    destroys: ScriptCallback[]
+    inits:      ScriptCallback[]
+    preloads:   ScriptCallback[]
+    creates:    ScriptCallback[]
+    updates:    ScriptCallback[]
+    destroys:   ScriptCallback[]
 }
 
 export default class EriengineScene extends Phaser.Scene {
 
+    protected __inits!:     ScriptCallback[]
     protected __preloads!:  ScriptCallback[]
     protected __creates!:   ScriptCallback[]
     protected __updates!:   ScriptCallback[]
     protected __destroys!:  ScriptCallback[]
 
     init(script: EriengineScript): void {
-        const { preloads, creates, updates, destroys } = script
+        const { inits, preloads, creates, updates, destroys } = script
+        this.__inits    = inits
         this.__preloads = preloads
         this.__creates  = creates
         this.__updates  = updates
         this.__destroys = destroys
     }
 
-    protected runScript(callbacks: ((scene: this) => void)[]): void {
-        callbacks.forEach((callback): void => callback(this))
+    protected runScript(callbacks: ScriptCallback[], ...args: any): void {
+        callbacks.forEach((callback): void => callback.call(this, args))
     }
 
     protected loadImage(): void {

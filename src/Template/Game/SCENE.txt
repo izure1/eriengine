@@ -41,7 +41,14 @@ export default class NewScene extends BaseScene {
 
     constructor() {
         super({ key, active: true })
-        this.events.on(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__destroys))
+    }
+
+    init(data: object = {}): void {
+        super.init()
+        this.runScript(this.__inits, data)
+        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__destroys))
+
+        // 이 아래에 작성하세요
     }
 
     preload(): void {
@@ -49,17 +56,21 @@ export default class NewScene extends BaseScene {
         this.loadVideo()
         this.loadImage()
         this.loadSpritesheet()
-
         this.runScript(this.__preloads)
+
+        // 이 아래에 작성하세요
     }
 
     create(): void {
         this.createAnimation()
-        
         this.runScript(this.__creates)
+
+        // 이 아래에 작성하세요
     }
 
-    update(): void {
-        this.runScript(this.__updates)
+    update(time: number, delta: number): void {
+        this.runScript(this.__updates, time, delta)
+
+        // 이 아래에 작성하세요
     }
 }
