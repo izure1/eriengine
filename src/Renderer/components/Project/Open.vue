@@ -8,13 +8,16 @@
             >
                 <v-card-title>프로젝트 열기</v-card-title>
                 <v-card-text>
-                    <p v-if="isLoading">
-                        프로젝트를 재구축하는 중입니다.
-                        <br>
-                        필요한 모듈을 다운로드받고 있으며, 이 작업에는 인터넷 연결이 필요합니다.
-                        <br>
-                        잠시만 기다려주세요.
-                    </p>
+                    <div v-if="isLoading">
+                        <p>
+                            프로젝트를 재구축하는 중입니다.
+                            <br>
+                            필요한 모듈을 다운로드받고 있으며, 이 작업에는 인터넷 연결이 필요합니다.
+                            <br>
+                            잠시만 기다려주세요.
+                        </p>
+                        <pre>{{ streamMessage }}</pre>
+                    </div>
                     <span v-else>프로젝트 디렉토리를 선택하세요.</span>
                 </v-card-text>
                 <v-card-actions>
@@ -41,10 +44,12 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer } from 'electron'
+import { readFromMain } from '@/Utils/stream'
 
 @Component
 export default class OpenProjectComponent extends Vue {
     private isLoading: boolean = false
+    private streamMessage: string = ''
 
     private async selectDirectory(): Promise<void> {
         const directoryOpen: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
@@ -62,7 +67,14 @@ export default class OpenProjectComponent extends Vue {
             return
         }
 
+        const streamReader = readFromMain('ensure-require-modules')
+        streamReader.setEncoding('utf-8').on('data', (data: string): void => {
+            this.streamMessage += data
+        })
+
         const projectEnsure: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('ensure-project', directoryOpen.path, projectRead.config)
+
+        streamReader.destroy()
         if (!projectEnsure.success) {
             this.isLoading = false
             this.$store.dispatch('snackbar', projectEnsure.message)

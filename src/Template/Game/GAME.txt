@@ -6,15 +6,15 @@ import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 
 import Scenes from './{{ PROJECT_SRC_SCENELIST_NAME }}'
-import { GAME_DISPLAY_SIZE } from '../config.json'
+import config from '../config.json'
 
 
 new Phaser.Game({
-    width: GAME_DISPLAY_SIZE[0],
-    height: GAME_DISPLAY_SIZE[1],
+    width: config.GAME_DISPLAY_SIZE[0],
+    height: config.GAME_DISPLAY_SIZE[1],
     scene: [
         ...Object.values(Scenes).map((scene) => scene.default)
-    ]
+    ],
     scale: {
         parent: '#canvas-wrapper',
         expandParent: true,

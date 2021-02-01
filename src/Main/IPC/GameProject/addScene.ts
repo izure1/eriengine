@@ -27,7 +27,9 @@ async function writeSceneFile(projectDirPath: string, filePath: string): Promise
     const files: FileWriteQueue[] = [
         {
             path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, 'BaseScene.ts'),
-            content: RAW_BASE_SCENE
+            content: parseProperty(RAW_BASE_SCENE, {
+                PROJECT_LISTS
+            })
         },
         {
             path: filePath,

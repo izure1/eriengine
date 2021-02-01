@@ -3,13 +3,16 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import { parseProperty } from '@/Utils/parseProperty'
-import { installModuleFromPackage } from '@/Utils/installModule'
+import { ProcessSpawner } from '@/Utils/ProcessSpawner'
+import { writeToRenderer } from '@/Utils/stream'
 import {
     PROJECT_CONFIG_NAME,
     PROJECT_TSCONFIG_NAME,
     PROJECT_PACAKGE_NAME,
     PROJECT_WEBPACK_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_GAME_NAME,
+    PROJECT_SRC_SCENELIST_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_AUDIO_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_FONT_DIRECTORY_NAME,
@@ -29,6 +32,7 @@ import RAW_PROJECT_PACKAGE from 'raw-loader!@/Template/Project/PACKAGE.txt'
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
 import RAW_PROJECT_CONFIG from 'raw-loader!@/Template/Project/CONFIG.txt'
 import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
+import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
 
 async function ensureConfig(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     let fileWrite: Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail
@@ -69,6 +73,15 @@ async function ensureConfig(projectDirPath: string, config: Engine.GameProject.C
         return fileWrite as Engine.FileSystem.WriteFileFail
     }
 
+    // src/game.ts
+    const gamePath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_GAME_NAME)
+    const gameEnsure = await writeFile(gamePath, parseProperty(RAW_GAME, {
+        PROJECT_SRC_SCENELIST_NAME: path.parse(PROJECT_SRC_SCENELIST_NAME).name
+    }))
+    if (!gameEnsure.success) {
+        return gameEnsure as Engine.GameProject.CreateProjectFail
+    }
+
     return {
         success: true,
         name: '설정 파일 생성 성공',
@@ -77,10 +90,16 @@ async function ensureConfig(projectDirPath: string, config: Engine.GameProject.C
     }
 }
 
-async function ensureRequireModules(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
-    const moduleInstall = await installModuleFromPackage(projectDirPath)
-    if (!moduleInstall.success) {
-        return moduleInstall as Engine.ModuleSystem.InstallFail
+async function ensureRequireModules(projectDirPath: string): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
+    try {
+        const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
+        await spawner.spawn('npm i', writeToRenderer('ensure-require-modules'))
+    } catch(reason) {
+        return {
+            success: false,
+            name: reason,
+            message: reason
+        }
     }
 
     return {
@@ -123,7 +142,7 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     }
 
     // 종속 모듈 설치
-    const moduleInstall = await ensureRequireModules(directoryPath, config)
+    const moduleInstall = await ensureRequireModules(directoryPath)
     if (!moduleInstall.success) {
         return moduleInstall as Engine.GameProject.CreateProjectFail
     }

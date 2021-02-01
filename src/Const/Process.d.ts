@@ -1,3 +1,7 @@
+interface StreamData {
+    channel: string
+}
+
 declare namespace Engine {
     namespace Process {
         interface CheckCommandExistsSuccess extends Engine.ActionSuccessState { exists: boolean }

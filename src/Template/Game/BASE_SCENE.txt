@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+{{ PROJECT_LISTS }}
 
 type ScriptCallback = (scene: Phaser.Scene) => void
 interface EriengineScript {
@@ -25,6 +26,46 @@ export default class EriengineScene extends Phaser.Scene {
 
     protected runScript(callbacks: ((scene: this) => void)[]): void {
         callbacks.forEach((callback): void => callback(this))
+    }
+
+    protected loadImage(): void {
+        for (const name in Images) {
+            const { key } = Images[name as keyof typeof Images]
+            this.load.image(name, key)
+        }
+    }
+
+    protected loadAudio(): void {
+        for (const name in Audios) {
+            const { key } = Audios[name as keyof typeof Audios]
+            this.load.audio(name, key)
+        }
+    }
+
+    protected loadVideo(): void {
+        for (const name in Videos) {
+            const { key } = Videos[name as keyof typeof Videos]
+            this.load.video(name, key)
+        }
+    }
+
+    protected loadSpritesheet(): void {
+        for (const name in Animations) {
+            const { key, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
+            this.load.spritesheet(name, key, { frameWidth, frameHeight })
+        }
+    }
+
+    protected createAnimation(): void {
+        for (const name in Animations) {
+            const { key, frameRate, start, end, repeat } = Animations[name as keyof typeof Animations]
+            this.anims.create({
+                key: name,
+                frames: this.anims.generateFrameNumbers(key, { start, end }),
+                frameRate,
+                repeat
+            })
+        }
     }
 
 }

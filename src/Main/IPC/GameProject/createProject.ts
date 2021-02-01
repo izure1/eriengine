@@ -8,13 +8,9 @@ import { parseProperty } from '@/Utils/parseProperty'
 import {
     PROJECT_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_GAME_NAME,
-    PROJECT_SRC_SCENELIST_NAME,
     PROJECT_SRC_DATA_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME
 } from '@/Const'
-
-import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
 
 function createSceneName(name: string): string {
     return `${name}.${nanoid(10)}.ts`
@@ -48,15 +44,6 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     const projectEnsure = await ensureProject(projectDirPath, config)
     if (!projectEnsure.success) {
         return projectEnsure as Engine.GameProject.CreateProjectFail
-    }
-
-    // 기본 게임 파일 생성
-    const gamePath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_GAME_NAME)
-    const gameEnsure = await writeFile(gamePath, parseProperty(RAW_GAME, {
-        PROJECT_SRC_SCENELIST_NAME: path.parse(PROJECT_SRC_SCENELIST_NAME).name
-    }))
-    if (!gameEnsure.success) {
-        return gameEnsure as Engine.GameProject.CreateProjectFail
     }
 
     // 기본 씬 생성

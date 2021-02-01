@@ -4,5 +4,10 @@ declare namespace Engine {
         interface Json {
             [key: string]: Primitive|Primitive[]|Json
         }
+
+        interface StreamChunk {
+            channel: string
+            data: string
+        }
     }
 }

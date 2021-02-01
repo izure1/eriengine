@@ -45,10 +45,17 @@ export default class NewScene extends BaseScene {
     }
 
     preload(): void {
+        this.loadAudio()
+        this.loadVideo()
+        this.loadImage()
+        this.loadSpritesheet()
+
         this.runScript(this.__preloads)
     }
 
     create(): void {
+        this.createAnimation()
+        
         this.runScript(this.__creates)
     }
 
