@@ -46,6 +46,7 @@ export default class BuildComponent extends Vue {
     private isBuilding: boolean = false
     private isBuildSuccess: boolean = false
     private builtPath: string = this.cwd
+    private lastClearTime: number = 0
     private emoticonUpdateId: number = NaN
     private emoticonUpdate: number = 0
 
@@ -62,6 +63,7 @@ export default class BuildComponent extends Vue {
             return
         }
 
+        this.lastClearTime = Date.now()
         this.isBuilding = true
         this.isBuildSuccess = false
 
