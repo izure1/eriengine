@@ -9,7 +9,8 @@ import { handler as writeSceneMap } from './writeSceneMap'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME,
-    PROJECT_LISTS
+    DATA_LISTS,
+    STORAGE_LISTS
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
@@ -23,19 +24,22 @@ interface FileWriteQueue {
 }
 
 async function writeSceneFile(projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const KEY: string = nanoid()
+    const KEY: string           = nanoid()
+    const STORAGE_KEY: string   = getStorageKeyFromFilename(filePath)
     const files: FileWriteQueue[] = [
         {
             path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, 'BaseScene.ts'),
             content: parseProperty(RAW_BASE_SCENE, {
-                PROJECT_LISTS
+                DATA_LISTS
             })
         },
         {
             path: filePath,
             content: parseProperty(RAW_SCENE, {
                 KEY,
-                PROJECT_LISTS
+                STORAGE_KEY,
+                DATA_LISTS,
+                STORAGE_LISTS
             })
         }
     ]

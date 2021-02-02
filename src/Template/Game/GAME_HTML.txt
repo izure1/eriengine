@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>{{ TITLE }}</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <script type="text/javascript" src="./js/Main.js"></script>
+    </head>
+    <body>
+        <div id="canvas-wrapper"></div>
+    </body>
+</html>

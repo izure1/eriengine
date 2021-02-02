@@ -7,7 +7,8 @@ import { handler as addStorageDirectory } from './addStorageDirectory'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_STORAGE_ACTOR_SCRIPT_DIRECTORY_NAME,
-    PROJECT_LISTS
+    DATA_LISTS,
+    STORAGE_LISTS
 } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
@@ -21,6 +22,7 @@ interface FileWriteQueue {
 }
 
 async function writeActorFile(projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+    const STORAGE_KEY: string = getStorageKeyFromFilename(filePath)
     const files: FileWriteQueue[] = [
         {
             path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, 'BaseActor.ts'),
@@ -29,7 +31,9 @@ async function writeActorFile(projectDirPath: string, filePath: string): Promise
         {
             path: filePath,
             content: parseProperty(RAW_ACTOR, {
-                PROJECT_LISTS
+                DATA_LISTS,
+                STORAGE_LISTS,
+                STORAGE_KEY
             })
         }
     ]

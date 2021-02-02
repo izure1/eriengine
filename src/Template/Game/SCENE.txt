@@ -6,8 +6,14 @@ import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 
 import BaseScene from '@/BaseScene'
+{{ DATA_LISTS }}
+{{ STORAGE_LISTS }}
 
-{{ PROJECT_LISTS }}
+type ScriptCallback = (this: NewScene, ...args: any) => void
+
+
+// 이 씬이 참조하고 있는 스토리지 정보입니다.
+const storage = Storages['{{ STORAGE_KEY }}']
 
 // 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다.
 const key: string = '{{ KEY }}'
@@ -39,37 +45,50 @@ export default class NewScene extends BaseScene {
     protected dialogue!: DialoguePlugin
     protected fow!: FogOfWarPlugin
 
+    private __scripts: Map<string, ScriptCallback[]> = new Map
+    private __map = Object.values(storage.Map)[0]
+
     constructor() {
         super({ key, active: true })
+        this.generateScript()
+    }
+
+    private generateScript(): void {
+        for (const key in storage.Script) {
+            const script = storage.Script[key as keyof typeof storage.Script]
+            for (const type in script) {
+                if (!this.__scripts.has(type)) {
+                    this.__scripts.set(type, [])
+                }
+                const callback: ScriptCallback = script[type as keyof typeof script]
+                this.__scripts.get(type)!.push(callback)
+            }
+        }
     }
 
     init(data: object = {}): void {
-        super.init()
-        this.runScript(this.__inits, data)
-        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__destroys))
+        this.runScript(this.__scripts.get('onSceneInit'), data)
+        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')))
 
         // 이 아래에 작성하세요
     }
 
     preload(): void {
-        this.loadAudio()
-        this.loadVideo()
-        this.loadImage()
-        this.loadSpritesheet()
-        this.runScript(this.__preloads)
+        this.loadAssets()
+        this.runScript(this.__scripts.get('onScenePreload'))
 
         // 이 아래에 작성하세요
     }
 
     create(): void {
         this.createAnimation()
-        this.runScript(this.__creates)
+        this.runScript(this.__scripts.get('onSceneCreate'))
 
         // 이 아래에 작성하세요
     }
 
     update(time: number, delta: number): void {
-        this.runScript(this.__updates, time, delta)
+        this.runScript(this.__scripts.get('onSceneUpdate'), time, delta)
 
         // 이 아래에 작성하세요
     }

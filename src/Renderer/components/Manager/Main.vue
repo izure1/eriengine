@@ -52,6 +52,7 @@ import { FileWatcher } from '@/Utils/FileWatcher'
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
+    PROJECT_SRC_STORAGE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_DIRECTORY_NAME,
     PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME,
@@ -210,6 +211,10 @@ export default class ProjectFileListComponent extends Vue {
         const videoDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME)
         const videoWatcher = new FileWatcher(videoDir).update(() => ipcRenderer.invoke('generate-video-list', this.projectDirectory)).start().emit()
 
+        // 스토리지 디렉토리 감지
+        const storageDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME)
+        const storageWatcher = new FileWatcher(storageDir).update(() => ipcRenderer.invoke('generate-storage-list', this.projectDirectory)).start().emit()
+
         // 디렉토리 감지
         this.watchers.add(assetWatcher)
         this.watchers.add(actorWatcher)
@@ -219,6 +224,7 @@ export default class ProjectFileListComponent extends Vue {
         this.watchers.add(imageWatcher)
         this.watchers.add(audioWatcher)
         this.watchers.add(videoWatcher)
+        this.watchers.add(storageWatcher)
     }
 
     private destroyWatchers(): void {

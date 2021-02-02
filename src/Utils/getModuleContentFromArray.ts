@@ -1,6 +1,23 @@
-export function getModuleContentFromArray(list: string[], exportKey: string = '', mapKey: (modulePath: string) => string = (modulePath: string) => modulePath): string {
+interface ModuleMap {
+    path: string
+    name: string
+}
+
+export function mappingDefaultExport(moduleDatas: ModuleMap[]): string {
+    let content: string = ''
+    for (const { name, path } of moduleDatas) {
+        content += `    '${path}': ${name},\n`
+    }
+
+    content = 'export default {\n' + content
+    content += '}'
+
+    return content
+}
+
+export function getModuleContentFromArray(list: string[], exportKey: string = '', mappingExport: (moduleDatas: ModuleMap[]) => string = mappingDefaultExport): string {
     let modules: string = ''
-    let exports: string = ''
+    const maps: ModuleMap[] = []
     for (let i: number = 0, len: number = list.length; i < len; i++) {
         const path: string = list[i]
         const name: string = `M${i}`
@@ -13,12 +30,11 @@ export function getModuleContentFromArray(list: string[], exportKey: string = ''
         else {
             modules += `import { ${exportKey} as ${name} } from '${path}'\n`
         }
-        exports += `    '${mapKey(path)}': ${name},\n`
+        maps.push({ name, path })
     }
 
     modules += '\n'
-    exports = 'export default {\n' + exports
-    exports += '}'
+    modules += mappingExport(maps)
 
-    return modules + exports
+    return modules
 }

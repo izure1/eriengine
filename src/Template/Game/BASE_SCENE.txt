@@ -1,70 +1,60 @@
 import Phaser from 'phaser'
-{{ PROJECT_LISTS }}
-
-type ScriptCallback = (this: Phaser.Scene, ...args: any) => void
-interface EriengineScript {
-    inits:      ScriptCallback[]
-    preloads:   ScriptCallback[]
-    creates:    ScriptCallback[]
-    updates:    ScriptCallback[]
-    destroys:   ScriptCallback[]
-}
+{{ DATA_LISTS }}
 
 export default class EriengineScene extends Phaser.Scene {
 
-    protected __inits!:     ScriptCallback[]
-    protected __preloads!:  ScriptCallback[]
-    protected __creates!:   ScriptCallback[]
-    protected __updates!:   ScriptCallback[]
-    protected __destroys!:  ScriptCallback[]
-
-    init(script: EriengineScript): void {
-        const { inits, preloads, creates, updates, destroys } = script
-        this.__inits    = inits
-        this.__preloads = preloads
-        this.__creates  = creates
-        this.__updates  = updates
-        this.__destroys = destroys
-    }
-
-    protected runScript(callbacks: ScriptCallback[], ...args: any): void {
+    protected runScript(callbacks?: ((...args: any) => void)[], ...args: any): void {
+        if (!callbacks)  {
+            return
+        }
         callbacks.forEach((callback): void => callback.call(this, args))
     }
 
-    protected loadImage(): void {
+    private loadImage(): void {
         for (const name in Images) {
             const { key } = Images[name as keyof typeof Images]
-            this.load.image(name, key)
+            this.load.image(key, key)
         }
     }
 
-    protected loadAudio(): void {
+    private loadAudio(): void {
         for (const name in Audios) {
             const { key } = Audios[name as keyof typeof Audios]
-            this.load.audio(name, key)
+            this.load.audio(key, key)
         }
     }
 
-    protected loadVideo(): void {
+    private loadVideo(): void {
         for (const name in Videos) {
             const { key } = Videos[name as keyof typeof Videos]
-            this.load.video(name, key)
+            this.load.video(key, key)
         }
     }
 
-    protected loadSpritesheet(): void {
+    private loadSpritesheet(): void {
         for (const name in Animations) {
-            const { key, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
-            this.load.spritesheet(name, key, { frameWidth, frameHeight })
+            const { key, texture, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
+            this.load.spritesheet(texture, texture, { frameWidth, frameHeight })
         }
+    }
+
+    protected loadAssets(): void {
+        this.load.setPath('Asset/')
+        this.loadImage()
+        this.loadAudio()
+        this.loadVideo()
+        this.loadSpritesheet()
     }
 
     protected createAnimation(): void {
         for (const name in Animations) {
-            const { key, frameRate, start, end, repeat } = Animations[name as keyof typeof Animations]
+            const { key, texture, frameRate, start, end, repeat } = Animations[name as keyof typeof Animations]
+            if (this.anims.exists(key)) {
+                continue
+            }
             this.anims.create({
-                key: name,
-                frames: this.anims.generateFrameNumbers(key, { start, end }),
+                key,
+                frames: this.anims.generateFrameNumbers(texture, { start, end }),
                 frameRate,
                 repeat
             })

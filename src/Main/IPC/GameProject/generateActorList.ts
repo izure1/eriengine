@@ -24,7 +24,14 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
                     return normalize(path.join(aliasCwd, filePath))
                 }),
                 '*',
-                (modulePath: string) => normalize(path.relative(aliasCwd, modulePath))
+                (maps): string => {
+                    let content: string = 'export default {\n'
+                    for (const map of maps) {
+                        content += `    '${normalize(path.relative(aliasCwd, map.path))}': ${map.name},\n`
+                    }
+                    content += '}'
+                    return content
+                }
             ))
             
         if (!jsonWrite.success) {

@@ -1,7 +1,9 @@
 import Phaser from 'phaser'
 import { Actor } from '@eriengine/plugin-actor'
 
-{{ PROJECT_LISTS }}
+{{ DATA_LISTS }}
+
+
 // 타입 추론을 위한 클래스 타입이므로 별도의 멤버변수나, 메서드를 추가하지 마십시오.
 // 해당하는 올바른 씬을 선택하여 주십시오.
 declare class Scene extends Scenes[].default {}

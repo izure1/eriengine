@@ -106,6 +106,9 @@ declare namespace Engine {
         interface GenerateSceneListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateSceneListFail extends Engine.ActionFailState {}
 
+        interface GenerateStorageListSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface GenerateStorageListFail extends Engine.ActionFailState {}
+
         interface CheckValidProjectSuccess extends Engine.ActionSuccessState { valid: boolean }
         interface CheckValidProjectFail extends Engine.ActionFailState {}
 

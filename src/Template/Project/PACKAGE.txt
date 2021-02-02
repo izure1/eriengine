@@ -4,11 +4,12 @@
     "description": "{{ DESCRIPTION }}",
     "main": "index.js",
     "scripts": {
-        "serve": "set NODE_ENV=development && webpack",
-        "build": "set NODE_ENV=production && webpack"
+        "build:dev": "set NODE_ENV=development && webpack",
+        "build:prod": "set NODE_ENV=production && webpack",
+        "serve": "set NODE_ENV=development && npm run build:dev && npx webpack-cli serve"
     },
     "dependencies": {
-        "phaser": "^3.50.1",
+        "phaser": "^3.52.0",
         "@eriengine/plugin-actor": "^1.0.0",
         "@eriengine/plugin-dialogue": "^1.0.0",
         "@eriengine/plugin-fog-of-war": "^1.0.0",

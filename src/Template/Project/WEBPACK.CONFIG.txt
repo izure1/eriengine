@@ -11,6 +11,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
+        publicPath: '/js/',
         filename: '[name].js',
         library: 'Eriengine[name]',
         libraryTarget: 'umd'
@@ -44,7 +45,9 @@ module.exports = {
         })
     ],
     devServer: {
+        contentBase: path.resolve(__dirname, 'dist'),
         port: 9002,
-        hot: true
+        hot: true,
+        open: true
     }
 }

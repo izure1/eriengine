@@ -2,14 +2,14 @@ import path from 'path'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
-import { PROJECT_LISTS } from '@/Const'
+import { DATA_LISTS } from '@/Const'
 
 import { parseProperty } from '@/Utils/parseProperty'
 import RAW_ANIMATION from 'raw-loader!@/Template/Game/ANIMATION.txt'
 
 async function writeAnimationFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_ANIMATION, {
-        PROJECT_LISTS
+        DATA_LISTS
     })
 
     const fileWrite = await writeFile(filePath, fileContent)

@@ -54,6 +54,7 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/generateImageList')
     yield require('./Main/IPC/GameProject/generateAudioList')
     yield require('./Main/IPC/GameProject/generateVideoList')
+    yield require('./Main/IPC/GameProject/generateStorageList')
 
     yield require('./Main/IPC/GameProject/addStorage')
     yield require('./Main/IPC/GameProject/addStorageDirectory')
