@@ -12,5 +12,11 @@ declare namespace Engine {
 
         interface GetEngineVersionSuccess extends Engine.ActionSuccessState { version: string }
         interface GetEngineVersionFail extends Engine.ActionFailState {}
+
+        interface KillProcessSuccess extends Engine.ActionSuccessState { pid: number }
+        interface killProcessFail extends Engine.ActionFailState {}
+
+        interface KillSpawnerSuccess extends Engine.ActionSuccessState {}
+        interface KillSpawnerFail extends Engine.ActionFailState {}
     }
 }

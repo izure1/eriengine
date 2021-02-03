@@ -1,103 +1,88 @@
 <template>
-    <v-card flat :loading="isBuilding"> 
-        <v-card-title>
-            게임으로 빌드하기
-            <v-btn icon v-if="!isBuilding" @click="build">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-            <v-btn icon v-if="!isBuilding && isBuildSuccess" @click="openBuiltDirectory">
-                <v-icon>mdi-folder-open-outline</v-icon>
-            </v-btn>
-        </v-card-title>
-        <v-card-subtitle>
-            <p v-if="isBuilding">작업 중...  {{ emoticon1 }}</p>
-            <p v-else-if="isBuildSuccess" class="green--text lighten-5">성공적으로 빌드되었습니다  ＼(´ ∇`)ノ</p>
-            <p v-else class="red--text">
-                빌드 실패.  ∑(゜△゜;)
+    <v-card flat> 
+        <v-card-title>테스트 및 빌드하기</v-card-title>
+        <v-card-subtitle>당신의 게임을 테스트하거나, 실제 작동하는 애플리케이션으로 빌드할 수 있습니다</v-card-subtitle>
+        <v-card-text>
+            <h3>빌드</h3>
+            <p class="my-3">
+                모든 작업을 완료했나요?
                 <br>
-                오류에 대한 자세한 내용은 아래 로그를 확인하세요.
-                <br>
-                정확한 원인을 알 수 없다면 에리엔진 저장소에 아래 내용을 복사하여 질문해주세요.
+                그렇다면 당신의 게임 소스코드를 이제 실제 게임으로 만들 수 있습니다.
             </p>
-        </v-card-subtitle>
-        <v-card-text> 
-            <p v-if="isBuilding">
-                게임을 빌드 중입니다. 결과물은 프로젝트 디렉토리의 <code>dist</code> 폴더에 생성됩니다.
+            <h3>테스트</h3>
+            <p class="my-3">
+                하지만 게임에 버그가 없는지 확인하는 작업이 필요하겠죠.
                 <br>
-                이 작업은 몇 분이 걸릴 수 있습니다.
+                빌드하는데는 시간이 걸리기 때문에, 버그를 수정하고 확인하기엔 오래걸립니다.
+                <br>
+                테스트는 소스코드를 수정하면, 즉시 미리보기에 적용되기 때문에, 이런 문제로부터 자유롭습니다.
             </p>
-            <shell-channel-component channel="build-to-web" :clear="lastClearTime" />
         </v-card-text>
+        <v-card-actions>
+            <v-spacer />
+                <v-tooltip
+                    v-for="(button, i) in buttons"
+                    :key="`build-button-${i}`"
+                    bottom
+                >
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            v-on="on"
+                            @click="runBuilder(button)"
+                            large
+                            text
+                        >{{ button.title }}</v-btn>
+                    </template>
+                    <span class="caption">{{ button.description }}</span>
+                </v-tooltip>
+            <v-spacer />
+        </v-card-actions>
     </v-card>
 </template>
 
 <script lang="ts">
-import { ipcRenderer } from 'electron'
+import { Base64 } from 'js-base64'
 import { Vue, Component } from 'vue-property-decorator'
+import { BuildData } from './Runner.vue'
 
-import ShellChannelComponent from '@/Renderer/components/Shell/Channel.vue'
-
-@Component({
-    components: {
-        ShellChannelComponent
-    }
-})
+@Component
 export default class BuildComponent extends Vue {
-    private isBuilding: boolean = false
-    private isBuildSuccess: boolean = false
-    private builtPath: string = this.cwd
-    private lastClearTime: number = 0
-    private emoticonUpdateId: number = NaN
-    private emoticonUpdate: number = 0
-
     private get cwd(): string {
         return this.$store.state.projectDirectory
     }
 
-    private get emoticon1(): string {
-        return '(´･ω･`)' + (this.emoticonUpdate % 2 ? 'ノ' : 'ﾉ')
+    private buttons: BuildData[] = [
+        {
+            title: '테스트',
+            description: '브라우저에서 게임을 테스트합니다. 빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
+            jobChannel: 'build-serve',
+            jobParameters: [ this.cwd ],
+            streamChannel: 'build'
+        },
+        {
+            title: '빌드',
+            description: '소스코드를 게임이 작동하는 실제 애플리케이션으로 추출합니다.',
+            jobChannel: 'build-prod',
+            jobParameters: [ this.cwd ],
+            streamChannel: 'build'
+        },
+        {
+            title: '빌드 (개발용)',
+            description: '개발용으로 빠르게 빌드합니다. 다만 보안상 문제가 있으므로 실제 배포용으로 쓰지 마십시오.',
+            jobChannel: 'build-dev',
+            jobParameters: [ this.cwd ],
+            streamChannel: 'build'
+        },
+    ]
+
+    private createBuildDataToken(buildData: BuildData): string {
+        const stringify: string = JSON.stringify(buildData)
+        return Base64.encode(stringify)
     }
 
-    private async build(): Promise<void> {
-        if (!this.cwd) {
-            return
-        }
-
-        this.lastClearTime = Date.now()
-        this.isBuilding = true
-        this.isBuildSuccess = false
-
-        const gameBuild: Engine.GameProject.BuildToWebSuccess|Engine.GameProject.BuildToWebFail = await ipcRenderer.invoke('build-to-web', this.cwd)
-        if (gameBuild.success) {
-            this.builtPath = gameBuild.path
-        }
-
-        this.isBuilding = false
-        this.isBuildSuccess = gameBuild.success
-    }
-
-    private openBuiltDirectory(): void {
-        ipcRenderer.invoke('show-item', this.builtPath)
-    }
-
-    private updateEmoticon(): void {
-        this.emoticonUpdate++
-        this.emoticonUpdateId = window.setTimeout(() => {
-            this.updateEmoticon()
-        }, 1000)
-    }
-
-    private stopUpdateEmoticon(): void {
-        window.clearTimeout(this.emoticonUpdate)
-    }
-
-    mounted(): void {
-        this.build()
-        this.updateEmoticon()
-    }
-
-    beforeDestroy(): void {
-        this.stopUpdateEmoticon()
+    private runBuilder(button: BuildData): void {
+        const buildDataToken: string = this.createBuildDataToken(button)
+        this.$router.replace(`/manager/build/runner/${buildDataToken}`)
     }
 }
 </script>

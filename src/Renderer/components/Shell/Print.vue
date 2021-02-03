@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { clipboard } from 'electron'
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import Convert from 'ansi-to-html'
 
 @Component({
@@ -45,15 +45,28 @@ export default class ShellPrintComponent extends Vue {
         clipboard.writeText(content)
         this.$store.dispatch('snackbar', '복사 완료!')
     }
+
+    @Watch('print')
+    private onPrintChange(): void {
+        this.$nextTick((): void => {
+            const el: Element = this.$refs.code as Element
+            if (!el) {
+                return
+            }
+            el.scrollTop = el.scrollHeight
+        })
+    }
 }
 </script>
 
 <style lang="scss" scoped>
 code {
     font-family: Consolas;
+    max-height: 380px;
     color: #333 !important;
     display: block;
     white-space: pre-wrap;
+    overflow: auto;
     padding: 10px;
 }
 </style>

@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
+import { ipcRenderer } from 'electron'
 import Stream from 'stream'
 import { readFromMain } from '@/Utils/stream'
 

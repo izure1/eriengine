@@ -69,12 +69,17 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/ensureSceneMap')
     yield require('./Main/IPC/GameProject/writeSceneMap')
 
-    yield require('./Main/IPC/GameProject/buildToWeb')
+    yield require('./Main/IPC/GameProject/buildCreateFiles')
+    yield require('./Main/IPC/GameProject/buildDev')
+    yield require('./Main/IPC/GameProject/buildProd')
+    yield require('./Main/IPC/GameProject/buildServe')
     
     // Process
     yield require('./Main/IPC/Process/checkCommandExists')
     yield require('./Main/IPC/Process/getEngineAuth')
     yield require('./Main/IPC/Process/getEngineVersion')
+    yield require('./Main/IPC/Process/killProcess')
+    yield require('./Main/IPC/Process/killSpawner')
 }
 
 // IPC 함수를 실행합니다.

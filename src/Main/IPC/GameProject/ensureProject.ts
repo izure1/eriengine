@@ -93,7 +93,7 @@ async function ensureConfig(projectDirPath: string, config: Engine.GameProject.C
 async function ensureRequireModules(projectDirPath: string): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
     try {
         const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
-        await spawner.spawn('npm i', writeToRenderer('ensure-require-modules'))
+        await spawner.spawn('npm i', { writeStream: writeToRenderer('ensure-require-modules') })
     } catch(reason) {
         return {
             success: false,

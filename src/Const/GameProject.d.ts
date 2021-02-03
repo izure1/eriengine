@@ -118,7 +118,19 @@ declare namespace Engine {
         interface WriteSceneMapSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface WriteSceneMapFail extends Engine.ActionFailState {}
 
-        interface BuildToWebSuccess extends PathRequired, Engine.ActionSuccessState {}
-        interface BuildToWebFail extends Engine.ActionFailState {}
+        interface BuildJobSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface BuildJobFail extends Engine.ActionFailState {}
+
+        interface BuildCreateFilesSuccess extends PathRequired, Engine.ActionSuccessState {}
+        interface BuildCreateFilesFail extends BuildJobFail {}
+
+        interface BuildDevSuccess extends BuildJobSuccess {}
+        interface BuildDevFail extends BuildJobFail {}
+
+        interface BuildProdSuccess extends BuildJobSuccess {}
+        interface BuildProdFail extends BuildJobFail {}
+
+        interface BuildServeSuccess extends BuildJobSuccess {}
+        interface BuildServeFail extends BuildJobFail {}
     }
 }
