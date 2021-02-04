@@ -322,7 +322,7 @@
 
                         <v-stepper-content step="8">
                             <v-card>
-                                <v-card-title>프로젝트 생성 중</v-card-title>
+                                <v-card-title>프로젝트 생성 중  ☆ﾐ(o*･ω･)ﾉ</v-card-title>
                                 <v-card-text>
                                     <p>
                                         프로젝트를 생성하는 중입니다.

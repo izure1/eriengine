@@ -6,7 +6,7 @@
                 :disabled="isLoading"
                 flat
             >
-                <v-card-title>프로젝트 열기</v-card-title>
+                <v-card-title>프로젝트 열기  ☆ﾐ(o*･ω･)ﾉ</v-card-title>
                 <v-card-text>
                     <div v-if="isLoading">
                         <p>
@@ -25,12 +25,12 @@
                     <v-container class="text-center">
                         <v-row>
                             <v-col>
-                                <v-btn min-width="150" text tile @click="selectDirectory">디렉토리 선택</v-btn>
+                                <v-btn min-width="150" text @click="selectDirectory">디렉토리 선택</v-btn>
                             </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
-                                <v-btn min-width="150" text tile @click="goBack">돌아가기</v-btn>
+                                <v-btn min-width="150" text @click="goBack">돌아가기</v-btn>
                             </v-col>
                         </v-row>
                     </v-container>

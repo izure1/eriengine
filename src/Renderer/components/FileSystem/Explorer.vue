@@ -38,6 +38,10 @@
                         @click="open(file)"
                     >
 
+                        <v-list-item-avatar>
+                            <v-icon>{{ getFileMaterialIcon(file) }}</v-icon>
+                        </v-list-item-avatar>
+
                         <v-list-item-content>
                             <v-list-item-title :class="{ 'subtitle-1': isTwoLine, 'caption': !isTwoLine }">
                                 {{ getRelativePath(file) }}
@@ -296,6 +300,45 @@ export default class ExplorerComponent extends Vue {
         this.startWatcher()
         this.setFiles()
         this.$emit('update:path', this.currentPath)
+    }
+
+    private getFileMaterialIcon(filePath: string): string {
+        switch (path.parse(filePath).ext) {
+            // directory
+            case '':        return 'mdi-folder-outline'
+
+            // language
+            case '.ts':     return 'mdi-language-typescript'
+            case '.js':     return 'mdi-language-javascript'
+            case '.tson':
+            case '.json':    return 'mdi-code-json'
+
+            // image
+            case '.png':
+            case '.jpg':
+            case '.gif':
+            case '.jpeg':
+            case '.webp':   return 'mdi-image-outline'
+
+            // audio
+            case '.ogg':
+            case '.wav':
+            case '.mp3':    return 'mdi-music-note-outline'
+
+            // video
+            case '.webm':
+            case '.mp4':    return 'mdi-video-outline'
+
+            // font
+            case '.woff':
+            case '.woff2':  return 'mdi-format-font'
+
+            // text
+            case '.txt':    return 'mdi-file-document-outline'
+
+            // else
+            default:        return 'mdi-file-outline'
+        }
     }
 
     @Watch('cwd', { immediate: true })

@@ -26,7 +26,7 @@
         >
             <v-card>
                 <v-card-title>이름을 입력하세요</v-card-title>
-                <v-card-subtitle>특수문자는 사용할 수 없습니다</v-card-subtitle>
+                <v-card-subtitle>이름을 변경하면 이 파일을 참조하는 다른 파일에서도 수정해야합니다</v-card-subtitle>
                 <v-card-text>
                     <v-text-field
                         :rules="[ namingRule ]"
@@ -110,13 +110,13 @@ export default class GeneratorComponent extends Vue {
     private actions: ContextItemAction[] = [
         {
             icon: 'mdi-plus',
-            description: '추가',
+            description: '파일 추가',
             action: (): void => {
                 this.add(this.getNewFilePath())
             }
         },
         {
-            icon: 'mdi-folder-multiple-plus-outline',
+            icon: 'mdi-folder-plus-outline',
             description: '폴더 추가',
             action: async (directoryPath: string): Promise<void> => {
                 const name: string = await this.receiveNaming()
@@ -141,13 +141,6 @@ export default class GeneratorComponent extends Vue {
     private contextmenus: ContextItemAction[] = [
         ...this.extraContextmenus,
         {
-            icon: 'mdi-open-in-new',
-            description: '파일로 이동합니다',
-            action: (filePath: string): void => {
-                ipcRenderer.invoke('show-item', filePath)
-            }
-        },
-        {
             icon: 'mdi-rename-box',
             description: '이름을 변경합니다',
             action: async (src: string): Promise<void> => {
@@ -155,12 +148,19 @@ export default class GeneratorComponent extends Vue {
 
                 const before: string    = parsed.name
                 const after: string     = await this.receiveNaming(parsed.name, parsed.ext)
-                const dist: string      = path.resolve(parsed.dir, `${after}${parsed.ext}`)
+                const dist: string      = path.resolve(parsed.dir, after)
 
                 const renaming: Engine.FileSystem.RenameSuccess|Engine.FileSystem.RenameFail = await ipcRenderer.invoke('rename', src, dist)
                 if (!renaming.success) {
                     this.$store.dispatch('snackbar', renaming.message)
                 }
+            }
+        },
+        {
+            icon: 'mdi-open-in-new',
+            description: '파일로 이동합니다',
+            action: (filePath: string): void => {
+                ipcRenderer.invoke('show-item', filePath)
             }
         },
         {
@@ -219,7 +219,7 @@ export default class GeneratorComponent extends Vue {
     }
 
     private dispatchNaming(): void {
-        this.$emit('dispatch-naming', this.namingText)
+        this.$emit('dispatch-naming', this.namingText + this.namingExt)
         this.isNamingDialogOpen = false
         this.namingText = ''
     }

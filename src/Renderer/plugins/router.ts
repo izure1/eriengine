@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Error404 from '@/Renderer/components/Error/404.vue'
+import DependenciesMain from '@/Renderer/components/Dependencies/Main.vue'
+import DependenciesInstall from '@/Renderer/components/Dependencies/Install.vue'
 import ProjectMain from '@/Renderer/components/Project/Main.vue'
 import ProjectNew from '@/Renderer/components/Project/New.vue'
 import ProjectOpen from '@/Renderer/components/Project/Open.vue'
@@ -25,6 +27,22 @@ import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
+    {
+        path: '/',
+        redirect: '/dependencies'
+    },
+    {
+        path: '/dependencies',
+        component: DependenciesMain
+    },
+    {
+        path: '/dependencies/install',
+        redirect: '/dependencies'
+    },
+    {
+        path: '/dependencies/install/:missings',
+        component: DependenciesInstall
+    },
     {
         path: '/project',
         component: ProjectMain
