@@ -17,25 +17,28 @@
 
                     <v-row class="my-10">
                         <v-spacer />
-                        <v-card
+                        <v-hover
                             v-for="(dependency, i) in missings"
                             :key="`dependency-${i}`"
-                            width="250"
-                            class="dependency-wrapper mx-3"
                         >
-                            <v-img
-                                :src="dependency.image"
-                                height="150"
-                                class="white--text align-end"
-                            >
-                                <v-card-title>{{ dependency.title }}</v-card-title>
-                            </v-img>
-                            <v-card-text class="dependency-description">{{ dependency.description }}</v-card-text>
-                            <v-divider />
-                            <v-card-actions>
-                                <v-btn text @click="download(dependency.homepage)">다운로드</v-btn>
-                            </v-card-actions>
-                        </v-card>
+                            <template v-slot:default="{ hover }">
+                                <v-card
+                                    :elevation="hover ? 12 : 3"
+                                    @click="download(dependency.homepage)"
+                                    width="250"
+                                    class="dependency-wrapper mx-3"
+                                >
+                                    <v-img
+                                        :src="dependency.image"
+                                        height="150"
+                                        class="white--text align-end"
+                                    >
+                                        <v-card-title>{{ dependency.title }}</v-card-title>
+                                    </v-img>
+                                    <v-card-text class="dependency-description">{{ dependency.description }}</v-card-text>
+                                </v-card>
+                            </template>
+                        </v-hover>
                         <v-spacer />
                     </v-row>
                 </v-card-text>
@@ -102,3 +105,12 @@ export default class DependenciesInstallComponent extends Vue {
 
 }
 </script>
+
+<style lang="scss" scoped>
+.dependency-wrapper {
+    transition: box-shadow 0.15s linear;
+}
+.dependency-description {
+    min-height: 130px;
+}
+</style>

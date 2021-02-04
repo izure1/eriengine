@@ -39,7 +39,7 @@ export default class DependenciesCheckComponent extends Vue {
         },
         {
             title: 'NPM',
-            description: 'NPM(Node Package Manager)은 JavaScript 프로그래밍 패키지 관리자 입니다 .',
+            description: 'Node.js를 설치하면 자동으로 같이 설치됩니다.',
             image: BgDependenciesNPM,
             command: 'npm',
             homepage: 'https://nodejs.org'

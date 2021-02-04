@@ -107,7 +107,7 @@ async function createWindow() {
             nodeIntegration: true,
             webSecurity: false
         },
-        icon: path.resolve(__static, 'icon-cube.png')
+        icon: path.resolve(__static, 'icon.png')
     })
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {

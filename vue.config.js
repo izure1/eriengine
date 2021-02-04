@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   "transpileDependencies": [
     "vuetify"
@@ -12,5 +14,14 @@ module.exports = {
       .use('raw-loader')
       .loader('raw-loader')
       .end()
+  },
+  pluginOptions: {
+    electronBuilder: {
+      builderOptions: {
+        win: {
+          icon: path.resolve(__dirname, 'public', 'icon.png')
+        }
+      }
+    }
   }
 }

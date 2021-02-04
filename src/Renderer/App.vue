@@ -14,7 +14,6 @@ export default class AppComponent extends Vue {}
 
 <style lang="scss" scoped>
 .lancher-main {
-    height: 100%;
     overflow: auto;
 }
 </style>

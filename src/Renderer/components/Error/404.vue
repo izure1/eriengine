@@ -2,7 +2,7 @@
     <v-app>
         <v-main>
             <v-card flat>
-                <v-card-title>아이~씻팔!!!</v-card-title>
+                <v-card-title>아이~씻팔!!!  ٩(╬ʘ益ʘ╬)۶	</v-card-title>
                 <v-card-text>
                     알 수 없는 오류가 발생했습니다.
                     <br>
