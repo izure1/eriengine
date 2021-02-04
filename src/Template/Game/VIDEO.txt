@@ -3,5 +3,8 @@ import Phaser from 'phaser'
 {{ DATA_LISTS }}
 
 
-// 비디오에 사용할 에셋입니다.
-export const key: string      = Assets[]
+/** 비디오의 고유값입니다. 다른 비디오와 중복되어선 안됩니다. 잘 모르겠다면 건드리지 마십시오. */
+export const key: string    = __filename
+
+/** 비디오에 사용할 비디오 에셋입니다. */
+export const asset: string  = Assets[]

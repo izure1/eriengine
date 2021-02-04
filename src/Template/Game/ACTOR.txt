@@ -64,8 +64,8 @@ export default class SampleActor extends BaseActor {
 
         // 이 아래에 작성하세요
 
-        // this.run.stop()
         // this.playMovingAnimation()
+        // this.run.stop()
     }
 
     end(): void {
@@ -80,9 +80,11 @@ export default class SampleActor extends BaseActor {
             this.play(Animations[].key, true)
         }
         if (this.run.isMovingLeft) {
+            // this.flipX = false
             // this.play(Animations[].key, true)
         }
         if (this.run.isMovingRight) {
+            // this.flipX = true
             // this.play(Animations[].key, true)
         }
         if (this.run.isMovingDown) {

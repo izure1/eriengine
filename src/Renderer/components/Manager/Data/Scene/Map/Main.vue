@@ -41,6 +41,7 @@
                         </v-list-item>
                     </v-list>
                 </v-card-text>
+                <v-divider />
                 <v-card-actions>
                     <v-spacer />
                     <v-btn text @click="isTooltipOpen = false">알겠습니다</v-btn>

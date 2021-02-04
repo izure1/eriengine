@@ -12,29 +12,29 @@ export default class EriengineScene extends Phaser.Scene {
 
     private loadImage(): void {
         for (const name in Images) {
-            const { key } = Images[name as keyof typeof Images]
-            this.load.image(key, key)
+            const { key, asset } = Images[name as keyof typeof Images]
+            this.load.image(key, asset)
         }
     }
 
     private loadAudio(): void {
         for (const name in Audios) {
-            const { key } = Audios[name as keyof typeof Audios]
-            this.load.audio(key, key)
+            const { key, asset } = Audios[name as keyof typeof Audios]
+            this.load.audio(key, asset)
         }
     }
 
     private loadVideo(): void {
         for (const name in Videos) {
-            const { key } = Videos[name as keyof typeof Videos]
-            this.load.video(key, key)
+            const { key, asset } = Videos[name as keyof typeof Videos]
+            this.load.video(key, asset)
         }
     }
 
     private loadSpritesheet(): void {
         for (const name in Animations) {
-            const { key, texture, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
-            this.load.spritesheet(texture, texture, { frameWidth, frameHeight })
+            const { key, asset, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
+            this.load.spritesheet(key, asset, { frameWidth, frameHeight })
         }
     }
 
@@ -48,13 +48,13 @@ export default class EriengineScene extends Phaser.Scene {
 
     protected createAnimation(): void {
         for (const name in Animations) {
-            const { key, texture, frameRate, start, end, repeat } = Animations[name as keyof typeof Animations]
+            const { key, frameRate, start, end, repeat } = Animations[name as keyof typeof Animations]
             if (this.anims.exists(key)) {
                 continue
             }
             this.anims.create({
                 key,
-                frames: this.anims.generateFrameNumbers(texture, { start, end }),
+                frames: this.anims.generateFrameNumbers(key, { start, end }),
                 frameRate,
                 repeat
             })

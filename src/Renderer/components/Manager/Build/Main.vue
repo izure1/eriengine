@@ -33,7 +33,7 @@
                             text
                         >{{ button.title }}</v-btn>
                     </template>
-                    <span class="caption">{{ button.description }}</span>
+                    <div class="caption" v-html="button.description" />
                 </v-tooltip>
             <v-spacer />
         </v-card-actions>
@@ -54,7 +54,7 @@ export default class BuildComponent extends Vue {
     private buttons: BuildData[] = [
         {
             title: '테스트',
-            description: '브라우저에서 게임을 테스트합니다. 빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
+            description: '브라우저에서 게임을 테스트합니다. <br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
             jobChannel: 'build-serve',
             jobParameters: [ this.cwd ],
             streamChannel: 'build'
@@ -68,7 +68,7 @@ export default class BuildComponent extends Vue {
         },
         {
             title: '빌드 (개발용)',
-            description: '개발용으로 빠르게 빌드합니다. 다만 보안상 문제가 있으므로 실제 배포용으로 쓰지 마십시오.',
+            description: '개발용으로 빠르게 빌드합니다. <br>다만 보안상 문제가 있으므로 실제 배포용으로 쓰지 마십시오.',
             jobChannel: 'build-dev',
             jobParameters: [ this.cwd ],
             streamChannel: 'build'

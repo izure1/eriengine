@@ -15,9 +15,6 @@ type ScriptCallback = (this: NewScene, ...args: any) => void
 // 이 씬이 참조하고 있는 스토리지 정보입니다.
 const storage = Storages['{{ STORAGE_KEY }}']
 
-// 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다.
-const key: string = '{{ KEY }}'
-
 /*
  *  주의!
  *  씬 파일 이름의 뒷 부분은 절대 변경하지 마십시오.
@@ -37,7 +34,9 @@ const key: string = '{{ KEY }}'
  *  가능하다면 스크립트 기능을 이용하도록 하십시오.
  */
 export default class NewScene extends BaseScene {
-    static key: string = key
+    
+    /** 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다. 잘 모르겠다면 건드리지 마십시오. */
+    static Key: string = __filename
 
     protected actor!: ActorPlugin
     protected isometric!: IsometricScenePlugin
@@ -49,7 +48,7 @@ export default class NewScene extends BaseScene {
     private __map = Object.values(storage.Map)[0]
 
     constructor() {
-        super({ key, active: true })
+        super({ key: NewScene.Key, active: true })
         this.generateScript()
     }
 

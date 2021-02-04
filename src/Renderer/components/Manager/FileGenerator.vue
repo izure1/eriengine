@@ -19,17 +19,50 @@
             :contextmenus="contextmenus"
             @update:path="setCurrentDirectory"
         />
+        <v-dialog
+            v-model="isNamingDialogOpen"
+            max-width="600"
+            persistent
+        >
+            <v-card>
+                <v-card-title>이름을 입력하세요</v-card-title>
+                <v-card-subtitle>특수문자는 사용할 수 없습니다</v-card-subtitle>
+                <v-card-text>
+                    <v-text-field
+                        :rules="[ namingRule ]"
+                        :suffix="namingExt"
+                        v-model="namingText"
+                        ref="dialog-naming"
+                        label="이름"
+                        placeholder="이곳에 입력하세요"
+                        filled
+                        rounded
+                    ></v-text-field>
+                </v-card-text>
+                <v-divider />
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn text @click="dispatchNaming">완료</v-btn>
+                    <v-btn text @click="cancelNaming">취소</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </section>
 </template>
 
 <script lang="ts">
 import path from 'path'
 import normalize from 'normalize-path'
+import isValidFilename from 'valid-filename'
+import sanitize from 'sanitize-filename'
 import { Vue, Component } from 'vue-property-decorator'
 import { ipcRenderer, shell } from 'electron'
 import increment from 'add-filename-increment'
 import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 export { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
+
+
+type Rule = (v: string) => boolean|string;
 
 @Component({
     components: {
@@ -70,12 +103,29 @@ export default class GeneratorComponent extends Vue {
     private add!: (filePath: string) => Promise<void>
     private currentPath: string = normalize(this.cwd)
 
+    private isNamingDialogOpen: boolean = false
+    private namingText: string = ''
+    private namingExt: string = ''
+
     private actions: ContextItemAction[] = [
         {
             icon: 'mdi-plus',
             description: '추가',
             action: (): void => {
                 this.add(this.getNewFilePath())
+            }
+        },
+        {
+            icon: 'mdi-folder-multiple-plus-outline',
+            description: '폴더 추가',
+            action: async (directoryPath: string): Promise<void> => {
+                const name: string = await this.receiveNaming()
+                const dirname: string = path.resolve(directoryPath, name)
+
+                const directoryMake: Engine.FileSystem.MakeDirectorySuccess|Engine.FileSystem.MakeDirectoryFail = await ipcRenderer.invoke('make-directory', dirname)
+                if (!directoryMake.success) {
+                    this.$store.dispatch('snackbar', directoryMake.message)
+                }
             }
         },
         {
@@ -98,6 +148,22 @@ export default class GeneratorComponent extends Vue {
             }
         },
         {
+            icon: 'mdi-rename-box',
+            description: '이름을 변경합니다',
+            action: async (src: string): Promise<void> => {
+                const parsed = path.parse(src)
+
+                const before: string    = parsed.name
+                const after: string     = await this.receiveNaming(parsed.name, parsed.ext)
+                const dist: string      = path.resolve(parsed.dir, `${after}${parsed.ext}`)
+
+                const renaming: Engine.FileSystem.RenameSuccess|Engine.FileSystem.RenameFail = await ipcRenderer.invoke('rename', src, dist)
+                if (!renaming.success) {
+                    this.$store.dispatch('snackbar', renaming.message)
+                }
+            }
+        },
+        {
             icon: 'mdi-delete-outline',
             description: '파일을 삭제합니다',
             action: async (filePath: string): Promise<void> => {
@@ -113,6 +179,10 @@ export default class GeneratorComponent extends Vue {
         return this.$store.state.projectDirectory
     }
 
+    private get namingRule(): Rule {
+        return (v: string) => v && isValidFilename(v) || '올바르지 않은 이름입니다'
+    }
+
     private setCurrentDirectory(directoryPath: string): void {
         this.currentPath = normalize(directoryPath)
     }
@@ -126,6 +196,32 @@ export default class GeneratorComponent extends Vue {
 
     private openPath(filePath: string): void {
         shell.openPath(filePath)
+    }
+
+    private receiveNaming(defaultName?: string, defaultExt?: string): Promise<string> {
+        return new Promise((resolve): void => {
+            this.openNamingDialog(defaultName, defaultExt)
+            this.$once('dispatch-naming', (filename: string): void => {
+                resolve(sanitize(filename))
+            })
+        })
+    }
+
+    private openNamingDialog(defaultName: string = '', defaultExt: string = ''): void {
+        this.isNamingDialogOpen = true
+        this.namingText         = defaultName
+        this.namingExt          = defaultExt
+    }
+
+    private cancelNaming(): void {
+        this.isNamingDialogOpen = false
+        this.namingText = ''
+    }
+
+    private dispatchNaming(): void {
+        this.$emit('dispatch-naming', this.namingText)
+        this.isNamingDialogOpen = false
+        this.namingText = ''
     }
 
 }

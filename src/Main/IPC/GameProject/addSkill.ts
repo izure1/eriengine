@@ -1,5 +1,4 @@
 import path from 'path'
-import { nanoid } from 'nanoid'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
@@ -10,8 +9,7 @@ import RAW_SKILL from 'raw-loader!@/Template/Game/SKILL.txt'
 
 async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const fileContent: string   = parseProperty(RAW_SKILL, {
-        DATA_LISTS,
-        KEY: nanoid()
+        DATA_LISTS
     })
 
     const fileWrite = await writeFile(filePath, fileContent)

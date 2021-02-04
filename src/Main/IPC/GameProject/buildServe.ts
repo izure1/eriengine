@@ -7,6 +7,11 @@ import { writeToRenderer } from '@/Utils/stream'
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.BuildServeSuccess|Engine.GameProject.BuildServeFail> {
 
+    const htmlAppend = await buildCreateFiles(projectDirPath)
+    if (!htmlAppend.success) {
+        return htmlAppend as Engine.GameProject.BuildServeFail
+    }
+
     try {
         const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
         const command: string = 'npm run serve'
@@ -19,11 +24,6 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
             name,
             message
         }
-    }
-
-    const htmlAppend = await buildCreateFiles(projectDirPath)
-    if (!htmlAppend.success) {
-        return htmlAppend as Engine.GameProject.BuildServeFail
     }
 
     return {

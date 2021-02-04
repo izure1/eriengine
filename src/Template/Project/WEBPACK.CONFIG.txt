@@ -6,6 +6,10 @@ const mode = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'production'
 module.exports = {
     mode,
     target: 'web',
+    node: {
+        __dirname: true,
+        __filename: true
+    },
     entry: {
         Main: path.resolve(__dirname, 'src', 'Game.ts')
     },

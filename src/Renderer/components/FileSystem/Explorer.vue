@@ -51,19 +51,34 @@
                         </v-list-item-content>
 
                         <v-list-item-action class="flex-row" v-if="!isUpperDirectory(file)">
-                            <div
-                                v-for="({ icon, description, action }, i) in contextmenus"
-                                :key="`file-list-contextmenu-${file}-${i}`"
+                            <v-menu
+                                open-on-hover
+                                offset-y
                             >
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn icon v-on="on" @click.stop="action(getAbsolutePath(file))">
-                                            <v-icon color="blue-grey">{{ icon }}</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span class="caption">{{ description }}</span>
-                                </v-tooltip>
-                            </div>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn icon v-on="on" @click.stop="">
+                                        <v-icon>mdi-dots-vertical</v-icon>
+                                    </v-btn>
+                                </template>
+                                <v-list>
+                                    <v-list-item
+                                        v-for="({ icon, description, action }, i) in contextmenus"
+                                        :key="`file-list-contextmenu-${file}-${i}`"
+                                    >
+                                        <v-tooltip left>
+                                            <template v-slot:activator="{ on }">
+                                                <v-list-item-title>
+                                                    <v-btn icon v-on="on" @click.stop="action(getAbsolutePath(file))">
+                                                        <v-icon color="blue-grey">{{ icon }}</v-icon>
+                                                    </v-btn>
+                                                </v-list-item-title>
+                                            </template>
+                                            <span class="caption">{{ description }}</span>
+                                        </v-tooltip>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                            
                         </v-list-item-action>
 
                     </v-list-item>
@@ -93,9 +108,8 @@
 import path from 'path'
 import normalize from 'normalize-path'
 import fs from 'fs-extra'
-import { ipcRenderer, shell } from 'electron'
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-import { PropOptions } from 'vue'
+import { ipcRenderer } from 'electron'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
 
 export interface ContextItemAction {

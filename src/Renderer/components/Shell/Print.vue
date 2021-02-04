@@ -18,6 +18,7 @@
 import { clipboard } from 'electron'
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import Convert from 'ansi-to-html'
+import * as RegExp from '@/Utils/Regexps'
 
 @Component({
     props: {
@@ -32,7 +33,8 @@ export default class ShellPrintComponent extends Vue {
     private converter = new Convert({ stream: true, fg: '#333', bg: '#eee' })
 
     private get encodedText(): string {
-        return this.converter.toHtml(this.print)
+        const html: string = this.converter.toHtml(this.print).replace(RegExp.uri, (match: string): string => `<a href="${match}" target="_blank">${match}</a>`)
+        return this.converter.toHtml(html)
     }
 
     private copy(): void {

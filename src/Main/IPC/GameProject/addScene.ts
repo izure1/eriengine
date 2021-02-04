@@ -24,7 +24,6 @@ interface FileWriteQueue {
 }
 
 async function writeSceneFile(projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const KEY: string           = nanoid()
     const STORAGE_KEY: string   = getStorageKeyFromFilename(filePath)
     const files: FileWriteQueue[] = [
         {
@@ -36,7 +35,6 @@ async function writeSceneFile(projectDirPath: string, filePath: string): Promise
         {
             path: filePath,
             content: parseProperty(RAW_SCENE, {
-                KEY,
                 STORAGE_KEY,
                 DATA_LISTS,
                 STORAGE_LISTS

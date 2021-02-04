@@ -4,8 +4,8 @@ import { ActorDot } from '@eriengine/plugin-actor/dist/actor/src/Actor/ActorDot'
 
 {{ DATA_LISTS }}
 
-// 스킬명으로 사용할 이름입니다. 다른 스킬명과 중복되어선 안됩니다.
-export const key: string = '{{ KEY }}'
+/** 스킬명으로 사용할 이름입니다. 다른 스킬명과 중복되어선 안됩니다. 잘 모르겠다면 건드리지 마십시오. */
+export const key: string = __filename
 
 /**
  * 
