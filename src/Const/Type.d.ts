@@ -5,6 +5,7 @@ declare namespace Engine {
             [key: string]: Primitive|Primitive[]|Json
         }
         type Transferable = Primitive|Json
+        type TransferableEncoding = 'utf8'|'utf-8'|'hex'|'base64'
 
         interface StreamChunk {
             channel: string

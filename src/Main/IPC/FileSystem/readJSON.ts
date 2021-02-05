@@ -19,6 +19,7 @@ export async function handler(filePath: string): Promise<Engine.FileSystem.ReadJ
         name: '파일 읽기',
         message: '파일을 읽었습니다',
         path: filePath,
+        encoding: 'utf-8',
         content
     }
 }

@@ -5,7 +5,7 @@ import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
 
-import Logo from '@/Renderer/assets/logo.png'
+import Icon from '@/Renderer/assets/icon.png'
 
 
 export default class PreviewScene extends Phaser.Scene {
@@ -68,7 +68,7 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     preload(): void {
-        this.load.image('logo', Logo)
+        this.load.image('logo', Icon)
     }
 
     create(): void {

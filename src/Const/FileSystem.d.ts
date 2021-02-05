@@ -1,5 +1,5 @@
 interface FileSystemState extends Engine.ActionState { path: string }
-interface FileContent { content: string }
+interface FileContent { encoding: Engine.Type.TransferableEncoding, content: string }
 interface FileTranslate { src: string, dist: string }
 
 declare namespace Engine {

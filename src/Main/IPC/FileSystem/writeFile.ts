@@ -1,9 +1,9 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import fs from 'fs-extra'
 
-export async function handler(filePath: string, fileContent: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+export async function handler(filePath: string, fileContent: string, encoding: Engine.Type.TransferableEncoding = 'utf-8'): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     try {
-        await fs.writeFile(filePath, fileContent)
+        await fs.writeFile(filePath, fileContent, { encoding })
     } catch(e) {
         const { message } = e as Error
         return {
@@ -22,7 +22,7 @@ export async function handler(filePath: string, fileContent: string): Promise<En
 }
 
 export function ipc(): void {
-    ipcMain.handle('write-file', async (e: IpcMainInvokeEvent, filePath: string, fileContent: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> => {
-        return await handler(filePath, fileContent)
+    ipcMain.handle('write-file', async (e: IpcMainInvokeEvent, filePath: string, fileContent: string, encoding?: Engine.Type.TransferableEncoding): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> => {
+        return await handler(filePath, fileContent, encoding)
     })
 }
