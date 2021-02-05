@@ -33,11 +33,8 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
 
     // package.json 생성
     const appPkgPath: string = path.resolve(webBuild.path, PROJECT_PACAKGE_NAME)
-    const appPkgContent: object = JSON.parse(parseProperty(RAW_PACKAGE, {
-        NAME: config.PROJECT_NAME,
-        VERSION: '1.0.0',
-        author: 'ERIENGINE'
-    }))
+    const appPkgChunkContent: object = JSON.parse(RAW_PACKAGE)
+    const appPkgContent: object = merge(pkgRead.content, appPkgChunkContent)
 
     const appPkgWrite = await writeJson(appPkgPath, appPkgContent)
     if (!appPkgWrite.success) {

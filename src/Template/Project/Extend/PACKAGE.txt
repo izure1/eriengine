@@ -4,11 +4,11 @@
     "version": "{{ version }}",
     "description": "{{ description }}",
     "author": "{{ author }}",
-    "license": "{{ license }}"
+    "license": "{{ license }}",
     "engineAuth": "{{ engineAuth }}",
     "engineVersion": "{{ engineVersion }}",
-    "gameDisplaySize": {{ gameDisplaySize }},
-    "gameThemeTextColor: "{{ gameThemeTextColor }}",
+    "gameDisplaySize": [{{ gameDisplaySize }}],
+    "gameThemeTextColor": "{{ gameThemeTextColor }}",
     "gameThemeBackgroundColor": "{{ gameThemeBackgroundColor }}",
     "dependencies": {
     }

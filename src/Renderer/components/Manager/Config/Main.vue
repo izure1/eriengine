@@ -13,6 +13,9 @@ import path from 'path'
 import { Vue, Component } from 'vue-property-decorator'
 import { shell, ipcRenderer } from 'electron'
 import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
+import {
+    PROJECT_EXTEND_DIRECTORY_NAME
+} from '@/Const'
 
 @Component({
     components: {
@@ -45,7 +48,7 @@ export default class ConfigMainComponent extends Vue {
         if (!projectDirectory) {
             return ''
         }
-        return projectDirectory
+        return path.resolve(projectDirectory, PROJECT_EXTEND_DIRECTORY_NAME)
     }
 
     private openPath(filePath: string): void {

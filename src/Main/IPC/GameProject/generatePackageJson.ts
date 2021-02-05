@@ -31,8 +31,13 @@ export async function handler(projectDirPath: string, config: Engine.GameProject
     const pkgPath: string = path.resolve(projectDirPath, PROJECT_PACAKGE_NAME)
     const pkgContent: object = JSON.parse(RAW_PROJECT_PACKAGE)
 
+    const extendPkgRead = await readJson(extendPkgPath)
+    if (!extendPkgRead.success) {
+        return extendPkgRead as Engine.GameProject.GeneratePackageJsonFail
+    }
+
     // 병합 시작
-    const merged: object = merge(pkgContent, extendPkgContent)
+    const merged: object = merge(pkgContent, extendPkgRead.content)
 
     // 병합된 내용 package.json 파일로 추출
     const mergedPkgWrite = await writeJson(pkgPath, merged)
