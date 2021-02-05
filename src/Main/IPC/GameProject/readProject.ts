@@ -1,17 +1,20 @@
 import path from 'path'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { PROJECT_CONFIG_NAME } from '@/Const'
 import { handler as readJSON } from '../FileSystem/readJSON'
 import { handler as checkValidProject } from './checkValidProject'
+import {
+    PROJECT_EXTEND_DIRECTORY_NAME,
+    PROJECT_EXTEND_PACKAGE_NAME
+} from '@/Const'
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {
-    const configPath: string = path.resolve(projectDirPath, PROJECT_CONFIG_NAME)
-    const raw = await readJSON(configPath)
-    if (!raw.success) {
-        return raw as Engine.GameProject.ReadProjectFail
+    const pkgPath: string = path.resolve(projectDirPath, PROJECT_EXTEND_DIRECTORY_NAME, PROJECT_EXTEND_PACKAGE_NAME)
+    const pkgContent = await readJSON(pkgPath)
+    if (!pkgContent.success) {
+        return pkgContent as Engine.GameProject.ReadProjectFail
     }
 
-    const config: Engine.GameProject.Config = raw.content as Engine.GameProject.Config
+    const config: Engine.GameProject.Config = pkgContent.content as Engine.GameProject.Config
     const validConfig: Engine.GameProject.CheckValidProjectSuccess|Engine.GameProject.CheckValidProjectFail = await checkValidProject(config)
 
     if (

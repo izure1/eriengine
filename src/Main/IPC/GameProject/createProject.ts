@@ -1,7 +1,6 @@
 import path from 'path'
 import { nanoid } from 'nanoid'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { handler as writeFile } from '../FileSystem/writeFile'
 import { handler as ensureProject } from './ensureProject'
 import { handler as addScene } from './addScene'
 import { parseProperty } from '@/Utils/parseProperty'

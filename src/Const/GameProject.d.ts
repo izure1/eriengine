@@ -4,13 +4,17 @@ interface GameProjectState extends PathRequired, Engine.ActionState { config: En
 declare namespace Engine {
     namespace GameProject {
         interface Config extends Engine.Type.Json {
-            ENGINE_AUTH: string
-            ENGINE_VERSION: string
-            PROJECT_NAME: string
-            APPLICATION_ID: string
-            GAME_DISPLAY_SIZE: [number, number]
-            GAME_THEME_TEXT_COLOR: string
-            GAME_THEME_BACKGROUND_COLOR: string
+            applicationId: string
+            name: string
+            version: string
+            description: string
+            author: string
+            license: string
+            engineAuth: string
+            engineVersion: string
+            gameDisplaySize: [number, number]
+            gameThemeTextColor: string
+            gameThemeBackgroundColor: string
         }
 
         interface SceneMap {
@@ -135,5 +139,11 @@ declare namespace Engine {
 
         interface BuildServeSuccess extends BuildJobSuccess {}
         interface BuildServeFail extends BuildJobFail {}
+
+        interface BuildToWebSuccess extends BuildJobSuccess {}
+        interface BuildToWebFail extends BuildJobFail {}
+
+        interface BuildToAppSuccess extends BuildJobSuccess {}
+        interface BuildToAppFail extends BuildJobFail {}
     }
 }

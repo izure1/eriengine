@@ -74,6 +74,8 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/buildDev')
     yield require('./Main/IPC/GameProject/buildProd')
     yield require('./Main/IPC/GameProject/buildServe')
+    yield require('./Main/IPC/GameProject/buildToWeb')
+    yield require('./Main/IPC/GameProject/buildToApp')
     
     // Process
     yield require('./Main/IPC/Process/checkCommandExists')

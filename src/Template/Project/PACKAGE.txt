@@ -1,7 +1,4 @@
 {
-    "name": "{{ NAME }}",
-    "version": "1.0.0",
-    "description": "{{ DESCRIPTION }}",
     "main": "index.js",
     "scripts": {
         "build:dev": "set NODE_ENV=development && webpack",
@@ -25,7 +22,5 @@
         "@webpack-cli/serve": "^1.2.2",
         "fast-glob": "^3.2.5",
         "copy-webpack-plugin": "^7.0.0"
-    },
-    "author": "{{ AUTHOR }}",
-    "license": "{{ LICENSE }}"
+    }
 }

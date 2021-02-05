@@ -11,7 +11,6 @@ export const PROJECT_ALLOW_ASSET_EXTENSIONS: string[] = [ 'jpg', 'jpeg', 'png', 
 
 // root
 export const PROJECT_DIRECTORY_NAME: string     = 'Eriengine Project_{{ PROJECT_NAME }}'
-export const PROJECT_CONFIG_NAME: string        = 'config.json'
 export const PROJECT_PACAKGE_NAME: string       = 'package.json'
 export const PROJECT_TSCONFIG_NAME: string      = 'tsconfig.json'
 export const PROJECT_WEBPACK_NAME: string       = 'webpack.config.js'
@@ -20,6 +19,10 @@ export const PROJECT_README_NAME: string        = 'README.txt'
 // extend
 export const PROJECT_EXTEND_DIRECTORY_NAME: string      = 'extend'
 export const PROJECT_EXTEND_PACKAGE_NAME: string        = 'package.json'
+
+// build
+export const PROJECT_DIST_DIRECTORY_NAME: string    = 'dist'
+export const PROJECT_DIST_INDEX_NAME: string        = 'index.html'
 
 // src
 export const PROJECT_SRC_GAME_NAME: string          = 'Game.ts'

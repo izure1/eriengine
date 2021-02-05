@@ -1,5 +1,15 @@
 {
+    "applicationId": "{{ applicationId }}",
+    "name": "{{ name }}",
+    "version": "{{ version }}",
+    "description": "{{ description }}",
+    "author": "{{ author }}",
+    "license": "{{ license }}"
+    "engineAuth": "{{ engineAuth }}",
+    "engineVersion": "{{ engineVersion }}",
+    "gameDisplaySize": {{ gameDisplaySize }},
+    "gameThemeTextColor: "{{ gameThemeTextColor }}",
+    "gameThemeBackgroundColor": "{{ gameThemeBackgroundColor }}",
     "dependencies": {
-        
     }
 }

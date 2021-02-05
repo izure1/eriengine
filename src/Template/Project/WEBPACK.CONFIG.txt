@@ -11,10 +11,10 @@ module.exports = {
         __filename: true
     },
     entry: {
-        Main: path.resolve(__dirname, 'src', 'Game.ts')
+        main: path.resolve(__dirname, 'src', 'Game.ts')
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'dist', 'js'),
         publicPath: '/js/',
         filename: '[name].js',
         library: 'Eriengine[name]',

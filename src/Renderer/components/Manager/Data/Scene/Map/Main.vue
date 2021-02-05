@@ -104,7 +104,7 @@ export default class SceneMapEditor extends Vue {
     }
 
     private async createGame(): Promise<void> {
-        const [ width, height ] = this.projectConfig.GAME_DISPLAY_SIZE
+        const [ width, height ] = this.projectConfig.gameDisplaySize
 
         const config = createConfig(width, height, [ PreviewScene ], this.canvasParent)
         this.game = new Phaser.Game(config)

@@ -9,7 +9,6 @@ import { parseProperty } from '@/Utils/parseProperty'
 import { ProcessSpawner } from '@/Utils/ProcessSpawner'
 import { writeToRenderer } from '@/Utils/stream'
 import {
-    PROJECT_CONFIG_NAME,
     PROJECT_TSCONFIG_NAME,
     PROJECT_WEBPACK_NAME,
     PROJECT_README_NAME,
@@ -35,7 +34,6 @@ import {
     PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
 } from '@/Const'
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
-import RAW_PROJECT_CONFIG from 'raw-loader!@/Template/Project/CONFIG.txt'
 import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
 import RAW_PROJECT_README from 'raw-loader!@/Template/Project/README.txt'
 import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
@@ -59,15 +57,6 @@ async function ensureFiles(projectDirPath: string, config: Engine.GameProject.Co
     const wpPath: string        = path.resolve(projectDirPath, PROJECT_WEBPACK_NAME)
 
     fileWrite = await writeFile(wpPath, wpContent)
-    if (!fileWrite.success) {
-        return fileWrite as Engine.FileSystem.WriteFileFail
-    }
-
-    // config.json
-    const configContent: string = parseProperty(RAW_PROJECT_CONFIG, config)
-    const configPath: string    = path.resolve(projectDirPath, PROJECT_CONFIG_NAME)
-
-    fileWrite = await writeFile(configPath, configContent)
     if (!fileWrite.success) {
         return fileWrite as Engine.FileSystem.WriteFileFail
     }
@@ -102,7 +91,7 @@ async function ensureFiles(projectDirPath: string, config: Engine.GameProject.Co
     }
 
     // package.json, extend/package.json
-    const packageGen = await generatePackageJson(projectDirPath)
+    const packageGen = await generatePackageJson(projectDirPath, config)
     if (!packageGen.success) {
         return packageGen as Engine.FileSystem.WriteFileFail
     }

@@ -8,7 +8,6 @@ import { handler as writeFile } from '../FileSystem/writeFile'
 import { parseProperty } from '@/Utils/parseProperty'
 import {
     PROJECT_PACAKGE_NAME,
-    PROJECT_CONFIG_NAME,
     PROJECT_EXTEND_DIRECTORY_NAME,
     PROJECT_EXTEND_PACKAGE_NAME
 } from '@/Const'
@@ -16,32 +15,10 @@ import {
 import RAW_PROJECT_PACKAGE from 'raw-loader!@/Template/Project/PACKAGE.txt'
 import RAW_PROJECT_EXTEND_PACKAGE from 'raw-loader!@/Template/Project/Extend/PACKAGE.txt'
 
-export async function handler(projectDirPath: string): Promise<Engine.GameProject.GeneratePackageJsonSuccess|Engine.GameProject.GeneratePackageJsonFail> {
+export async function handler(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.GeneratePackageJsonSuccess|Engine.GameProject.GeneratePackageJsonFail> {
 
-    // config.json 파일로부터 설정 받아오기
-    const configPath: string = path.resolve(projectDirPath, PROJECT_CONFIG_NAME)
-    const configRead = await readJson(configPath)
-    if (!configRead.success) {
-        return configRead as Engine.GameProject.GeneratePackageJsonFail
-    }
-
-    const config: Engine.GameProject.Config = configRead.content as Engine.GameProject.Config
-    const pkgPath: string = path.resolve(projectDirPath, PROJECT_PACAKGE_NAME)
-
-    // package.json 임시 파일 생성
-    const pkgContent: string = parseProperty(RAW_PROJECT_PACKAGE, {
-        NAME: config.PROJECT_NAME,
-        DESCRIPTION: '',
-        AUTHOR: '',
-        LICENSE: ''
-    })
-    const pckWrite = await writeFile(pkgPath, pkgContent)
-    if (!pckWrite.success) {
-        return pckWrite as Engine.GameProject.GeneratePackageJsonFail
-    }
-
-    // extend/package.json 임시 파일 생성
-    const extendPkgContent: string   = parseProperty(RAW_PROJECT_EXTEND_PACKAGE, {})
+    // extend/package.json 파일 생성
+    const extendPkgContent: string   = parseProperty(RAW_PROJECT_EXTEND_PACKAGE, config)
     const extendPkgPath: string      = path.resolve(projectDirPath, PROJECT_EXTEND_DIRECTORY_NAME, PROJECT_EXTEND_PACKAGE_NAME)
 
     if (!fs.existsSync(extendPkgPath)) {
@@ -51,20 +28,11 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
         }
     }
 
-    // 병합할 package.json 파일 목록
-    // 순서에 주의하십시오. 배열의 뒤에 있을수록 우선순위가 높아집니다.
-    const pkgPaths: string[] = [ pkgPath, extendPkgPath ]
+    const pkgPath: string = path.resolve(projectDirPath, PROJECT_PACAKGE_NAME)
+    const pkgContent: object = JSON.parse(RAW_PROJECT_PACKAGE)
 
     // 병합 시작
-    let merged: object = {}
-    for (const filePath of pkgPaths) {
-        const jsonRead = await readJson(filePath)
-        if (!jsonRead.success) {
-            return jsonRead as Engine.GameProject.GeneratePackageJsonFail
-        }
-
-        merged = merge(merged, jsonRead.content)
-    }
+    const merged: object = merge(pkgContent, extendPkgContent)
 
     // 병합된 내용 package.json 파일로 추출
     const mergedPkgWrite = await writeJson(pkgPath, merged)
@@ -82,7 +50,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
 }
 
 export function ipc(): void {
-    ipcMain.handle('generate-packagejson', async (e: IpcMainInvokeEvent, projectDirPath: string): Promise<Engine.GameProject.GeneratePackageJsonSuccess|Engine.GameProject.GeneratePackageJsonFail> => {
-        return await handler(projectDirPath)
+    ipcMain.handle('generate-packagejson', async (e: IpcMainInvokeEvent, projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.GeneratePackageJsonSuccess|Engine.GameProject.GeneratePackageJsonFail> => {
+        return await handler(projectDirPath, config)
     })
 }

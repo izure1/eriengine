@@ -60,16 +60,16 @@ export default class BuildComponent extends Vue {
             streamChannel: 'build'
         },
         {
-            title: '빌드',
-            description: '소스코드를 게임이 작동하는 실제 애플리케이션으로 추출합니다.',
-            jobChannel: 'build-prod',
+            title: '웹',
+            description: '소스코드를 게임이 작동하는 웹페이지로 추출합니다.',
+            jobChannel: 'build-to-web',
             jobParameters: [ this.cwd ],
             streamChannel: 'build'
         },
         {
-            title: '빌드 (개발용)',
-            description: '개발용으로 빠르게 빌드합니다. <br>다만 보안상 문제가 있으므로 실제 배포용으로 쓰지 마십시오.',
-            jobChannel: 'build-dev',
+            title: '애플리케이션',
+            description: '소스코드를 게임이 작동하는 애플리케이션으로 추출합니다.',
+            jobChannel: 'build-to-app',
             jobParameters: [ this.cwd ],
             streamChannel: 'build'
         },

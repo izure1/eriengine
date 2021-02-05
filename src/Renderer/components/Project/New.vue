@@ -448,13 +448,17 @@ export default class NewProjectComponent extends Vue {
         }
 
         const config: Engine.GameProject.Config = {
-            ENGINE_AUTH: engineAuth.auth,
-            ENGINE_VERSION: engineVersion.version,
-            PROJECT_NAME: this.projectName,
-            APPLICATION_ID: this.applicationId,
-            GAME_DISPLAY_SIZE: this.gameDisplaySize,
-            GAME_THEME_TEXT_COLOR: this.gameThemeTextColor,
-            GAME_THEME_BACKGROUND_COLOR: this.gameThemeBackgroundColor
+            engineAuth: engineAuth.auth,
+            engineVersion: engineVersion.version,
+            name: this.projectName,
+            applicationId: this.applicationId,
+            gameDisplaySize: this.gameDisplaySize,
+            gameThemeTextColor: this.gameThemeTextColor,
+            gameThemeBackgroundColor: this.gameThemeBackgroundColor,
+            version: '1.0.0',
+            author: '',
+            license: '',
+            description: '에리엔진으로 만들어진 게임 프로젝트'
         }
 
         this.isCreating = true

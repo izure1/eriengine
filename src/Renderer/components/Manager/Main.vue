@@ -157,11 +157,11 @@ export default class ProjectFileListComponent extends Vue {
     private watchers: Set<FileWatcher> = new Set
 
     private get projectName(): string {
-        const { PROJECT_NAME } = this.$store.state.projectConfig
-        if (!PROJECT_NAME) {
+        const { name } = this.$store.state.projectConfig
+        if (!name) {
             return ''
         }
-        return PROJECT_NAME
+        return name
     }
 
     private get projectDirectory(): string {
