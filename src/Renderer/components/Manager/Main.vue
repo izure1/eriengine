@@ -250,7 +250,7 @@ export default class ProjectFileListComponent extends Vue {
 
 <style lang="scss" scoped>
 .main-view {
-    height: calc(100vh - 94px);
+    height: calc(100vh - 64px);
     margin-top: 64px !important;
     overflow: auto;
     overflow-x: hidden;

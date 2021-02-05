@@ -12,19 +12,13 @@ import { Vue, Component } from 'vue-property-decorator'
 export default class AppComponent extends Vue {}
 </script>
 
-<style lang="scss" scoped>
-.lancher-main {
-    overflow: auto;
-}
-</style>
-
 <style lang="scss">
 html,
 body {
     width: 100%;
     height: 100%;
-    overflow: auto;
-    overflow-y: hidden !important;
+    overflow: hidden;
+    overflow-y: auto !important;
 }
 
 *:not(input):not(textarea) {
