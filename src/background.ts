@@ -97,13 +97,14 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+// delete 모듈이 빌드된 파일의 .asar 파일을 삭제하지 못하는 오류를 수정
 process.noAsar = true
 
 async function createWindow() {
     // Create the browser window.
     const win = new BrowserWindow({
         width: 1280,
-        height: 680,
+        height: 720,
         show: false,
         webPreferences: {
             // Use pluginOptions.nodeIntegration, leave this alone

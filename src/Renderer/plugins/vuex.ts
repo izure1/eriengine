@@ -29,6 +29,9 @@ export default new Vuex.Store({
             commit('setProjectDirectory', path)
             commit('setProjectConfig', config)
         },
+        setProjectConfig({ commit }, config: Engine.GameProject.Config): void {
+            commit('setProjectConfig', config)
+        },
         closeProject({ commit }): void {
             commit('setProjectDirectory', '')
             commit('setProjectConfig', {})

@@ -36,11 +36,11 @@ export default class RestructureComponent extends Vue {
 
     private finally(message: string): void {
         this.$store.dispatch('snackbar', message)
-        this.$router.replace('/manager')
+        this.$router.replace('/manager').catch(() => null)
     }
 
     private goBack(): void {
-        this.$router.replace('/manager')
+        this.$router.replace('/manager').catch(() => null)
     }
 
     private async readProject(): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {

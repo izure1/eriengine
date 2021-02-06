@@ -44,7 +44,7 @@
                 <v-divider />
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn text @click="isTooltipOpen = false">알겠습니다</v-btn>
+                    <v-btn text @click.stop="isTooltipOpen = false">알겠습니다</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -90,13 +90,13 @@ export default class SceneMapEditor extends Vue {
     private async setMap(): Promise<void> {
         if (!this.storageKey) {
             this.$store.dispatch('snackbar', '씬 파일 이름에 스토리지 정보가 없습니다')
-            this.$router.replace('/manager/scene')
+            this.$router.replace('/manager/scene').catch(() => null)
             return
         }
         const sceneMapRead: Engine.GameProject.ReadSceneMapSuccess|Engine.GameProject.ReadSceneMapFail = await ipcRenderer.invoke('read-scene-map', this.projectDirectory, this.storageKey)
         if (!sceneMapRead.success) {
             this.$store.dispatch('snackbar', sceneMapRead.message)
-            this.$router.replace('/manager/scene')
+            this.$router.replace('/manager/scene').catch(() => null)
             return
         }
 
@@ -156,7 +156,7 @@ export default class SceneMapEditor extends Vue {
         if (this.storageKey) {
             return
         }
-        this.$router.replace('/manager/scene')
+        this.$router.replace('/manager/scene').catch(() => null)
     }
 
     created(): void {

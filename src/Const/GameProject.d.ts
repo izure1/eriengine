@@ -13,13 +13,15 @@ declare namespace Engine {
             engineAuth: string
             engineVersion: string
             gameDisplaySize: [number, number]
+            gameDisplayResizable: boolean
+            gameMaximizable: boolean
             gameThemeTextColor: string
             gameThemeBackgroundColor: string
         }
 
         interface SceneMap {
-            walls: [number, number, string][],
-            floors: [number, number, string][],
+            walls: [number, number, string][]
+            floors: [number, number, string][]
             actors: { name: string, x: number, y: number }[]
         }
 

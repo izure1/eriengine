@@ -71,7 +71,8 @@ export async function handler(projectDirPath: string, buildMode: 'dev'|'prod'): 
         BUILD_MODE: buildMode,
         INDEX: PROJECT_BUILD_SRC_INDEX_NAME,
         WIDTH: config.gameDisplaySize[0],
-        HEIGHT: config.gameDisplaySize[1]
+        HEIGHT: config.gameDisplaySize[1],
+        RESIZABLE: config.gameDisplayResizable
     })
     const mainWrite = await writeFile(mainPath, mainContent)
     if (!mainWrite.success) {

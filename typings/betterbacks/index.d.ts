@@ -7,7 +7,7 @@ declare module 'betterbacks' {
         dark?: boolean
     }
     interface Betterbacks {
-        (selector: string, setting: Options): void
+        (selector: string, setting: BetterbacksOptions): void
     }
     const _: Betterbacks
     export default _

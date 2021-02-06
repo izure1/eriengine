@@ -40,14 +40,14 @@ export default class SkillMainComponent extends Vue {
             icon: 'mdi-script-text-outline',
             description: '스크립트 파일을 찾습니다',
             action: (filePath: string): void => {
-                this.$router.replace(`/manager/scene/script/${encodeURIComponent(filePath)}`)
+                this.$router.replace(`/manager/scene/script/${encodeURIComponent(filePath)}`).catch(() => null)
             }
         },
         {
             icon: 'mdi-pencil-ruler',
             description: '씬을 꾸밉니다',
             action: (filePath: string): void => {
-                this.$router.replace(`/manager/scene/map/${encodeURIComponent(filePath)}`)
+                this.$router.replace(`/manager/scene/map/${encodeURIComponent(filePath)}`).catch(() => null)
             }
         }
     ]

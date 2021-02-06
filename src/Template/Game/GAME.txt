@@ -18,7 +18,9 @@ new Phaser.Game({
     scale: {
         parent: '#canvas-wrapper',
         expandParent: true,
-        zoom: 1
+        zoom: 1,
+        mode: Phaser.Scale.ScaleModes.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     },
     dom: {
         createContainer: true

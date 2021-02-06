@@ -26,7 +26,7 @@ import { Vue, Component } from 'vue-property-decorator'
 @Component
 export default class Error404Component extends Vue {
     private goBack(): void {
-        this.$router.replace('/')
+        this.$router.replace('/').catch(() => null)
     }
 }
 </script>

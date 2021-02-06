@@ -50,6 +50,7 @@ import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
 import {
+    PROJECT_EXTEND_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_STORAGE_DIRECTORY_NAME,
@@ -169,7 +170,7 @@ export default class ProjectFileListComponent extends Vue {
     }
 
     private showManager(url: string): void {
-        this.$router.replace(url).catch(() => {})
+        this.$router.replace(url).catch(() => null)
     }
 
     private generateWatchers(): void {
@@ -215,6 +216,16 @@ export default class ProjectFileListComponent extends Vue {
         const storageDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME)
         const storageWatcher = new FileWatcher(storageDir).update(() => ipcRenderer.invoke('generate-storage-list', this.projectDirectory)).start().emit()
 
+        // 설정 디렉토리 감지
+        const extendDir: string = path.resolve(this.projectDirectory, PROJECT_EXTEND_DIRECTORY_NAME)
+        const extendWatcher = new FileWatcher(extendDir).update(async () => {
+            const projectRead: Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail = await ipcRenderer.invoke('read-project', this.projectDirectory)
+            if (!projectRead.success) {
+                return
+            }
+            this.$store.dispatch('setProjectConfig', projectRead.config)
+        }).start().emit()
+
         // 디렉토리 감지
         this.watchers.add(assetWatcher)
         this.watchers.add(actorWatcher)
@@ -225,6 +236,7 @@ export default class ProjectFileListComponent extends Vue {
         this.watchers.add(audioWatcher)
         this.watchers.add(videoWatcher)
         this.watchers.add(storageWatcher)
+        this.watchers.add(extendWatcher)
     }
 
     private destroyWatchers(): void {

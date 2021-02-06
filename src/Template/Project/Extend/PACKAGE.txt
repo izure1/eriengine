@@ -8,6 +8,7 @@
     "engineAuth": "{{ engineAuth }}",
     "engineVersion": "{{ engineVersion }}",
     "gameDisplaySize": [{{ gameDisplaySize }}],
+    "gameDisplayResizable": {{ gameDisplayResizable }},
     "gameThemeTextColor": "{{ gameThemeTextColor }}",
     "gameThemeBackgroundColor": "{{ gameThemeBackgroundColor }}",
     "dependencies": {

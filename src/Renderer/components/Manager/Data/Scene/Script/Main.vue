@@ -58,7 +58,7 @@ export default class ScriptMainComponent extends Vue {
     }
 
     private goBack(): void {
-        this.$router.replace('/manager/scene')
+        this.$router.replace('/manager/scene').catch(() => null)
     }
 
     private checkKey(): void {

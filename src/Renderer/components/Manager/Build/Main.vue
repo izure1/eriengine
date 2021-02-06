@@ -1,29 +1,35 @@
 <template>
     <v-card flat> 
-        <v-card-title>테스트 및 빌드하기</v-card-title>
-        <v-card-subtitle>당신의 게임을 테스트하거나, 실제 작동하는 애플리케이션으로 빌드할 수 있습니다</v-card-subtitle>
+        <v-card-title>테스트 및 빌드하기  (｢• ω •)｢	</v-card-title>
+        <v-card-subtitle>
+            게임을 테스트하거나, 실제 작동하는 애플리케이션으로 빌드할 수 있습니다. 하지만 순서를 지켜주세요.
+        </v-card-subtitle>
         <v-card-text>
-            <h3>빌드</h3>
-            <p class="my-3">
+            <v-subheader>테스트</v-subheader>
+            <p>
+                버그많음 = 똥겜. 하지만 어느 세월에 빌드─수정─디버깅하나요?
+                <br>
+                테스트는 소스코드를 수정하면, 즉시 미리보기에 적용되므로 이런 문제로부터 자유롭습니다.
+            </p>
+            <v-subheader>개발용 빌드</v-subheader>
+            <p>
+                테스트를 마쳤다면, 마지막으로 개발용 빌드를 사용해보세요. 실제 동작하는 프로그램의 환경에서 마지막 최종검수가 가능합니다.
+                <br>
+                개발용 빌드는 빌드 속도가 빠르기 때문에, 빠른 검수가 가능해요.
+            </p>
+            <v-subheader>빌드</v-subheader>
+            <p>
                 모든 작업을 완료했나요?
                 <br>
-                그렇다면 당신의 게임 소스코드를 이제 실제 게임으로 만들 수 있습니다.
-            </p>
-            <h3>테스트</h3>
-            <p class="my-3">
-                하지만 게임에 버그가 없는지 확인하는 작업이 필요하겠죠.
-                <br>
-                빌드하는데는 시간이 걸리기 때문에, 버그를 수정하고 확인하기엔 오래걸립니다.
-                <br>
-                테스트는 소스코드를 수정하면, 즉시 미리보기에 적용되기 때문에, 이런 문제로부터 자유롭습니다.
+                그렇다면 당신의 게임 소스코드를 이제 배포 가능한 실제 게임으로 만드세요.
             </p>
         </v-card-text>
-        <v-card-actions class="mt-10 mb-0 pb-0">
+        <v-card-actions class="mt-5 mb-0 pb-0">
             <v-spacer />
                 <v-tooltip
                     v-for="(button, i) in buttons"
                     :key="`build-button-${i}`"
-                    bottom
+                    top
                 >
                     <template v-slot:activator="{ on }">
                         <v-btn
@@ -39,21 +45,25 @@
         </v-card-actions>
         <v-card-actions class="my-0 py-0">
             <v-spacer />
-            <v-tooltip bottom>
+            <v-tooltip top>
                 <template v-slot:activator="{ on }">
                     <div v-on="on">
                         <v-switch
                             v-model="isDevMode"
-                            :label="isDevMode ? '개발모드 사용 중' : '개발모드 사용하기'"
                             :class="{ 'text--green': isDevMode }"
+                            label="개발용 빌드"
+                            color="warning"
                             dense
+                            inset
                         />
                     </div>
                 </template>
-                <div>
-                    개발모드를 이용하면 빠르게 빌드할 수 있습니다.
+                <div class="caption">
+                    테스트가 미리보기라면, 개발모드는 최종검수에 가깝습니다.
                     <br>
-                    하지만 개발모드는 보안 문제가 있기 때문에, 어디까지나 테스트를 위해 사용해야합니다.
+                    활성화 후, 원하는 빌드를 선택하세요. 빠르게 빌드됩니다.
+                    <br>
+                    하지만 보안 문제가 있기에, 반드시 디버깅을 위해서만 사용해야합니다.
                 </div>
             </v-tooltip>
             <v-spacer />
@@ -113,7 +123,7 @@ export default class BuildComponent extends Vue {
 
     private runBuilder(button: BuildData): void {
         const buildDataToken: string = this.createBuildDataToken(button)
-        this.$router.replace(`/manager/build/runner/${buildDataToken}`)
+        this.$router.replace(`/manager/build/runner/${buildDataToken}`).catch(() => null)
     }
 }
 </script>

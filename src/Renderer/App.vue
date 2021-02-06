@@ -21,6 +21,11 @@ body {
     overflow-y: auto !important;
 }
 
+.v-navigation-drawer {
+    // Vuetify 네이게이션 글자가 흐릿하게 보이는 오류를 수정
+    will-change: initial !important;
+}
+
 *:not(input):not(textarea) {
     user-select: none;
 }

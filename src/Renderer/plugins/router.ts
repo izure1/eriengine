@@ -2,11 +2,13 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Error404 from '@/Renderer/components/Error/404.vue'
 import DependenciesMain from '@/Renderer/components/Dependencies/Main.vue'
-import DependenciesInstall from '@/Renderer/components/Dependencies/Install.vue'
+import DependenciesCheck from '@/Renderer/components/Dependencies/Check/Main.vue'
+import DependenciesInstall from '@/Renderer/components/Dependencies/Install/Main.vue'
 import ProjectMain from '@/Renderer/components/Project/Main.vue'
-import ProjectNew from '@/Renderer/components/Project/New.vue'
-import ProjectOpen from '@/Renderer/components/Project/Open.vue'
-import ProjectClose from '@/Renderer/components/Project/Close.vue'
+import ProjectJob from '@/Renderer/components/Project/Job/Main.vue'
+import ProjectNew from '@/Renderer/components/Project/New/Main.vue'
+import ProjectOpen from '@/Renderer/components/Project/Open/Main.vue'
+import ProjectClose from '@/Renderer/components/Project/Close/Main.vue'
 import Manager from '@/Renderer/components/Manager/Main.vue'
 import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue'
 import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue'
@@ -33,19 +35,51 @@ const routes: Array<RouteConfig> = [
     },
     {
         path: '/dependencies',
-        component: DependenciesMain
-    },
-    {
-        path: '/dependencies/install',
-        redirect: '/dependencies'
-    },
-    {
-        path: '/dependencies/install/:missings',
-        component: DependenciesInstall
+        component: DependenciesMain,
+        children: [
+            {
+                path: '',
+                redirect: 'check'
+            },
+            {
+                path: 'check',
+                component: DependenciesCheck
+            },
+            {
+                path: 'install',
+                redirect: 'check'
+            },
+            {
+                path: 'install/:missings',
+                component: DependenciesInstall
+            }
+        ]
     },
     {
         path: '/project',
-        component: ProjectMain
+        component: ProjectMain,
+        children: [
+            {
+                path: '',
+                redirect: 'job'
+            },
+            {
+                path: 'job',
+                component: ProjectJob
+            },
+            {
+                path: 'new',
+                component: ProjectNew
+            },
+            {
+                path: 'open',
+                component: ProjectOpen
+            },
+            {
+                path: 'close',
+                component: ProjectClose
+            },
+        ]
     },
     {
         path: '/project/new',

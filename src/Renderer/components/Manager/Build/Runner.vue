@@ -139,7 +139,7 @@ export default class BuildRunnerComponent extends Vue {
 
     private goBack(message: string): void {
         this.$store.dispatch('snackbar', message)
-        this.$router.replace('/manager/build')
+        this.$router.replace('/manager/build').catch(() => null)
     }
 
     created(): void {
