@@ -18,7 +18,7 @@
                 테스트는 소스코드를 수정하면, 즉시 미리보기에 적용되기 때문에, 이런 문제로부터 자유롭습니다.
             </p>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="mt-10 mb-0 pb-0">
             <v-spacer />
                 <v-tooltip
                     v-for="(button, i) in buttons"
@@ -37,43 +37,74 @@
                 </v-tooltip>
             <v-spacer />
         </v-card-actions>
+        <v-card-actions class="my-0 py-0">
+            <v-spacer />
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <div v-on="on">
+                        <v-switch
+                            v-model="isDevMode"
+                            :label="isDevMode ? '개발모드 사용 중' : '개발모드 사용하기'"
+                            :class="{ 'text--green': isDevMode }"
+                            dense
+                        />
+                    </div>
+                </template>
+                <div>
+                    개발모드를 이용하면 빠르게 빌드할 수 있습니다.
+                    <br>
+                    하지만 개발모드는 보안 문제가 있기 때문에, 어디까지나 테스트를 위해 사용해야합니다.
+                </div>
+            </v-tooltip>
+            <v-spacer />
+        </v-card-actions>
     </v-card>
 </template>
 
 <script lang="ts">
 import { Base64 } from 'js-base64'
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import { BuildData } from './Runner.vue'
 
 @Component
 export default class BuildComponent extends Vue {
+    private isDevMode: boolean = false
+    private buttons: BuildData[] = []
+
     private get cwd(): string {
         return this.$store.state.projectDirectory
     }
 
-    private buttons: BuildData[] = [
-        {
-            title: '테스트',
-            description: '브라우저에서 게임을 테스트합니다. <br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
-            jobChannel: 'build-serve',
-            jobParameters: [ this.cwd ],
-            streamChannel: 'build'
-        },
-        {
-            title: '웹',
-            description: '소스코드를 게임이 작동하는 웹페이지로 추출합니다.',
-            jobChannel: 'build-to-web',
-            jobParameters: [ this.cwd ],
-            streamChannel: 'build'
-        },
-        {
-            title: '애플리케이션',
-            description: '소스코드를 게임이 작동하는 애플리케이션으로 추출합니다.',
-            jobChannel: 'build-to-app',
-            jobParameters: [ this.cwd ],
-            streamChannel: 'build'
-        },
-    ]
+    private get buildMode(): string {
+        return this.isDevMode ? 'dev' : 'prod'
+    }
+
+    @Watch('buildMode', { immediate: true })
+    private onBuildModeChange(): void {
+        this.buttons = [
+            {
+                title: '테스트',
+                description: '브라우저에서 게임을 테스트합니다. <br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
+                jobChannel: 'build-serve',
+                jobParameters: [ this.cwd ],
+                streamChannel: 'build'
+            },
+            {
+                title: '웹',
+                description: '소스코드를 게임이 작동하는 웹페이지로 추출합니다.',
+                jobChannel: 'build-to-web',
+                jobParameters: [ this.cwd, this.buildMode ],
+                streamChannel: 'build'
+            },
+            {
+                title: '애플리케이션',
+                description: '소스코드를 게임이 작동하는 애플리케이션으로 추출합니다.',
+                jobChannel: 'build-to-app',
+                jobParameters: [ this.cwd, this.buildMode ],
+                streamChannel: 'build'
+            }
+        ]
+    }
 
     private createBuildDataToken(buildData: BuildData): string {
         const stringify: string = JSON.stringify(buildData)

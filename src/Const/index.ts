@@ -21,12 +21,12 @@ export const PROJECT_EXTEND_DIRECTORY_NAME: string      = 'extend'
 export const PROJECT_EXTEND_PACKAGE_NAME: string        = 'package.json'
 
 // build
-export const PROJECT_DIST_DIRECTORY_NAME: string        = 'dist'
-export const PROJECT_DIST_SRC_DIRECTORY_NAME: string    = 'src'
-export const PROJECT_DIST_SRC_INDEX_NAME: string        = 'index.html'
-export const PROJECT_DIST_SRC_MAIN_NAME: string         = 'main.js'
-export const PROJECT_DIST_WEB_DIRECTORY_NAME: string    = 'build-web'
-export const PROJECT_DIST_APP_DIRECTORY_NAME: string    = 'build-application'
+export const PROJECT_BUILD_DIRECTORY_NAME: string       = 'build'
+export const PROJECT_BUILD_SRC_DIRECTORY_NAME: string   = 'src'
+export const PROJECT_BUILD_SRC_INDEX_NAME: string       = 'index.html'
+export const PROJECT_BUILD_SRC_MAIN_NAME: string        = 'main.js'
+export const PROJECT_BUILD_WEB_DIRECTORY_NAME: string   = 'build-web'
+export const PROJECT_BUILD_APPLICATION_DIRECTORY_NAME: string   = 'build-application'
 
 // src
 export const PROJECT_SRC_GAME_NAME: string          = 'Game.ts'

@@ -1,27 +1,32 @@
 const { app, BrowserWindow } = require('electron')
+const mode = '{{ BUILD_MODE }}'
 
 function createWindow () {
-  const win = new BrowserWindow({
-    width: {{ WIDTH }},
-    height: {{ HEIGHT }},
-    webPreferences: {
-      nodeIntegration: true
-    }
-  })
+    const win = new BrowserWindow({
+        width: {{ WIDTH }},
+        height: {{ HEIGHT }},
+        webPreferences: {
+            spellcheck: false,
+            nodeIntegration: true
+        }
+    })
 
-  win.loadFile('{{ INDEX }}')
+    if (mode !== 'dev') {
+        win.setMenu(null)
+    }
+    win.loadFile('{{ INDEX }}')
 }
 
 app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow()
+    }
 })

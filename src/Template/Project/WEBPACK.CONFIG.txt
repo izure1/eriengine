@@ -14,7 +14,7 @@ module.exports = {
         main: path.resolve(__dirname, 'src', 'Game.ts')
     },
     output: {
-        path: path.resolve(__dirname, 'dist', 'src', 'js'),
+        path: path.resolve(__dirname, 'build', 'src', 'js'),
         publicPath: '/js/',
         filename: '[name].js',
         library: 'Eriengine[name]',
@@ -43,13 +43,13 @@ module.exports = {
             patterns: [
                 {
                     from: path.resolve(__dirname, 'src', 'Asset'),
-                    to: path.resolve(__dirname, 'dist', 'src', 'Asset')
+                    to: path.resolve(__dirname, 'build', 'src', 'Asset')
                 }
             ]
         })
     ],
     devServer: {
-        contentBase: path.resolve(__dirname, 'dist', 'src'),
+        contentBase: path.resolve(__dirname, 'build', 'src'),
         hot: true,
         open: true
     }

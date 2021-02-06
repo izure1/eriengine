@@ -22,7 +22,7 @@
         </v-card-subtitle>
         <v-card-text> 
             <p v-if="isRunning">
-                결과물은 프로젝트 디렉토리의 <code>dist</code> 폴더에 생성됩니다.
+                결과물은 프로젝트 디렉토리의 <code>build</code> 폴더에 생성됩니다.
                 <br>
                 이 작업은 몇 분이 걸릴 수 있습니다.
             </p>

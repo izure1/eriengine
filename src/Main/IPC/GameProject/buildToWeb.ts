@@ -2,21 +2,24 @@ import path from 'path'
 import normalize from 'normalize-path'
 import sanitize from 'sanitize-filename'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import { handler as buildDev } from './buildDev'
 import { handler as buildProd } from './buildProd'
 import { handler as copy } from '../FileSystem/copy'
 import { writeToRenderer } from '@/Utils/stream'
 import {
-    PROJECT_DIST_WEB_DIRECTORY_NAME
+    PROJECT_BUILD_WEB_DIRECTORY_NAME
 } from '@/Const'
 
-export async function handler(projectDirPath: string): Promise<Engine.GameProject.BuildToWebSuccess|Engine.GameProject.BuildToWebFail> {
-    const prodBuild = await buildProd(projectDirPath)
-    if (!prodBuild.success) {
-        return prodBuild as Engine.GameProject.BuildToWebFail
+export async function handler(projectDirPath: string, buildMode: 'dev'|'prod' = 'prod'): Promise<Engine.GameProject.BuildToWebSuccess|Engine.GameProject.BuildToWebFail> {
+
+    // 기본 빌드
+    const built = await (buildMode === 'dev' ? buildDev : buildProd)(projectDirPath)
+    if (!built.success) {
+        return built as Engine.GameProject.BuildToWebFail
     }
 
-    const dist: string = normalize(path.resolve(prodBuild.path, '../', PROJECT_DIST_WEB_DIRECTORY_NAME, sanitize(new Date().toUTCString())))
-    const dirCopy = await copy(prodBuild.path, dist)
+    const dist: string = normalize(path.resolve(built.path, '../', PROJECT_BUILD_WEB_DIRECTORY_NAME, sanitize(new Date().toUTCString())))
+    const dirCopy = await copy(built.path, dist)
     if (!dirCopy.success) {
         const stream = writeToRenderer('build')
         stream.write(dirCopy.message)
@@ -33,7 +36,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
 }
 
 export function ipc(): void {
-    ipcMain.handle('build-to-web', async (e: IpcMainInvokeEvent, projectDirPath: string): Promise<Engine.GameProject.BuildToWebSuccess|Engine.GameProject.BuildToWebFail> => {
-        return await handler(projectDirPath)
+    ipcMain.handle('build-to-web', async (e: IpcMainInvokeEvent, projectDirPath: string, buildMode: 'dev'|'prod'): Promise<Engine.GameProject.BuildToWebSuccess|Engine.GameProject.BuildToWebFail> => {
+        return await handler(projectDirPath, buildMode)
     })
 }

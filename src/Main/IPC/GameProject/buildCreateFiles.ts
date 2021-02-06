@@ -9,14 +9,14 @@ import { parseProperty } from '@/Utils/parseProperty'
 import {
     PROJECT_EXTEND_DIRECTORY_NAME,
     PROJECT_EXTEND_PACKAGE_NAME,
-    PROJECT_DIST_DIRECTORY_NAME,
-    PROJECT_DIST_SRC_DIRECTORY_NAME,
-    PROJECT_DIST_SRC_INDEX_NAME
+    PROJECT_BUILD_DIRECTORY_NAME,
+    PROJECT_BUILD_SRC_DIRECTORY_NAME,
+    PROJECT_BUILD_SRC_INDEX_NAME
 } from '@/Const'
 import RAW_HTML from 'raw-loader!@/Template/Project/Build-Web/HTML.txt'
 
-function getDistPath(projectDirPath: string): string {
-    return normalize(path.resolve(projectDirPath, PROJECT_DIST_DIRECTORY_NAME, PROJECT_DIST_SRC_DIRECTORY_NAME))
+function getBuildPath(projectDirPath: string): string {
+    return normalize(path.resolve(projectDirPath, PROJECT_BUILD_DIRECTORY_NAME, PROJECT_BUILD_SRC_DIRECTORY_NAME))
 }
 
 async function readTitle(projectDirPath: string): Promise<Engine.FileSystem.ReadJsonSuccess|Engine.FileSystem.ReadJsonFail> {
@@ -25,7 +25,7 @@ async function readTitle(projectDirPath: string): Promise<Engine.FileSystem.Read
 }
 
 async function appendHtml(projectDirPath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const dist: string  = getDistPath(projectDirPath)
+    const dist: string  = getBuildPath(projectDirPath)
 
     const directoryMake = await makeDirectory(dist)
     if (!directoryMake.success) {
@@ -39,7 +39,7 @@ async function appendHtml(projectDirPath: string): Promise<Engine.FileSystem.Wri
 
     const config: Engine.GameProject.Config = pkgRead.content as Engine.GameProject.Config
     return await writeFile(
-        path.resolve(dist, PROJECT_DIST_SRC_INDEX_NAME),
+        path.resolve(dist, PROJECT_BUILD_SRC_INDEX_NAME),
         parseProperty(RAW_HTML, {
             TITLE: config.name
         })
@@ -55,7 +55,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
         success: true,
         name: '빌드 파일 생성',
         message: '빌드 파일 생성에 성공했습니다',
-        path: getDistPath(projectDirPath)
+        path: getBuildPath(projectDirPath)
     }
 }
 
