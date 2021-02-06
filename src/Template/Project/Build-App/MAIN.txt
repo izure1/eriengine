@@ -11,7 +11,7 @@ function createWindow () {
         }
     })
 
-    if (mode !== 'dev') {
+    if (mode === 'production') {
         win.setMenu(null)
     }
     win.loadFile('{{ INDEX }}')
