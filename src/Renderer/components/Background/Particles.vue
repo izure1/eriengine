@@ -45,10 +45,6 @@ export default class ParticleBgComponent extends Vue {
     private type!: string
     private num!: number
     private bg!: boolean
-
-    mounted(): void {
-        console.log(this.type)
-    }
 }
 </script>
 

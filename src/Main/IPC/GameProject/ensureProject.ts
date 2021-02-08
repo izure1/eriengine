@@ -19,6 +19,7 @@ import {
     PROJECT_SRC_BASESCENE_NAME,
     PROJECT_SRC_BASEACTOR_NAME,
     PROJECT_SRC_GAME_NAME,
+    PROJECT_SRC_TYPES_NAME,
     PROJECT_SRC_SCENELIST_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_AUDIO_DIRECTORY_NAME,
@@ -40,74 +41,16 @@ import {
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
 import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
 import RAW_PROJECT_README from 'raw-loader!@/Template/Project/README.txt'
+import RAW_TYPES from 'raw-loader!@/Template/Project/TYPES.txt'
 import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
 import RAW_BASE_SCENE from 'raw-loader!@/Template/Game/BASE_SCENE.txt'
 import RAW_BASE_ACTOR from 'raw-loader!@/Template/Game/BASE_ACTOR.txt'
 
 declare const __static: string
 
-async function ensureFiles(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    let fileWrite: Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail
-
-    // tsconfig.json
-    const tsContent: string     = parseProperty(RAW_PROJECT_TSCONFIG, {})
-    const tsPath: string        = path.resolve(projectDirPath, PROJECT_TSCONFIG_NAME)
-
-    fileWrite = await writeFile(tsPath, tsContent)
-    if (!fileWrite.success) {
-        return fileWrite as Engine.FileSystem.WriteFileFail
-    }
-
-    // webpack.config.js
-    const wpContent: string     = parseProperty(RAW_PROJECT_WEBPACK, {})
-    const wpPath: string        = path.resolve(projectDirPath, PROJECT_WEBPACK_NAME)
-
-    fileWrite = await writeFile(wpPath, wpContent)
-    if (!fileWrite.success) {
-        return fileWrite as Engine.FileSystem.WriteFileFail
-    }
-
-    // README.txt
-    const readmeContent: string   = parseProperty(RAW_PROJECT_README, {})
-    const readmePath: string      = path.resolve(projectDirPath, PROJECT_README_NAME)
-
-    fileWrite = await writeFile(readmePath, readmeContent)
-    if (!fileWrite.success) {
-        return fileWrite as Engine.FileSystem.WriteFileFail
-    }
-
-    // src/game.ts
-    const gamePath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_GAME_NAME)
-
-    fileWrite = await writeFile(gamePath, parseProperty(RAW_GAME, {
-        PROJECT_SRC_SCENELIST_NAME: path.parse(PROJECT_SRC_SCENELIST_NAME).name
-    }))
-    if (!fileWrite.success) {
-        return fileWrite as Engine.FileSystem.WriteFileFail
-    }
-
-    // src/build/favicon.png
-    const faviconPath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_BUILD_DIRECTORY_NAME, PROJECT_SRC_BUILD_FAVICON_NAME)
-    if (!fs.existsSync(faviconPath)) {
-        const src: string = path.resolve(__static, 'icon.png')
-        const faviconEnsure = await copy(src, faviconPath)
-        if (!faviconEnsure.success) {
-            return faviconEnsure as Engine.FileSystem.CopyFail
-        }
-    }
-
-    // package.json, extend/package.json
-    const packageGen = await generatePackageJson(projectDirPath, config)
-    if (!packageGen.success) {
-        return packageGen as Engine.FileSystem.WriteFileFail
-    }
-
-    return {
-        success: true,
-        name: '설정 파일 생성 성공',
-        message: '설정 파일 생성을 성공했습니다',
-        path: projectDirPath,
-    }
+interface FileWriteQueue {
+    path?: string
+    content: string|((path?: string) => Promise<void>)
 }
 
 async function ensureRequireModules(projectDirPath: string): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
@@ -124,47 +67,113 @@ async function ensureRequireModules(projectDirPath: string): Promise<Engine.Modu
 
     return {
         success: true,
-        name: '씬 서드파티모듈 설치 성공',
-        message: '씬에 필요한 서드파티모듈 설치를 성공했습니다'
+        name: '프로젝트 서드파티모듈 설치 성공',
+        message: '프로젝트에 필요한 서드파티모듈 설치를 성공했습니다'
     }
 }
 
-async function ensureBaseFile(projectDirPath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-
-    interface FileWriteQueue {
-        path: string
-        content: string
-    }
+async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
 
     const srcDirPath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME)
     const files: FileWriteQueue[] = [
+        // tsconfig.json
+        {
+            path: path.resolve(projectDirPath, PROJECT_TSCONFIG_NAME),
+            content: parseProperty(RAW_PROJECT_TSCONFIG, {})
+        },
+        // webpack.config.js
+        {
+            path: path.resolve(projectDirPath, PROJECT_WEBPACK_NAME),
+            content: parseProperty(RAW_PROJECT_WEBPACK, {})
+        },
+        // README.txt
+        {
+            path: path.resolve(projectDirPath, PROJECT_README_NAME),
+            content: parseProperty(RAW_PROJECT_README, {})
+        },
+        {
+            path: path.resolve(srcDirPath, PROJECT_SRC_TYPES_NAME),
+            content: parseProperty(RAW_TYPES, {})
+        },
+        // src/BaseScene.ts
         {
             path: path.resolve(srcDirPath, PROJECT_SRC_BASESCENE_NAME),
             content: parseProperty(RAW_BASE_SCENE, {
                 DATA_LISTS,
-                STORAGE_LISTS
+                STORAGE_LISTS,
+                APPLICATION_ID: config.applicationId
             })
         },
+        // src/BaseActor.ts
         {
             path: path.resolve(srcDirPath, PROJECT_SRC_BASEACTOR_NAME),
             content: parseProperty(RAW_BASE_ACTOR, {
                 DATA_LISTS,
                 STORAGE_LISTS
             })
+        },
+        // src/Game.ts
+        {
+            path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_GAME_NAME),
+            content: parseProperty(RAW_GAME, {
+                PROJECT_SRC_SCENELIST_NAME: path.parse(PROJECT_SRC_SCENELIST_NAME).name
+            })
+        },
+        // src/build/favicon.png
+        {
+            path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_BUILD_DIRECTORY_NAME, PROJECT_SRC_BUILD_FAVICON_NAME),
+            content: async (faviconPath?: string): Promise<void> => {
+                if (!faviconPath) {
+                    throw new Error('파비콘이 생성될 경로가 지정되지 않았습니다')
+                }
+                if (!fs.existsSync(faviconPath)) {
+                    const src: string = path.resolve(__static, 'icon.png')
+                    const faviconEnsure = await copy(src, faviconPath)
+                    if (!faviconEnsure.success) {
+                        throw faviconEnsure
+                    }
+                }
+            }
+        },
+        // package.json, extend/package.json
+        {
+            content: async (): Promise<void> => {
+                const packageGen = await generatePackageJson(projectDirPath, config)
+                if (!packageGen.success) {
+                    throw packageGen
+                }
+            }
         }
     ]
 
     for (const { path, content } of files) {
-        const fileWrite = await writeFile(path, content)
-        if (!fileWrite.success) {
-            return fileWrite
+        if (typeof content === 'function') {
+            try {
+                await content(path)
+            } catch(e) {
+                const { name, message } = e as Error
+                return { success: false, name, message }
+            }
+        }
+        else {
+            if (!path) {
+                return {
+                    success: false,
+                    name: '프로젝트 기본 파일 생성',
+                    message: '파일이 생성될 경로가 지정되지 않았습니다'
+                }
+            }
+            const fileWrite = await writeFile(path, content)
+            if (!fileWrite.success) {
+                return fileWrite
+            }
         }
     }
 
     return {
         success: true,
-        name: '씬 기본 파일 생성',
-        message: '씬 기본 파일 생성에 성공했습니다',
+        name: '프로젝트 기본 파일 생성',
+        message: '프로젝트 기본 파일 생성에 성공했습니다',
         path: srcDirPath
     }
 }
@@ -197,14 +206,8 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
         }
     }
 
-    // 설정 파일 만들기
-    const filesWrite = await ensureFiles(directoryPath, config)
-    if (!filesWrite.success) {
-        return filesWrite as Engine.GameProject.CreateProjectFail
-    }
-
     // 기본 파일 생성
-    const baseFilesWrite = await ensureBaseFile(directoryPath)
+    const baseFilesWrite = await ensureBaseFile(directoryPath, config)
     if (!baseFilesWrite.success) {
         return baseFilesWrite as Engine.GameProject.CreateProjectFail
     }

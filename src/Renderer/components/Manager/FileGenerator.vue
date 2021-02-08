@@ -6,7 +6,7 @@
                     v-for="(text, index) in description"
                     v-html="text"
                     :key="`generator-text-${index}`"
-                    class="caption"
+                    class="overline"
                 />
             </v-card-text>
         </v-card>

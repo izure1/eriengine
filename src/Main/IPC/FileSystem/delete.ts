@@ -25,8 +25,11 @@ export async function handler(itemPath: string, confirm: boolean): Promise<Engin
     }
     
     try {
+        process.noAsar = true
         await del(normalize(itemPath), { force: true })
+        process.noAsar = false
     } catch(e) {
+        process.noAsar = false
         const { message } = e as Error
         return {
             success: false,

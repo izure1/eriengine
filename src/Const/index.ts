@@ -30,6 +30,7 @@ export const PROJECT_BUILD_APPLICATION_DIRECTORY_NAME: string   = 'build-applica
 
 // src
 export const PROJECT_SRC_GAME_NAME: string          = 'Game.ts'
+export const PROJECT_SRC_TYPES_NAME: string         = 'Types.d.ts'
 export const PROJECT_SRC_ACTORLIST_NAME: string     = 'ACTOR_LIST.ts'
 export const PROJECT_SRC_ANIMSLIST_NAME: string     = 'ANIMS_LIST.ts'
 export const PROJECT_SRC_ASSETLIST_NAME: string     = 'ASSET_LIST.ts'

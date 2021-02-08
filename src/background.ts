@@ -98,7 +98,7 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 // delete 모듈이 빌드된 파일의 .asar 파일을 삭제하지 못하는 오류를 수정
-process.noAsar = true
+//process.noAsar = true
 
 async function createWindow() {
     // Create the browser window.
