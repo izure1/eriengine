@@ -21,7 +21,12 @@ export default abstract class EriengineActor extends Actor {
     protected generateSkill(data: typeof Skills): void {
         for (const name in data) {
             const skill = data[name as keyof typeof data]
-            this.battle.addSkill(skill.key, skill.default)
+            this.battle.addSkill(skill.key, skill.default.bind(this))
+
+            this.battle.on('hit',       (target, information) =>    this.runScript.call(this, this.__scripts.get('onActorHit'), target, information))
+            this.battle.on('get-hit',   (from, information) =>      this.runScript.call(this, this.__scripts.get('onActorGetHit'), from, information))
+            this.battle.on('win',       (from) =>                   this.runScript.call(this, this.__scripts.get('onActorWin'), from))
+            this.battle.on('defeat',    (...froms) =>               this.runScript.call(this, this.__scripts.get('onActorDefeat'), ...froms))
         }
     }
 

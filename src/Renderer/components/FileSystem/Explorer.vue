@@ -57,6 +57,7 @@
                         <v-list-item-action class="flex-row" v-if="!isUpperDirectory(file)">
                             <v-menu
                                 open-on-hover
+                                close-delay="250"
                                 offset-y
                             >
                                 <template v-slot:activator="{ on }">
