@@ -141,14 +141,16 @@ export default class GeneratorComponent extends Vue {
     private contextmenus: ContextItemAction[] = [
         ...this.extraContextmenus,
         {
-            icon: 'mdi-rename-box',
+            icon: 'mdi-form-textbox',
             description: '이름을 변경합니다',
             action: async (src: string): Promise<void> => {
-                const parsed = path.parse(src)
+                const basename: string      = path.basename(src)
+                const namewords: string[]   = basename.split('.')
 
-                const before: string    = parsed.name
-                const after: string     = await this.receiveNaming(parsed.name, parsed.ext)
-                const dist: string      = path.resolve(parsed.dir, after)
+                const before: string        = namewords.shift()!
+                const after: string         = await this.receiveNaming(before, `.${namewords.join('.')}`)
+
+                const dist: string          = path.resolve(path.dirname(src), after)
 
                 const renaming: Engine.FileSystem.RenameSuccess|Engine.FileSystem.RenameFail = await ipcRenderer.invoke('rename', src, dist)
                 if (!renaming.success) {

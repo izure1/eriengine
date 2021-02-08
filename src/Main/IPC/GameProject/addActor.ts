@@ -13,7 +13,6 @@ import {
 
 import { parseProperty } from '@/Utils/parseProperty'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
-import RAW_BASE_ACTOR from 'raw-loader!@/Template/Game/BASE_ACTOR.txt'
 import RAW_ACTOR from 'raw-loader!@/Template/Game/ACTOR.txt'
 
 interface FileWriteQueue {
@@ -24,10 +23,6 @@ interface FileWriteQueue {
 async function writeActorFile(projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const STORAGE_KEY: string = getStorageKeyFromFilename(filePath)
     const files: FileWriteQueue[] = [
-        {
-            path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, 'BaseActor.ts'),
-            content: RAW_BASE_ACTOR
-        },
         {
             path: filePath,
             content: parseProperty(RAW_ACTOR, {

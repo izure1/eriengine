@@ -53,7 +53,9 @@ export const STORAGE_LISTS: string =
 `import Storages from '@/${ PROJECT_SRC_STORAGELIST_NAME }'`
 
 // src/*
-export const PROJECT_SRC_DIRECTORY_NAME: string                     = 'src'
+export const PROJECT_SRC_DIRECTORY_NAME: string     = 'src'
+export const PROJECT_SRC_BASESCENE_NAME: string     = 'BaseScene.ts'
+export const PROJECT_SRC_BASEACTOR_NAME: string     = 'BaseActor.ts'
 
 // src/asset
 export const PROJECT_SRC_ASSET_DIRECTORY_NAME: string               = 'Asset'

@@ -3,13 +3,6 @@ import BaseActor from '@/BaseActor'
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
 
-type ScriptCallback = (this: SampleActor, ...args: any) => void
-
-
-// 이 액터가 참조하고 있는 스토리지 정보입니다.
-const storage = Storages['{{ STORAGE_KEY }}']
-
-
 /*
  *  주의!
  *  액터 파일 이름의 뒷 부분은 절대 변경하지 마십시오.
@@ -31,24 +24,10 @@ const storage = Storages['{{ STORAGE_KEY }}']
 
 export default class SampleActor extends BaseActor {
 
-    private __scripts: Map<string, ScriptCallback[]> = new Map
-
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string|Phaser.Textures.Texture, frame?: string|number) {
         super(scene, x, y, texture, frame)
-        this.generateScript()
-    }
-
-    private generateScript(): void {
-        for (const key in storage.Script) {
-            const script = storage.Script[key as keyof typeof storage.Script]
-            for (const type in script) {
-                if (!this.__scripts.has(type)) {
-                    this.__scripts.set(type, [])
-                }
-                const callback: ScriptCallback = script[type as keyof typeof script]
-                this.__scripts.get(type)!.push(callback)
-            }
-        }
+        this.generateSkill(Skills)
+        this.generateScript(Storages, '{{ STORAGE_KEY }}')
     }
 
     start(): void {

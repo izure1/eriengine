@@ -1,7 +1,47 @@
 import Phaser from 'phaser'
 import { Actor } from '@eriengine/plugin-actor'
 
+{{ DATA_LISTS }}
+{{ STORAGE_LISTS }}
+
+type ScriptCallback = (this: EriengineActor, ...args: any) => void
+
+interface ActorStorage {
+    Script: {
+        [key: string]: {
+            [key: string]: ScriptCallback
+        }
+    }
+}
+
 export default abstract class EriengineActor extends Actor {
+
+    protected __scripts: Map<string, ScriptCallback[]> = new Map
+
+    protected generateSkill(data: typeof Skills): void {
+        for (const name in data) {
+            const skill = data[name as keyof typeof data]
+            this.battle.addSkill(skill.key, skill.default)
+        }
+    }
+
+    protected generateScript(storages: typeof Storages, key: keyof typeof storages): void {
+        const storage: ActorStorage = storages[key] as unknown as ActorStorage
+        if (!storage) {
+            throw `${this.constructor.name} 액터에 스토리지 정보가 없습니다.`
+        }
+        const script = storage.Script
+        for (const name in script) {
+            const callbackData = script[name as keyof typeof script]
+            for (const type in callbackData) {
+                if (!this.__scripts.has(type)) {
+                    this.__scripts.set(type, [])
+                }
+                const callback: ScriptCallback = callbackData[type as keyof typeof callbackData]
+                this.__scripts.get(type)!.push(callback)
+            }
+        }
+    }
 
     protected runScript(callbacks?: ((...args: any) => void)[], ...args: any): void {
         if (!callbacks)  {

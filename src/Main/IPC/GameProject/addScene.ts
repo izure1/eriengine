@@ -15,7 +15,6 @@ import {
 
 import { parseProperty } from '@/Utils/parseProperty'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
-import RAW_BASE_SCENE from 'raw-loader!@/Template/Game/BASE_SCENE.txt'
 import RAW_SCENE from 'raw-loader!@/Template/Game/SCENE.txt'
 
 interface FileWriteQueue {
@@ -26,12 +25,6 @@ interface FileWriteQueue {
 async function writeSceneFile(projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const STORAGE_KEY: string   = getStorageKeyFromFilename(filePath)
     const files: FileWriteQueue[] = [
-        {
-            path: path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, 'BaseScene.ts'),
-            content: parseProperty(RAW_BASE_SCENE, {
-                DATA_LISTS
-            })
-        },
         {
             path: filePath,
             content: parseProperty(RAW_SCENE, {

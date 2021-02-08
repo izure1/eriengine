@@ -1,7 +1,70 @@
 import Phaser from 'phaser'
+import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
+import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
+import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+
 {{ DATA_LISTS }}
+{{ STORAGE_LISTS }}
+
+type ScriptCallback = (this: EriengineScene, ...args: any) => void
+
+interface SceneMap {
+    walls: [number, number, string][]
+    floors: [number, number, string][]
+    actors: { name: string, x: number, y: number }[]
+}
+
+interface SceneStorage {
+    Script: {
+        [key: string]: {
+            [key: string]: ScriptCallback
+        }
+    },
+    Map: {
+        [key: string]: {
+            default: SceneMap
+        }
+    }
+}
 
 export default class EriengineScene extends Phaser.Scene {
+
+    protected actor!: ActorPlugin
+    protected isometric!: IsometricScenePlugin
+    protected cursor!: IsometricCursorPlugin
+    protected dialogue!: DialoguePlugin
+    protected fow!: FogOfWarPlugin
+
+    protected __scripts: Map<string, ScriptCallback[]> = new Map
+    protected __map: SceneMap = { walls: [], floors: [], actors: [] }
+
+    protected generateMap(storages: typeof Storages, key: keyof typeof storages): void {
+        const storage: SceneStorage = storages[key] as unknown as SceneStorage
+        if (!storage) {
+            throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`
+        }
+        this.__map = Object.values(storage.Map)[0].default
+    }
+
+    protected generateScript(storages: typeof Storages, key: keyof typeof storages): void {
+        const storage: SceneStorage = storages[key] as unknown as SceneStorage
+        if (!storage) {
+            throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`
+        }
+        const script = storage.Script
+        for (const name in script) {
+            const callbackData = script[name as keyof typeof script]
+            for (const type in callbackData) {
+                if (!this.__scripts.has(type)) {
+                    this.__scripts.set(type, [])
+                }
+                const callback: ScriptCallback = callbackData[type as keyof typeof callbackData]
+                this.__scripts.get(type)!.push(callback)
+            }
+        }
+    }
 
     protected runScript(callbacks?: ((...args: any) => void)[], ...args: any): void {
         if (!callbacks)  {
@@ -13,6 +76,9 @@ export default class EriengineScene extends Phaser.Scene {
     private loadImage(): void {
         for (const name in Images) {
             const { key, asset } = Images[name as keyof typeof Images]
+            if (this.textures.exists(key)) {
+                continue
+            }
             this.load.image(key, asset)
         }
     }
@@ -20,6 +86,9 @@ export default class EriengineScene extends Phaser.Scene {
     private loadAudio(): void {
         for (const name in Audios) {
             const { key, asset } = Audios[name as keyof typeof Audios]
+            if (this.cache.audio.exists(key)) {
+                continue
+            }
             this.load.audio(key, asset)
         }
     }
@@ -27,6 +96,9 @@ export default class EriengineScene extends Phaser.Scene {
     private loadVideo(): void {
         for (const name in Videos) {
             const { key, asset } = Videos[name as keyof typeof Videos]
+            if (this.cache.video.exists(key)) {
+                continue
+            }
             this.load.video(key, asset)
         }
     }
@@ -34,6 +106,9 @@ export default class EriengineScene extends Phaser.Scene {
     private loadSpritesheet(): void {
         for (const name in Animations) {
             const { key, asset, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
+            if (this.textures.exists(key)) {
+                continue
+            }
             this.load.spritesheet(key, asset, { frameWidth, frameHeight })
         }
     }

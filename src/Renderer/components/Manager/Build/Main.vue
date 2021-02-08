@@ -7,13 +7,13 @@
         <v-card-text>
             <v-subheader>테스트</v-subheader>
             <p>
-                버그많음 = 똥겜. 하지만 어느 세월에 빌드─수정─디버깅하나요?
+                버그많음 = 똥겜. 디버깅은 필수죠! 하지만 어느 세월에 빌드─수정─반복하나요?
                 <br>
                 테스트는 소스코드를 수정하면, 즉시 미리보기에 적용되므로 이런 문제로부터 자유롭습니다.
             </p>
             <v-subheader>개발용 빌드</v-subheader>
             <p>
-                테스트를 마쳤다면, 마지막으로 개발용 빌드를 사용해보세요. 실제 동작하는 프로그램의 환경에서 마지막 최종검수가 가능합니다.
+                테스트를 마쳤다면, 마지막으로 개발용 빌드 옵션을 사용해보세요. 실제 동작하는 프로그램의 환경에서 마지막 최종검수가 가능합니다.
                 <br>
                 개발용 빌드는 빌드 속도가 빠르기 때문에, 빠른 검수가 가능해요.
             </p>
@@ -35,6 +35,7 @@
                         <v-btn
                             v-on="on"
                             @click="runBuilder(button)"
+                            min-width="130"
                             large
                             text
                         >{{ button.title }}</v-btn>
@@ -93,22 +94,29 @@ export default class BuildComponent extends Vue {
     private onBuildModeChange(): void {
         this.buttons = [
             {
-                title: '테스트',
-                description: '브라우저에서 게임을 테스트합니다. <br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
+                title: 'Test',
+                description: '브라우저에서 게임을 테스트합니다.<br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
                 jobChannel: 'build-serve',
                 jobParameters: [ this.cwd ],
                 streamChannel: 'build'
             },
             {
-                title: '웹',
+                title: 'Web',
                 description: '소스코드를 게임이 작동하는 웹페이지로 추출합니다.',
                 jobChannel: 'build-to-web',
                 jobParameters: [ this.cwd, this.buildMode ],
                 streamChannel: 'build'
             },
             {
-                title: '애플리케이션',
-                description: '소스코드를 게임이 작동하는 애플리케이션으로 추출합니다.',
+                title: 'Windows',
+                description: '소스코드를 게임이 작동하는 Windows 전용 애플리케이션으로 추출합니다.',
+                jobChannel: 'build-to-app',
+                jobParameters: [ this.cwd, this.buildMode ],
+                streamChannel: 'build'
+            },
+            {
+                title: 'PWA',
+                description: '모바일에서 동작하는 애플리케이션으로 추출합니다.',
                 jobChannel: 'build-to-app',
                 jobParameters: [ this.cwd, this.buildMode ],
                 streamChannel: 'build'

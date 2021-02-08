@@ -13,7 +13,7 @@ new Phaser.Game({
     width: config.gameDisplaySize[0],
     height: config.gameDisplaySize[1],
     scene: [
-        ...Object.values(Scenes).map((scene) => scene.default)
+        ...Object.values(Scenes).map((scene) => scene.default).sort((a, b): number => a.Depth - b.Depth)
     ],
     scale: {
         parent: '#canvas-wrapper',

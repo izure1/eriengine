@@ -9,12 +9,6 @@ import BaseScene from '@/BaseScene'
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
 
-type ScriptCallback = (this: NewScene, ...args: any) => void
-
-
-// 이 씬이 참조하고 있는 스토리지 정보입니다.
-const storage = Storages['{{ STORAGE_KEY }}']
-
 /*
  *  주의!
  *  씬 파일 이름의 뒷 부분은 절대 변경하지 마십시오.
@@ -38,31 +32,16 @@ export default class NewScene extends BaseScene {
     /** 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다. 잘 모르겠다면 건드리지 마십시오. */
     static Key: string = __filename
 
-    protected actor!: ActorPlugin
-    protected isometric!: IsometricScenePlugin
-    protected cursor!: IsometricCursorPlugin
-    protected dialogue!: DialoguePlugin
-    protected fow!: FogOfWarPlugin
-
-    private __scripts: Map<string, ScriptCallback[]> = new Map
-    private __map = Object.values(storage.Map)[0]
+    /**
+     *  씬의 우선순위입니다. 이 값이 클수록, 작은 값을 가진 씬보다 위에 보여집니다.  
+     *  가령 씬A의 Depth가 0이고, 씬B의 Depth가 1일 경우, 씬B가 씬A보다 위에 보여집니다.
+     */
+    static Depth: number = 0
 
     constructor() {
         super({ key: NewScene.Key, active: true })
-        this.generateScript()
-    }
-
-    private generateScript(): void {
-        for (const key in storage.Script) {
-            const script = storage.Script[key as keyof typeof storage.Script]
-            for (const type in script) {
-                if (!this.__scripts.has(type)) {
-                    this.__scripts.set(type, [])
-                }
-                const callback: ScriptCallback = script[type as keyof typeof script]
-                this.__scripts.get(type)!.push(callback)
-            }
-        }
+        this.generateMap(Storages, '{{ STORAGE_KEY }}')
+        this.generateScript(Storages, '{{ STORAGE_KEY }}')
     }
 
     init(data: object = {}): void {

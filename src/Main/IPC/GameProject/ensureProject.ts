@@ -9,11 +9,15 @@ import { parseProperty } from '@/Utils/parseProperty'
 import { ProcessSpawner } from '@/Utils/ProcessSpawner'
 import { writeToRenderer } from '@/Utils/stream'
 import {
+    DATA_LISTS,
+    STORAGE_LISTS,
     PROJECT_TSCONFIG_NAME,
     PROJECT_WEBPACK_NAME,
     PROJECT_README_NAME,
     PROJECT_EXTEND_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_BASESCENE_NAME,
+    PROJECT_SRC_BASEACTOR_NAME,
     PROJECT_SRC_GAME_NAME,
     PROJECT_SRC_SCENELIST_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME,
@@ -37,6 +41,8 @@ import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
 import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
 import RAW_PROJECT_README from 'raw-loader!@/Template/Project/README.txt'
 import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
+import RAW_BASE_SCENE from 'raw-loader!@/Template/Game/BASE_SCENE.txt'
+import RAW_BASE_ACTOR from 'raw-loader!@/Template/Game/BASE_ACTOR.txt'
 
 declare const __static: string
 
@@ -123,6 +129,46 @@ async function ensureRequireModules(projectDirPath: string): Promise<Engine.Modu
     }
 }
 
+async function ensureBaseFile(projectDirPath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+
+    interface FileWriteQueue {
+        path: string
+        content: string
+    }
+
+    const srcDirPath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME)
+    const files: FileWriteQueue[] = [
+        {
+            path: path.resolve(srcDirPath, PROJECT_SRC_BASESCENE_NAME),
+            content: parseProperty(RAW_BASE_SCENE, {
+                DATA_LISTS,
+                STORAGE_LISTS
+            })
+        },
+        {
+            path: path.resolve(srcDirPath, PROJECT_SRC_BASEACTOR_NAME),
+            content: parseProperty(RAW_BASE_ACTOR, {
+                DATA_LISTS,
+                STORAGE_LISTS
+            })
+        }
+    ]
+
+    for (const { path, content } of files) {
+        const fileWrite = await writeFile(path, content)
+        if (!fileWrite.success) {
+            return fileWrite
+        }
+    }
+
+    return {
+        success: true,
+        name: '씬 기본 파일 생성',
+        message: '씬 기본 파일 생성에 성공했습니다',
+        path: srcDirPath
+    }
+}
+
 export async function handler(directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
     // 디렉토리 생성하기
     const dirs: string[] = [
@@ -155,6 +201,12 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     const filesWrite = await ensureFiles(directoryPath, config)
     if (!filesWrite.success) {
         return filesWrite as Engine.GameProject.CreateProjectFail
+    }
+
+    // 기본 파일 생성
+    const baseFilesWrite = await ensureBaseFile(directoryPath)
+    if (!baseFilesWrite.success) {
+        return baseFilesWrite as Engine.GameProject.CreateProjectFail
     }
 
     // 종속 모듈 설치
