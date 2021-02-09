@@ -43,8 +43,10 @@ export default class EriengineScene extends Phaser.Scene {
     protected __map: SceneMap = { walls: [], floors: [], actors: [] }
 
     /** 게임데이터를 저장하는데 사용된 키 목록입니다 */
-    get saveKeys(): string[] {
-        return Object.keys(window.localStorage).filter((key: string): boolean => key.indexOf(this.getSaveKey('')) === 0)
+    protected get saveKeys(): string[] {
+        return Object.keys(window.localStorage)
+            .filter((key: string): boolean => key.indexOf(this.getSaveKey('')) === 0)
+            .map((key: string): string => key.replace(this.getSaveKey(''), ''))
     }
 
     protected generateMap(storages: typeof Storages, key: keyof typeof storages): void {
@@ -152,7 +154,7 @@ export default class EriengineScene extends Phaser.Scene {
      *  @param key      게임 데이터를 저장할 키 값입니다.
      *  @param data     저장할 게임 데이터입니다.
      */
-    saveGameData(key: string, data: Types.Json): void {
+    protected setSaveData(key: string, data: Types.Json): void {
         key = this.getSaveKey(key)
         const stringify: string = JSON.stringify(data)
         window.localStorage.setItem(key, stringify)
@@ -162,7 +164,7 @@ export default class EriengineScene extends Phaser.Scene {
      *  저장된 게임 데이터를 반환합니다. 저장된 값이 없다면 null을 반환합니다.
      *  @param key      게임 데이터를 저장하는데 사용된 키 값입니다.
      */
-    loadGameData(key: string): Types.Json|null {
+    protected getSaveData(key: string): Types.Json|null {
         key = this.getSaveKey(key)
         const raw: string|null = window.localStorage.getItem(key)
         if (!raw) {
@@ -175,7 +177,7 @@ export default class EriengineScene extends Phaser.Scene {
      *  저장된 게임 데이터를 삭제합니다. 매개변수로 넘긴 키 값에 해당하는 게임 데이터가 있었다면 true, 없었다면 false를 반환합니다.
      *  @param key      게임 데이터를 저장하는데 사용된 키 값입니다.
      */
-    removeGameData(key: string): boolean {
+    protected removeSaveData(key: string): boolean {
         key = this.getSaveKey(key)
         const raw: string|null = window.localStorage.getItem(key)
         if (!raw) {
@@ -188,8 +190,10 @@ export default class EriengineScene extends Phaser.Scene {
     /**
      *  저장된 모든 게임 데이터를 삭제합니다.
      */
-    clearGameData(): void {
-        this.saveKeys.forEach(window.localStorage.removeItem)
+    protected clearSaveData(): void {
+        for (const key of this.saveKeys) {
+            this.removeSaveData(key)
+        }
     }
 
 }
