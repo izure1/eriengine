@@ -9,6 +9,7 @@ import {
 
 async function writeEmptySceneMap(projectDirPath: string, storageKey: string): Promise<Engine.GameProject.WriteSceneMapSuccess|Engine.GameProject.WriteSceneMapFail> {
     const map: Engine.GameProject.SceneMap = {
+        side: 2000,
         walls: [],
         floors: [],
         actors: []

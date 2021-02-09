@@ -8,7 +8,7 @@ import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
 
-type ScriptCallback = (this: EriengineScene, ...args: any) => void
+type ScriptCallback = (this: BaseScene, ...args: any) => void
 
 interface SceneMap {
     walls: [number, number, string][]
@@ -29,7 +29,35 @@ interface SceneStorage {
     }
 }
 
-export default class EriengineScene extends Phaser.Scene {
+interface SaveData {
+    date: number
+    thumbnail: string
+    data: Types.Json
+}
+
+
+/**
+ * 
+ *    ██╗    ██╗     █████╗     ██████╗     ███╗   ██╗    ██╗    ███╗   ██╗     ██████╗ ██╗
+ *    ██║    ██║    ██╔══██╗    ██╔══██╗    ████╗  ██║    ██║    ████╗  ██║    ██╔════╝ ██║
+ *    ██║ █╗ ██║    ███████║    ██████╔╝    ██╔██╗ ██║    ██║    ██╔██╗ ██║    ██║  ███╗██║
+ *    ██║███╗██║    ██╔══██║    ██╔══██╗    ██║╚██╗██║    ██║    ██║╚██╗██║    ██║   ██║╚═╝
+ *    ╚███╔███╔╝    ██║  ██║    ██║  ██║    ██║ ╚████║    ██║    ██║ ╚████║    ╚██████╔╝██╗
+ *     ╚══╝╚══╝     ╚═╝  ╚═╝    ╚═╝  ╚═╝    ╚═╝  ╚═══╝    ╚═╝    ╚═╝  ╚═══╝     ╚═════╝ ╚═╝
+ *                                                                                        
+ *                                                                 
+ *  주의!
+ *  절대로 BaseScene 내용을 건들지 마십시오.
+ *  만일 추가하고 싶은 내용이 있다면 BaseScene을 상속받은 씬 파일을 수정하십시오.
+ *  하지만 가장 좋은 방법은, 씬의 스크립트를 이용하는 것입니다.
+ * 
+ *  
+ *  모든 씬은 이 BaseScene을 상속받습니다.
+ *  BaseScene은 에리엔진의 씬이 정상적으로 동작하기 위해 필수적인 내용을 가지고 있는 클래스입니다.
+ *  BaseScene은 프로젝트가 실행될 때 마다 새롭게 재생성됩니다. 따라서 이 파일을 수정하여도 전부 초기화되므로 건들지 마십시오.
+ * 
+ */
+export default class BaseScene extends Phaser.Scene {
 
     private static ApplicationId: string = '{{ APPLICATION_ID }}'
 
@@ -146,18 +174,48 @@ export default class EriengineScene extends Phaser.Scene {
     }
 
     private getSaveKey(key: string): string {
-        return `${EriengineScene.ApplicationId}-save-${key}`
+        return `${BaseScene.ApplicationId}-save-${key}`
+    }
+
+    private createThumbnail(type: 'image/png'|'image/jpeg' = 'image/jpeg', quality: number = 0.5, size: number = 100): Promise<string> {
+        return new Promise((resolve, reject): void => {
+            this.renderer.snapshot((image): void => {
+                image = image as HTMLImageElement
+                const canvas = document.createElement('canvas')
+                const ctx = canvas.getContext('2d')
+                if (!ctx) {
+                    return reject('CanvasRenderingContext2DSettings generate error.')
+                }
+                const ratio: number = image.naturalWidth / image.naturalHeight
+                if (image.naturalWidth > image.naturalHeight) {
+                    canvas.width    = size
+                    canvas.height   = size / ratio
+                }
+                else {
+                    canvas.width    = size * ratio
+                    canvas.height   = size
+                }
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+                resolve(canvas.toDataURL(type, quality))
+            }, 'image/png', 1)
+        })
     }
 
     /**
-     *  게임 데이터를 저장합니다. 너무 큰 데이터는 용량 상 저장할 수 없습니다.
+     *  게임 데이터를 저장합니다. 너무 큰 데이터는 용량 상 저장할 수 없습니다.  
+     *  총 저장공간은 5MB가 한도입니다.
      *  @param key      게임 데이터를 저장할 키 값입니다.
      *  @param data     저장할 게임 데이터입니다.
      */
-    protected setSaveData(key: string, data: Types.Json): void {
+    protected async setSaveData(key: string, data: Types.Json): Promise<SaveData> {
         key = this.getSaveKey(key)
-        const stringify: string = JSON.stringify(data)
+        const date: number          = Date.now()
+        const thumbnail: string     = await this.createThumbnail()
+        const saveData: SaveData    = { date, thumbnail, data }
+        const stringify: string     = JSON.stringify(saveData)
+
         window.localStorage.setItem(key, stringify)
+        return saveData
     }
 
     /**

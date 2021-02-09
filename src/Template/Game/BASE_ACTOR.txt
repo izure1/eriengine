@@ -4,7 +4,7 @@ import { Actor } from '@eriengine/plugin-actor'
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
 
-type ScriptCallback = (this: EriengineActor, ...args: any) => void
+type ScriptCallback = (this: BaseActor, ...args: any) => void
 
 interface ActorStorage {
     Script: {
@@ -14,7 +14,28 @@ interface ActorStorage {
     }
 }
 
-export default abstract class EriengineActor extends Actor {
+
+/**
+ * 
+ *    ██╗    ██╗     █████╗     ██████╗     ███╗   ██╗    ██╗    ███╗   ██╗     ██████╗ ██╗
+ *    ██║    ██║    ██╔══██╗    ██╔══██╗    ████╗  ██║    ██║    ████╗  ██║    ██╔════╝ ██║
+ *    ██║ █╗ ██║    ███████║    ██████╔╝    ██╔██╗ ██║    ██║    ██╔██╗ ██║    ██║  ███╗██║
+ *    ██║███╗██║    ██╔══██║    ██╔══██╗    ██║╚██╗██║    ██║    ██║╚██╗██║    ██║   ██║╚═╝
+ *    ╚███╔███╔╝    ██║  ██║    ██║  ██║    ██║ ╚████║    ██║    ██║ ╚████║    ╚██████╔╝██╗
+ *     ╚══╝╚══╝     ╚═╝  ╚═╝    ╚═╝  ╚═╝    ╚═╝  ╚═══╝    ╚═╝    ╚═╝  ╚═══╝     ╚═════╝ ╚═╝
+ *                                                                                        
+ *                                                                 
+ *  주의!
+ *  절대로 BaseActor 내용을 건들지 마십시오.
+ *  만일 추가하고 싶은 내용이 있다면 BaseActor를 상속받은 액터 파일을 수정하십시오.
+ *  하지만 가장 좋은 방법은, 액터의 스크립트를 이용하는 것입니다.
+ * 
+ *  
+ *  모든 액터는 이 BaseActor을 상속받습니다.
+ *  BaseActor는 에리엔진의 액터가 정상적으로 동작하기 위해 필수적인 내용을 가지고 있는 클래스입니다.
+ *  BaseActor는 프로젝트가 실행될 때 마다 새롭게 재생성됩니다. 따라서 이 파일을 수정하여도 전부 초기화되므로 건들지 마십시오.
+ */
+export default abstract class BaseActor extends Actor {
 
     protected __scripts: Map<string, ScriptCallback[]> = new Map
 

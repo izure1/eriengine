@@ -1,13 +1,64 @@
 <template>
     <section>
-        <section ref="game-canvas"></section>
+        <section ref="game-canvas" class="game-canvas" />
+        <v-toolbar
+            class="canvas-toolbar ma-5"
+            dark
+            floating
+            dense
+        >
+
+            <v-btn
+                v-for="(button, i) in buttons"
+                :key="`canvas-toolbar-btn-${i}`"
+                icon
+            >
+                <v-menu
+                    dark
+                    offset-y
+                    open-on-hover
+                >
+                    <template v-slot:activator="menu">
+                        <v-tooltip top>
+                            <template v-slot:activator="tooltip">
+                                <div v-on="menu.on">
+                                    <div v-on="tooltip.on">
+                                        <v-btn icon>
+                                            <v-icon>{{ button.icon }}</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </template>
+                            <span class="caption">{{ button.description }}</span>
+                        </v-tooltip>
+                    </template>
+                    <v-list
+                        v-if="button.lists.length"
+                        dense
+                        light
+                    >
+                        <v-list-item
+                            v-for="(list, i) in button.lists"
+                            :key="`canvas-toolbar-btn-list-${i}`"
+                            class="pa-0"
+                        >
+                            <v-btn
+                                @click="list.click"
+                                width="100%"
+                                text
+                            >{{ list.text }}</v-btn>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-btn>
+            
+        </v-toolbar>
         <v-dialog
             v-model="isTooltipOpen"
-            persistent
             max-width="800"
         >
             <v-card>
-                <v-card-title>사용법</v-card-title>
+                <v-card-title>기본 사용법</v-card-title>
                 <v-card-subtitle>
                     씬 에디터를 이용하여 씬을 GUI 환경에서 디자인할 수 있습니다.
                     <br>
@@ -39,33 +90,112 @@
                                 </v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>저장</v-list-item-title>
+                                <v-list-item-subtitle>
+                                    맵은 자동으로 저장됩니다.
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
                     </v-list>
                 </v-card-text>
-                <v-divider />
-                <v-card-actions>
-                    <v-spacer />
-                    <v-btn text @click.stop="isTooltipOpen = false">알겠습니다</v-btn>
-                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog
+            v-model="isMapResizerOpen"
+            max-width="500"
+        >
+            <v-card>
+                <v-card-title>맵의 크기를 지정하세요</v-card-title>
+                <v-card-subtitle>맵의 한 변의 크기를 지정합니다. 큰 맵은 성능 저하를 유발합니다.</v-card-subtitle>
+                <v-card-text>
+                    <v-text-field
+                        v-model="mapSceneSide"
+                        type="number"
+                        filled
+                        rounded
+                        suffix="px"
+                    />
+                </v-card-text>
             </v-card>
         </v-dialog>
     </section>
 </template>
 
 <script lang="ts">
+import Phaser from 'phaser'
 import { ipcRenderer } from 'electron'
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import NonReactivity from 'vue-nonreactivity-decorator'
 
-import Phaser from 'phaser'
 import PreviewScene from './Phaser/PreviewScene'
 import createConfig from './Phaser/createConfig'
+
+
+interface ActionList {
+    text: string
+    click: () => void
+}
+
+interface ActionButton {
+    icon: string
+    description: string
+    lists: ActionList[]
+}
 
 @Component
 export default class SceneMapEditor extends Vue {
     @NonReactivity(null) private game!: Phaser.Game|null
-    private map!: Engine.GameProject.SceneMap
-    private isTooltipOpen: boolean = true
+    @NonReactivity(null) private scene!: PreviewScene|null
+
+    private isTooltipOpen: boolean = false
+    private isMapResizerOpen: boolean = false
+
+    private mapSceneSide: number = 2000
+
+    private buttons: ActionButton[] = [
+        {
+            icon: 'mdi-cogs',
+            description: '씬을 설정합니다',
+            lists: [
+                {
+                    text: '맵 크기 설정',
+                    click: (): void => {
+                        this.openMapResizer()
+                    }
+                }
+            ]
+        },
+        {
+            icon: 'mdi-human-edit',
+            description: '액터를 배치합니다',
+            lists: []
+        },
+        {
+            icon: 'mdi-wall',
+            description: '액터가 지나갈 수 없는 벽을 설치합니다',
+            lists: []
+        },
+        {
+            icon: 'mdi-floor-plan',
+            description: '바닥 타일을 설치합니다',
+            lists: []
+        },
+        {
+            icon: 'mdi-help',
+            description: '툴팁을 엽니다',
+            lists: [
+                {
+                    text: '기본 사용법',
+                    click: (): void => {
+                        this.openTooltip()
+                    }
+                }
+            ]
+        }
+    ]
 
     private get filePath(): string {
         return decodeURIComponent(this.$route.params.filePath)
@@ -87,29 +217,28 @@ export default class SceneMapEditor extends Vue {
         return this.$refs['game-canvas'] as HTMLElement
     }
 
-    private async setMap(): Promise<void> {
-        if (!this.storageKey) {
-            this.$store.dispatch('snackbar', '씬 파일 이름에 스토리지 정보가 없습니다')
-            this.$router.replace('/manager/scene').catch(() => null)
-            return
-        }
-        const sceneMapRead: Engine.GameProject.ReadSceneMapSuccess|Engine.GameProject.ReadSceneMapFail = await ipcRenderer.invoke('read-scene-map', this.projectDirectory, this.storageKey)
-        if (!sceneMapRead.success) {
-            this.$store.dispatch('snackbar', sceneMapRead.message)
-            this.$router.replace('/manager/scene').catch(() => null)
-            return
-        }
-
-        this.map = sceneMapRead.content
+    private goBack(message: string): void {
+        this.$store.dispatch('snackbar', message)
+        this.$router.replace('/manager/scene').catch(() => null)
     }
 
     private async createGame(): Promise<void> {
         const [ width, height ] = this.projectConfig.gameDisplaySize
 
-        const config = createConfig(width, height, [ PreviewScene ], this.canvasParent)
-        this.game = new Phaser.Game(config)
+        const previewScene: PreviewScene = new PreviewScene(this.projectDirectory, this.storageKey, this.filePath)
+        const config = createConfig(width, height, [ previewScene ], this.canvasParent)
 
-        await this.setMap()
+        this.game   = new Phaser.Game(config)
+        this.scene  = previewScene
+
+        this.scene.transfer
+        .on('load-map-fail', (message: string): void => {
+            this.goBack(message)
+        })
+        .on('load-map-success', (map: Engine.GameProject.SceneMap): void => {
+            this.mapSceneSide = map.side
+        })
+
         this.resizeCanvas()
     }
 
@@ -130,7 +259,18 @@ export default class SceneMapEditor extends Vue {
 
         this.game.destroy(true)
         this.game = null
+        this.scene = null
     }
+
+
+    private openTooltip(): void {
+        this.isTooltipOpen = true
+    }
+
+    private openMapResizer(): void {
+        this.isMapResizerOpen = true
+    }
+
 
     private resizeCanvas(): void {
         if (!this.game) {
@@ -152,20 +292,29 @@ export default class SceneMapEditor extends Vue {
         window.removeEventListener('resize', this.resizeCanvas)
     }
 
-    private checkKey(): void {
-        if (this.storageKey) {
-            return
+    private checkKeyExists(): boolean {
+        if (!this.storageKey) {
+            this.$router.replace('/manager/scene').catch(() => null)
+            return false
         }
-        this.$router.replace('/manager/scene').catch(() => null)
+        return true
     }
 
-    created(): void {
-        this.checkKey()
+
+    @Watch('mapSceneSide')
+    private onChanageMapSceneSide(): void {
+        if (!this.scene) {
+            return
+        }
+        this.scene.transfer.emit('set-map-side', this.mapSceneSide)
     }
 
     mounted(): void {
-        this.watchResizeWindow()
-        this.createGame()
+        if (this.checkKeyExists()) {
+            this.createGame()
+            this.openTooltip()
+            this.watchResizeWindow()
+        }
     }
 
     beforeDestroy(): void {
@@ -176,8 +325,16 @@ export default class SceneMapEditor extends Vue {
 </script>
 
 <style lang="scss" scoped>
-section {
+.game-canvas {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 64px);
+    position: absolute;
+    top: 64px;
+    left: 0;
+}
+
+.canvas-toolbar {
+    background: transparent !important;
+    box-shadow: 0 0 0 !important;
 }
 </style>

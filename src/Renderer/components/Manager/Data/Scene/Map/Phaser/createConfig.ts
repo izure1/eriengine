@@ -5,7 +5,7 @@ import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
 
-export default function(width: number, height: number, scene: (typeof Phaser.Scene)[], parent: HTMLElement) {
+export default function(width: number, height: number, scene: Phaser.Scene[], parent: HTMLElement) {
 
    return {
         type: Phaser.AUTO,

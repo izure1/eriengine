@@ -20,6 +20,7 @@ declare namespace Engine {
         }
 
         interface SceneMap {
+            side: number
             walls: [number, number, string][]
             floors: [number, number, string][]
             actors: { name: string, x: number, y: number }[]

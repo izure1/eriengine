@@ -6,6 +6,7 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string, storageKey: string, content: Engine.GameProject.SceneMap = {
+    side: 2000,
     walls: [],
     floors: [],
     actors: []
