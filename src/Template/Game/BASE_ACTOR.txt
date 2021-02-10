@@ -41,7 +41,7 @@ export default abstract class BaseActor extends Actor {
 
     protected generateSkill(data: typeof Skills): void {
         for (const name in data) {
-            const skill = data[name as keyof typeof data]
+            const skill = data[name as keyof typeof data] as any
             this.battle.addSkill(skill.key, skill.default.bind(this))
 
             this.battle.on('hit',       (target, information) =>    this.runScript.call(this, this.__scripts.get('onActorHit'), target, information))

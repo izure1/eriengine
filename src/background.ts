@@ -19,6 +19,7 @@ function *generateIPC() {
     yield require('./Main/IPC/FileSystem/saveFile')
     yield require('./Main/IPC/FileSystem/makeDirectory')
     yield require('./Main/IPC/FileSystem/readFile')
+    yield require('./Main/IPC/FileSystem/readJSON')
     yield require('./Main/IPC/FileSystem/writeFile')
     yield require('./Main/IPC/FileSystem/writeJSON')
     yield require('./Main/IPC/FileSystem/copy')
@@ -65,6 +66,8 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/readStorageJSON')
     yield require('./Main/IPC/GameProject/checkStorageExists')
     yield require('./Main/IPC/GameProject/getStoragePath')
+    yield require('./Main/IPC/GameProject/getStorageDirectories')
+    yield require('./Main/IPC/GameProject/getStorageFiles')
 
     yield require('./Main/IPC/GameProject/readSceneMap')
     yield require('./Main/IPC/GameProject/ensureSceneMap')

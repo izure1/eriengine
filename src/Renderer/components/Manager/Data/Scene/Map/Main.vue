@@ -1,6 +1,10 @@
 <template>
     <section>
-        <section ref="game-canvas" class="game-canvas" />
+        <section
+            @click.right="onMouseRightButtonClick"
+            ref="game-canvas"
+            class="game-canvas"
+        />
         <v-toolbar
             class="canvas-toolbar ma-5"
             dark
@@ -120,15 +124,39 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <v-dialog
+            v-model="isCursorResizerOpen"
+            max-width="500"
+        >
+            <v-card>
+                <v-card-title>커서 크기를 지정하세요</v-card-title>
+                <v-card-subtitle>커서 크기를 지정합니다. 작으면 더 촘촘하게 배치할 수 있습니다.</v-card-subtitle>
+                <v-card-text>
+                    <v-text-field
+                        v-model="mapCursorSide"
+                        type="number"
+                        filled
+                        rounded
+                        suffix="px"
+                    />
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </section>
 </template>
 
 <script lang="ts">
+import path from 'path'
 import Phaser from 'phaser'
 import { ipcRenderer } from 'electron'
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import NonReactivity from 'vue-nonreactivity-decorator'
+
+import {
+    PROJECT_SRC_DIRECTORY_NAME,
+    PROJECT_SRC_ACTORLIST_NAME
+} from '@/Const'
 
 import PreviewScene from './Phaser/PreviewScene'
 import createConfig from './Phaser/createConfig'
@@ -152,8 +180,11 @@ export default class SceneMapEditor extends Vue {
 
     private isTooltipOpen: boolean = false
     private isMapResizerOpen: boolean = false
+    private isCursorResizerOpen: boolean = false
 
+    private isDisposeMode: boolean = false
     private mapSceneSide: number = 2000
+    private mapCursorSide: number = 100
 
     private buttons: ActionButton[] = [
         {
@@ -164,6 +195,12 @@ export default class SceneMapEditor extends Vue {
                     text: '맵 크기 설정',
                     click: (): void => {
                         this.openMapResizer()
+                    }
+                },
+                {
+                    text: '커서 크기 설정',
+                    click: (): void => {
+                        this.openCursorResizer()
                     }
                 }
             ]
@@ -222,6 +259,16 @@ export default class SceneMapEditor extends Vue {
         this.$router.replace('/manager/scene').catch(() => null)
     }
 
+    private async createActorList(): Promise<object> {
+        const filePath: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTORLIST_NAME)
+        const jsonRead: Engine.FileSystem.ReadJsonSuccess|Engine.FileSystem.ReadJsonFail = await ipcRenderer.invoke('read-json', this.projectDirectory, filePath)
+        if (!jsonRead.success) {
+            this.goBack(jsonRead.message)
+            return {}
+        }
+        return jsonRead.content
+    }
+
     private async createGame(): Promise<void> {
         const [ width, height ] = this.projectConfig.gameDisplaySize
 
@@ -271,6 +318,10 @@ export default class SceneMapEditor extends Vue {
         this.isMapResizerOpen = true
     }
 
+    private openCursorResizer(): void {
+        this.isCursorResizerOpen = true
+    }
+
 
     private resizeCanvas(): void {
         if (!this.game) {
@@ -292,6 +343,11 @@ export default class SceneMapEditor extends Vue {
         window.removeEventListener('resize', this.resizeCanvas)
     }
 
+    private onMouseRightButtonClick(): void {
+        this.setDisposeMode(false)
+    }
+
+
     private checkKeyExists(): boolean {
         if (!this.storageKey) {
             this.$router.replace('/manager/scene').catch(() => null)
@@ -300,13 +356,37 @@ export default class SceneMapEditor extends Vue {
         return true
     }
 
-
-    @Watch('mapSceneSide')
-    private onChanageMapSceneSide(): void {
+    private setDisposeMode(activity: boolean): void {
         if (!this.scene) {
             return
         }
-        this.scene.transfer.emit('set-map-side', this.mapSceneSide)
+        this.isDisposeMode = activity
+        this.scene.transfer.emit('receive-dispose-enable', activity)
+    }
+
+    private setCursorSide(side: number): void {
+        if (!this.scene) {
+            return
+        }
+        this.scene.transfer.emit('receive-cursor-side', side)
+    }
+
+    private setMapSide(side: number): void {
+        if (!this.scene) {
+            return
+        }
+        this.scene.transfer.emit('receive-map-side', this.mapSceneSide)
+    }
+
+
+    @Watch('mapSceneSide')
+    private onChanageMapSceneSide(): void {
+        this.setMapSide(this.mapSceneSide)
+    }
+
+    @Watch('mapCursorSide')
+    private onChangeMapCursorSide(): void {
+        this.setCursorSide(this.mapCursorSide)
     }
 
     mounted(): void {
@@ -314,6 +394,8 @@ export default class SceneMapEditor extends Vue {
             this.createGame()
             this.openTooltip()
             this.watchResizeWindow()
+
+            //this.createActorList().then(console.log)
         }
     }
 

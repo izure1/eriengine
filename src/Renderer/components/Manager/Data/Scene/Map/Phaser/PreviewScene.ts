@@ -1,7 +1,7 @@
 import path from 'path'
 import Phaser from 'phaser'
 import { TypedEmitter } from 'tiny-typed-emitter'
-import { ipcRenderer, IpcRendererEvent } from 'electron'
+import { ipcRenderer } from 'electron'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
 import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
@@ -11,14 +11,14 @@ import { FileWatcher } from '@/Utils/FileWatcher'
 
 
 interface DataTransferEvents {
-    'load-map-fail':        (message: string) => void
-    'load-map-success':     (map: Engine.GameProject.SceneMap) => void
-    'set-map-side':         (side: number) => void
+    'load-map-fail':            (message: string) => void
+    'load-map-success':         (map: Engine.GameProject.SceneMap) => void
+    'receive-map-side':         (side: number) => void
+    'receive-cursor-side':      (side: number) => void
+    'receive-dispose-enable':   (activity: boolean) => void
 }
 
-class DataTransfer extends TypedEmitter<DataTransferEvents> {
-
-}
+class DataTransfer extends TypedEmitter<DataTransferEvents> {}
 
 export default class PreviewScene extends Phaser.Scene {
     private isometric!: IsometricScenePlugin
@@ -35,7 +35,6 @@ export default class PreviewScene extends Phaser.Scene {
     private mapFilePath: string = ''
     private mapData: Engine.GameProject.SceneMap = { side: 2000, actors: [], walls: [], floors: [] }
     private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
-    private isDisposeMode: boolean = false
 
     constructor(projectDirectory: string, storageKey: string, filePath: string) {
         super({ key: '__preview-scene__', active: true })
@@ -67,7 +66,6 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     setDisposeMode(active: boolean = true): void {
-        this.isDisposeMode = active
         this.cursor.enable(active)
     }
 
@@ -97,15 +95,17 @@ export default class PreviewScene extends Phaser.Scene {
         this.watcher = null
     }
 
-    private onMouseLeftDown(): void {
+    private onMouseLeftDown(e: Phaser.Input.Pointer): void {
         if (this.cursor.isEnabled) {
             const { x, y } = this.cursor.pointer
             this.isometric.setWalltile(x, y, 100, 'logo')
         }
     }
     
-    private onMouseRightDown(): void {
-        this.setDisposeMode(false)
+    private onMouseRightDown(e: Phaser.Input.Pointer): void {
+    }
+
+    private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
     }
 
     private async generateMapData(): Promise<boolean> {
@@ -119,6 +119,41 @@ export default class PreviewScene extends Phaser.Scene {
         return true
     }
 
+    private attachMouseEvent(): void {
+        this.input.on(Phaser.Input.Events.POINTER_DOWN, (e: Phaser.Input.Pointer): void => {
+            switch (e.button) {
+                case 0:
+                    this.onMouseLeftDown(e)
+                    break
+                case 2:
+                    this.onMouseRightDown(e)
+                    break
+            }
+        })
+
+        this.input.on(Phaser.Input.Events.POINTER_MOVE, (e: Phaser.Input.Pointer): void => {
+            switch (e.buttons) {
+                case 1:
+                    this.onMouseLeftDrag(e)
+                    break
+            }
+        })
+    }
+
+    private attachTransferEvent(): void {
+        // 데이터 송수신 인스턴스 이벤트 할당
+        this.transfer
+        .on('receive-map-side', (side: number): void => {
+            this.isometric.setWorldSize(side)
+        })
+        .on('receive-dispose-enable', (activity: boolean): void => {
+            this.setDisposeMode(activity)
+        })
+        .on('receive-cursor-side', (side: number): void => {
+            this.cursor.setGridSide(side)
+        })
+    }
+
     preload(): void {
     }
 
@@ -128,14 +163,18 @@ export default class PreviewScene extends Phaser.Scene {
                 return
             }
 
+            // 맵 파일 감지 시작
+            this.generateWatcher()
+            
+            // 씬 기능 시작
             this.setCameraMoving()
             this.setDisposeMode(false)
 
-            this.transfer
-            .on('set-map-side', (side: number): void => {
-                this.isometric.setWorldSize(side)
-            })
+            // 이벤트 할당
+            this.attachMouseEvent()
+            this.attachTransferEvent()
 
+            // 플러그인 설정
             this.isometric.setWorldSize(this.mapData.side)
             this.cursor.enableCoordinate(true)
         })
@@ -145,8 +184,6 @@ export default class PreviewScene extends Phaser.Scene {
 
     update(time: number, delta: number): void {
         this.updateCamera(delta)
-        if (this.input.activePointer.leftButtonDown())  this.onMouseLeftDown()
-        if (this.input.activePointer.rightButtonDown()) this.onMouseRightDown()
     }
 
     private onDestroy(): void {

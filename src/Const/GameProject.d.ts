@@ -21,8 +21,8 @@ declare namespace Engine {
 
         interface SceneMap {
             side: number
-            walls: [number, number, string][]
-            floors: [number, number, string][]
+            walls:  { name: string, x: number, y: number, scale: number }[]
+            floors: { name: string, x: number, y: number, scale: number }[]
             actors: { name: string, x: number, y: number }[]
         }
 
@@ -85,6 +85,9 @@ declare namespace Engine {
 
         interface GetStoragePathSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GetStoragePathFail extends Engine.ActionFailState {}
+
+        interface GetStorageDirectoriesSuccess extends PathRequired, Engine.ActionSuccessState { files: string[] }
+        interface GetStorageDirectoriesFail extends Engine.ActionFailState {}
 
         interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface GenerateAssetListFail extends Engine.ActionFailState {}
