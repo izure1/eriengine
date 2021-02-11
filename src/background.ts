@@ -74,6 +74,7 @@ function *generateIPC() {
     yield require('./Main/IPC/GameProject/writeSceneMap')
 
     yield require('./Main/IPC/GameProject/buildCreateFiles')
+    yield require('./Main/IPC/GameProject/buildGen')
     yield require('./Main/IPC/GameProject/buildDev')
     yield require('./Main/IPC/GameProject/buildProd')
     yield require('./Main/IPC/GameProject/buildServe')
@@ -160,6 +161,13 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+
+  // file:/// 프로토콜 처리
+  protocol.registerFileProtocol('file', (request, callback) => {
+    const pathname = decodeURI(request.url.replace('file:///', ''))
+    callback(pathname)
+  })
+
   createWindow()
 })
 

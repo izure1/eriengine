@@ -134,6 +134,9 @@ declare namespace Engine {
         interface BuildJobSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface BuildJobFail extends Engine.ActionFailState {}
 
+        interface GeneratePreviewListSuccess extends BuildJobSuccess {}
+        interface GeneratePreviewListFail extends BuildJobFail {}
+
         interface BuildCreateFilesSuccess extends PathRequired, Engine.ActionSuccessState {}
         interface BuildCreateFilesFail extends BuildJobFail {}
 

@@ -13,6 +13,7 @@ import {
     STORAGE_LISTS,
     PROJECT_TSCONFIG_NAME,
     PROJECT_WEBPACK_NAME,
+    PROJECT_WEBPACKGEN_NAME,
     PROJECT_README_NAME,
     PROJECT_EXTEND_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
@@ -36,10 +37,13 @@ import {
     PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME, 
     PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME,
     PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
-    PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
+    PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME,
+    PROJECT_SRC_IMAGELIST_NAME,
+    PROJECT_SRC_ANIMSLIST_NAME
 } from '@/Const'
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
 import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
+import RAW_PROJECT_WEBPACKGEN from 'raw-loader!@/Template/Project/WEBPACK.GEN.CONFIG.txt'
 import RAW_PROJECT_README from 'raw-loader!@/Template/Project/README.txt'
 import RAW_TYPES from 'raw-loader!@/Template/Project/TYPES.txt'
 import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
@@ -85,6 +89,14 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
         {
             path: path.resolve(projectDirPath, PROJECT_WEBPACK_NAME),
             content: parseProperty(RAW_PROJECT_WEBPACK, {})
+        },
+        // webpack.gen.config.js
+        {
+            path: path.resolve(projectDirPath, PROJECT_WEBPACKGEN_NAME),
+            content: parseProperty(RAW_PROJECT_WEBPACKGEN, {
+                IMAGE_LIST: PROJECT_SRC_IMAGELIST_NAME,
+                ANIMS_LIST: PROJECT_SRC_ANIMSLIST_NAME
+            })
         },
         // README.txt
         {

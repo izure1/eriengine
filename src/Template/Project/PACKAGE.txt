@@ -1,6 +1,7 @@
 {
     "main": "index.js",
     "scripts": {
+        "build:gen": "webpack --config webpack.gen.config.js",
         "build:dev": "set NODE_ENV=development && webpack",
         "build:prod": "set NODE_ENV=production && webpack",
         "serve": "set NODE_ENV=development && npm run build:dev && npx webpack-cli serve"

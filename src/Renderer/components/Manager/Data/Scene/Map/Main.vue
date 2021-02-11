@@ -49,14 +49,80 @@
                             <v-btn
                                 @click="list.click"
                                 width="100%"
+                                class="text-sm-caption"
                                 text
-                            >{{ list.text }}</v-btn>
+                            >
+                                <div class="text-left">{{ list.text }}</div>
+                                <v-spacer />
+                            </v-btn>
                         </v-list-item>
                     </v-list>
                 </v-menu>
             </v-btn>
             
         </v-toolbar>
+        <v-dialog
+            v-model="isBuilding"
+            :persistent="isBuilding"
+            max-width="500"
+            scrollable
+        >
+            <v-card :loading="isBuilding && !isBuiltFail">
+
+                <div v-if="!isBuiltFail">
+                    <v-card-title>씬 파렛트 준비 중</v-card-title>
+                    <v-card-subtitle>필요한 내용을 준비하는 중입니다. 잠시만 기다려주세요.</v-card-subtitle>
+                </div>
+                <div v-else>
+                    <v-card-title class="red--text">씬 파렛트 준비 실패</v-card-title>
+                    <v-card-subtitle>
+                        빌드 도중 오류가 발생했습니다.
+                        <br>
+                        아래 내용을 기반으로 오류를 수정해주세요.
+                    </v-card-subtitle>
+                </div>
+
+                <v-card-text>
+                    <channel-component channel="build" />
+                </v-card-text>
+
+                <div v-if="isBuilding && isBuiltFail">
+                    <v-divider />
+                    <v-card-actions>
+                        <v-spacer />
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="goBack('씬 준비에 실패했습니다')"
+                                    v-on="on"
+                                    icon
+                                >
+                                    <v-icon>mdi-arrow-left</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>뒤로가기</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="start"
+                                    v-on="on"
+                                    icon
+                                >
+                                    <v-icon>mdi-refresh</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>재시도</span>
+                        </v-tooltip>
+
+                        <v-spacer />
+                    </v-card-actions>
+                </div>
+
+            </v-card>
+        </v-dialog>
         <v-dialog
             v-model="isTooltipOpen"
             max-width="800"
@@ -86,11 +152,14 @@
                             <v-list-item-content>
                                 <v-list-item-title>맵의 경계</v-list-item-title>
                                 <v-list-item-subtitle>
-                                    씬의 맵 크기에는 한계가 있습니다. 큰 맵은 성능 저하를 유발합니다.
-                                    <br>
-                                    일반적으로 1000 ~ 3000이 적당합니다.
-                                    <br>
-                                    경계는 파란선으로 보이며, 다이아몬드(◇) 모양으로 되어 있습니다. 이 내부를 꾸미세요.
+                                    <p>
+                                        씬의 맵 크기에는 한계가 있습니다. 큰 맵은 성능 저하를 유발합니다.
+                                        <br>
+                                        일반적으로 1000 ~ 3000이 적당합니다.
+                                    </p>
+                                    <p>
+                                        경계는 파란선으로 보이며, 다이아몬드(◇) 모양으로 되어 있습니다. 이 내부를 꾸미세요.
+                                    </p>
                                 </v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
@@ -147,19 +216,25 @@
 
 <script lang="ts">
 import path from 'path'
+import normalize from 'normalize-path'
 import Phaser from 'phaser'
 import { ipcRenderer } from 'electron'
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import NonReactivity from 'vue-nonreactivity-decorator'
 
-import {
-    PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_ACTORLIST_NAME
-} from '@/Const'
-
 import PreviewScene from './Phaser/PreviewScene'
 import createConfig from './Phaser/createConfig'
+
+import ChannelComponent from '@/Renderer/components/Shell/Channel.vue'
+import {
+    PaletteImage,
+    PaletteSprite
+} from './Phaser/PreviewScene'
+import {
+    PROJECT_SRC_DATA_DIRECTORY_NAME,
+    PROJECT_SRC_DIRECTORY_NAME
+} from '@/Const'
 
 
 interface ActionList {
@@ -173,16 +248,27 @@ interface ActionButton {
     lists: ActionList[]
 }
 
-@Component
+@Component({
+    components: {
+        ChannelComponent
+    }
+})
 export default class SceneMapEditor extends Vue {
     @NonReactivity(null) private game!: Phaser.Game|null
     @NonReactivity(null) private scene!: PreviewScene|null
 
+    private isBuilding: boolean = false
+    private isBuiltFail: boolean = false
     private isTooltipOpen: boolean = false
     private isMapResizerOpen: boolean = false
     private isCursorResizerOpen: boolean = false
 
-    private isDisposeMode: boolean = false
+    private paletteImages: PaletteImage[]   = []
+    private paletteSprites: PaletteSprite[] = []
+    private paletteBrush: PaletteImage|null = null
+
+    private disposeMode: number = 0
+    private disposeSource: PaletteImage|PaletteSprite|null = null
     private mapSceneSide: number = 2000
     private mapCursorSide: number = 100
 
@@ -254,19 +340,16 @@ export default class SceneMapEditor extends Vue {
         return this.$refs['game-canvas'] as HTMLElement
     }
 
+    private get palettes(): (PaletteImage|PaletteSprite)[] {
+        return [
+            ...Object.values(this.paletteSprites) as PaletteSprite[],
+            ...Object.values(this.paletteImages) as PaletteImage[]
+        ]
+    }
+
     private goBack(message: string): void {
         this.$store.dispatch('snackbar', message)
         this.$router.replace('/manager/scene').catch(() => null)
-    }
-
-    private async createActorList(): Promise<object> {
-        const filePath: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ACTORLIST_NAME)
-        const jsonRead: Engine.FileSystem.ReadJsonSuccess|Engine.FileSystem.ReadJsonFail = await ipcRenderer.invoke('read-json', this.projectDirectory, filePath)
-        if (!jsonRead.success) {
-            this.goBack(jsonRead.message)
-            return {}
-        }
-        return jsonRead.content
     }
 
     private async createGame(): Promise<void> {
@@ -277,6 +360,9 @@ export default class SceneMapEditor extends Vue {
 
         this.game   = new Phaser.Game(config)
         this.scene  = previewScene
+
+        this.scene.transfer.emit('receive-image-list', this.paletteImages)
+        this.scene.transfer.emit('receive-sprite-list', this.paletteSprites)
 
         this.scene.transfer
         .on('load-map-fail', (message: string): void => {
@@ -344,7 +430,7 @@ export default class SceneMapEditor extends Vue {
     }
 
     private onMouseRightButtonClick(): void {
-        this.setDisposeMode(false)
+        this.setDisposeMode(0, null)
     }
 
 
@@ -356,12 +442,13 @@ export default class SceneMapEditor extends Vue {
         return true
     }
 
-    private setDisposeMode(activity: boolean): void {
+    private setDisposeMode(mode: number, src: PaletteImage|PaletteSprite|null): void {
         if (!this.scene) {
             return
         }
-        this.isDisposeMode = activity
-        this.scene.transfer.emit('receive-dispose-enable', activity)
+        this.disposeMode = mode
+        this.disposeSource = src
+        this.scene.transfer.emit('receive-dispose-mode', mode, src)
     }
 
     private setCursorSide(side: number): void {
@@ -378,6 +465,56 @@ export default class SceneMapEditor extends Vue {
         this.scene.transfer.emit('receive-map-side', this.mapSceneSide)
     }
 
+    private wait(interval: number): Promise<void> {
+        return new Promise((resolve): void => {
+            setTimeout(resolve, interval)
+        })
+    }
+
+    private async start(): Promise<void> {
+        this.isBuilding = false
+        this.isBuiltFail = false
+
+        if (!this.checkKeyExists()) {
+            return
+        }
+
+        this.isBuilding = true
+
+        const built: Engine.GameProject.GeneratePreviewListSuccess|Engine.GameProject.GeneratePreviewListFail = await ipcRenderer.invoke('build-gen', this.projectDirectory)
+        if (!built.success) {
+            this.isBuiltFail = true
+            return
+        }
+
+        try {
+
+            const spriteModulePath: string = path.resolve(built.path, 'sprite.js')
+            const imageModulePath: string = path.resolve(built.path, 'image.js')
+
+            // 모듈 캐시 삭제
+            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(spriteModulePath)]
+            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(imageModulePath)]
+
+            const spriteModule  = __non_webpack_require__(spriteModulePath)
+            const imageModule   = __non_webpack_require__(imageModulePath)
+
+            this.paletteSprites = Object.values(spriteModule) as PaletteSprite[]
+            this.paletteImages  = Object.values(imageModule) as PaletteImage[]
+
+        } catch(e) {
+            this.isBuiltFail = true
+            return
+        }
+
+        this.isBuilding = false
+        this.isBuiltFail = false
+
+        this.createGame()
+        this.openTooltip()
+        this.watchResizeWindow()
+    }
+
 
     @Watch('mapSceneSide')
     private onChanageMapSceneSide(): void {
@@ -389,14 +526,36 @@ export default class SceneMapEditor extends Vue {
         this.setCursorSide(this.mapCursorSide)
     }
 
-    mounted(): void {
-        if (this.checkKeyExists()) {
-            this.createGame()
-            this.openTooltip()
-            this.watchResizeWindow()
+    @Watch('palettes', { immediate: true })
+    private onChangePalettes(): void {
+        const walls = this.buttons[2]
+        const tiles = this.buttons[3]
+        const dataDirPath: string = path.join(PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME)
 
-            //this.createActorList().then(console.log)
+        const setWallMap = (src: PaletteImage|PaletteSprite) => {
+            return {
+                text: normalize(path.relative(dataDirPath, src.key)),
+                click: (): void => {
+                    this.setDisposeMode(2, src)
+                }
+            }
         }
+
+        const setTileMap = (src: PaletteImage|PaletteSprite) => {
+            return {
+                text: normalize(path.relative(dataDirPath, src.key)),
+                click: (): void => {
+                    this.setDisposeMode(3, src)
+                }
+            }
+        }
+
+        walls.lists = this.palettes.map(setWallMap)
+        tiles.lists = this.palettes.map(setTileMap)
+    }
+
+    mounted(): void {
+        this.start()
     }
 
     beforeDestroy(): void {

@@ -14,11 +14,16 @@ export const PROJECT_DIRECTORY_NAME: string     = 'Eriengine Project_{{ name }}'
 export const PROJECT_PACAKGE_NAME: string       = 'package.json'
 export const PROJECT_TSCONFIG_NAME: string      = 'tsconfig.json'
 export const PROJECT_WEBPACK_NAME: string       = 'webpack.config.js'
+export const PROJECT_WEBPACKGEN_NAME: string    = 'webpack.gen.config.js'
 export const PROJECT_README_NAME: string        = 'README.txt'
 
 // extend
 export const PROJECT_EXTEND_DIRECTORY_NAME: string      = 'extend'
 export const PROJECT_EXTEND_PACKAGE_NAME: string        = 'package.json'
+
+// cache
+export const PROJECT_CACHE_DIRECTORY_NAME: string               = 'cache'
+export const PROJECT_CACHE_SCENEPALETTE_DIRECTORY_NAME: string   = 'scene-palette'
 
 // build
 export const PROJECT_BUILD_DIRECTORY_NAME: string       = 'build'
