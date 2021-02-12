@@ -5,6 +5,7 @@
             ref="game-canvas"
             class="game-canvas"
         />
+
         <v-toolbar
             class="canvas-toolbar ma-5"
             dark
@@ -27,7 +28,10 @@
                             <template v-slot:activator="tooltip">
                                 <div v-on="menu.on">
                                     <div v-on="tooltip.on">
-                                        <v-btn icon>
+                                        <v-btn
+                                            :color="isSelectedButton(button) ? '#00FF00' : 'white'"
+                                            icon
+                                        >
                                             <v-icon>{{ button.icon }}</v-icon>
                                         </v-btn>
                                     </div>
@@ -47,7 +51,7 @@
                             class="pa-0"
                         >
                             <v-btn
-                                @click="list.click"
+                                @click="list.click(button)"
                                 width="100%"
                                 class="text-sm-caption"
                                 text
@@ -61,6 +65,61 @@
             </v-btn>
             
         </v-toolbar>
+
+        <v-toolbar
+            v-if="!!selectionType"
+            class="canvas-toolbar ma-5"
+            dark
+            floating
+            dense
+        >
+
+            <v-btn icon>
+                <v-menu
+                    dark
+                    offset-y
+                    open-on-hover
+                >
+                    <template v-slot:activator="menu">
+                        <v-tooltip top>
+                            <template v-slot:activator="tooltip">
+                                <div v-on="menu.on">
+                                    <div v-on="tooltip.on">
+                                        <v-btn icon>
+                                            <v-icon>mdi-brush</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </template>
+                            <span class="caption">칠할 이미지를 선택합니다</span>
+                        </v-tooltip>
+                    </template>
+                    <v-list
+                        v-if="palettes.length"
+                        dense
+                        light
+                    >
+                        <v-list-item
+                            v-for="(brush, i) in palettes"
+                            :key="`canvas-brush-list-${i}`"
+                            class="pa-0"
+                        >
+                            <v-btn
+                                @click="setDisposeBrush(brush)"
+                                width="100%"
+                                class="text-sm-caption"
+                                text
+                            >
+                                <div class="text-left">{{ getBrushKey(brush.key) }}</div>
+                                <v-spacer />
+                            </v-btn>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-btn>
+            
+        </v-toolbar>
+
         <v-dialog
             v-model="isBuilding"
             :persistent="isBuilding"
@@ -193,24 +252,6 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
-        <v-dialog
-            v-model="isCursorResizerOpen"
-            max-width="500"
-        >
-            <v-card>
-                <v-card-title>커서 크기를 지정하세요</v-card-title>
-                <v-card-subtitle>커서 크기를 지정합니다. 작으면 더 촘촘하게 배치할 수 있습니다.</v-card-subtitle>
-                <v-card-text>
-                    <v-text-field
-                        v-model="mapCursorSide"
-                        type="number"
-                        filled
-                        rounded
-                        suffix="px"
-                    />
-                </v-card-text>
-            </v-card>
-        </v-dialog>
     </section>
 </template>
 
@@ -239,7 +280,7 @@ import {
 
 interface ActionList {
     text: string
-    click: () => void
+    click: (button: ActionButton) => void
 }
 
 interface ActionButton {
@@ -261,16 +302,15 @@ export default class SceneMapEditor extends Vue {
     private isBuiltFail: boolean = false
     private isTooltipOpen: boolean = false
     private isMapResizerOpen: boolean = false
-    private isCursorResizerOpen: boolean = false
 
     private paletteImages: PaletteImage[]   = []
     private paletteSprites: PaletteSprite[] = []
     private paletteBrush: PaletteImage|null = null
 
-    private disposeMode: number = 0
-    private disposeSource: PaletteImage|PaletteSprite|null = null
+    private selectionButton: ActionButton|null = null
+    private selectionType: number = 0
+    private disposeBrush: PaletteImage|PaletteSprite|null = null
     private mapSceneSide: number = 2000
-    private mapCursorSide: number = 100
 
     private buttons: ActionButton[] = [
         {
@@ -282,29 +322,47 @@ export default class SceneMapEditor extends Vue {
                     click: (): void => {
                         this.openMapResizer()
                     }
-                },
-                {
-                    text: '커서 크기 설정',
-                    click: (): void => {
-                        this.openCursorResizer()
-                    }
                 }
             ]
         },
         {
             icon: 'mdi-human-edit',
             description: '액터를 배치합니다',
-            lists: []
+            lists: [
+                {
+                    text: '액터 모드 사용',
+                    click: (button): void => {
+                        this.setSelectionButton(button)
+                        this.setSelectionType(1)
+                    }
+                }
+            ]
         },
         {
             icon: 'mdi-wall',
             description: '액터가 지나갈 수 없는 벽을 설치합니다',
-            lists: []
+            lists: [
+                {
+                    text: '벽 모드 사용',
+                    click: (button): void => {
+                        this.setSelectionButton(button)
+                        this.setSelectionType(2)
+                    }
+                }
+            ]
         },
         {
             icon: 'mdi-floor-plan',
             description: '바닥 타일을 설치합니다',
-            lists: []
+            lists: [
+                {
+                    text: '바닥 타일 모드 사용',
+                    click: (button): void => {
+                        this.setSelectionButton(button)
+                        this.setSelectionType(3)
+                    }
+                }
+            ]
         },
         {
             icon: 'mdi-help',
@@ -404,10 +462,6 @@ export default class SceneMapEditor extends Vue {
         this.isMapResizerOpen = true
     }
 
-    private openCursorResizer(): void {
-        this.isCursorResizerOpen = true
-    }
-
 
     private resizeCanvas(): void {
         if (!this.game) {
@@ -430,7 +484,7 @@ export default class SceneMapEditor extends Vue {
     }
 
     private onMouseRightButtonClick(): void {
-        this.setDisposeMode(0, null)
+        this.setDisposeBrush(null)
     }
 
 
@@ -442,20 +496,33 @@ export default class SceneMapEditor extends Vue {
         return true
     }
 
-    private setDisposeMode(mode: number, src: PaletteImage|PaletteSprite|null): void {
-        if (!this.scene) {
-            return
-        }
-        this.disposeMode = mode
-        this.disposeSource = src
-        this.scene.transfer.emit('receive-dispose-mode', mode, src)
+    private isSelectedButton(button: ActionButton): boolean {
+        return button === this.selectionButton
     }
 
-    private setCursorSide(side: number): void {
+    private setSelectionButton(button: ActionButton): void {
+        this.selectionButton = button
+    }
+
+    private setSelectionType(type: number): void {
         if (!this.scene) {
             return
         }
-        this.scene.transfer.emit('receive-cursor-side', side)
+        this.selectionType = type
+        this.scene.transfer.emit('receive-selection-type', type)
+    }
+
+    private setDisposeBrush(brush: PaletteImage|PaletteSprite|null): void {
+        if (!this.scene) {
+            return
+        }
+        this.disposeBrush = brush
+        this.scene.transfer.emit('receive-dispose-brush', brush)
+    }
+
+    private getBrushKey(key: string): string {
+        const cwd: string = normalize(path.join(PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME))
+        return normalize(path.relative(cwd, key))
     }
 
     private setMapSide(side: number): void {
@@ -519,39 +586,6 @@ export default class SceneMapEditor extends Vue {
     @Watch('mapSceneSide')
     private onChanageMapSceneSide(): void {
         this.setMapSide(this.mapSceneSide)
-    }
-
-    @Watch('mapCursorSide')
-    private onChangeMapCursorSide(): void {
-        this.setCursorSide(this.mapCursorSide)
-    }
-
-    @Watch('palettes', { immediate: true })
-    private onChangePalettes(): void {
-        const walls = this.buttons[2]
-        const tiles = this.buttons[3]
-        const dataDirPath: string = path.join(PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME)
-
-        const setWallMap = (src: PaletteImage|PaletteSprite) => {
-            return {
-                text: normalize(path.relative(dataDirPath, src.key)),
-                click: (): void => {
-                    this.setDisposeMode(2, src)
-                }
-            }
-        }
-
-        const setTileMap = (src: PaletteImage|PaletteSprite) => {
-            return {
-                text: normalize(path.relative(dataDirPath, src.key)),
-                click: (): void => {
-                    this.setDisposeMode(3, src)
-                }
-            }
-        }
-
-        walls.lists = this.palettes.map(setWallMap)
-        tiles.lists = this.palettes.map(setTileMap)
     }
 
     mounted(): void {

@@ -39,8 +39,9 @@ interface DataTransferEvents {
     'load-map-fail':            (message: string) => void
     'load-map-success':         (map: Engine.GameProject.SceneMap) => void
     'receive-map-side':         (side: number) => void
-    'receive-cursor-side':      (side: number) => void
-    'receive-dispose-mode':     (mode: number, source: PaletteImage|PaletteSprite|null) => void
+    'receive-selection-type':   (type: number) => void
+    'receive-dispose-mode':     (activity: boolean) => void
+    'receive-dispose-brush':    (brush: PaletteImage|PaletteSprite|null) => void
     'receive-image-list':       (list: PaletteImage[]) => void
     'receive-sprite-list':      (list: PaletteSprite[]) => void
 }
@@ -66,9 +67,9 @@ export default class PreviewScene extends Phaser.Scene {
     private requireImages:  PaletteImage[] = []
     private requireSprites: PaletteSprite[] = []
 
+    private selectionType: number = 0
     private shiftKey: Phaser.Input.Keyboard.Key|null = null
-    private disposeMode: number  = 0
-    private disposeSource: PaletteImage|PaletteSprite|null = null
+    private disposeBrush: PaletteImage|PaletteSprite|null = null
     private disposeShiftOffset: Point2 = { x: 0, y: 0 }
 
     constructor(projectDirectory: string, storageKey: string, filePath: string) {
@@ -92,13 +93,13 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     private get isDisposeEnable(): boolean {
-        if (!this.disposeMode) {
+        if (!this.selectionType) {
             return false
         }
-        if (!this.disposeSource) {
+        if (!this.disposeBrush) {
             return false
         }
-        if (!this.textures.exists(this.disposeSource.key)) {
+        if (!this.textures.exists(this.disposeBrush.key)) {
             return false
         }
         return true
@@ -108,7 +109,7 @@ export default class PreviewScene extends Phaser.Scene {
         if (!this.isDisposeEnable) {
             return false
         }
-        return Object.prototype.hasOwnProperty.call(this.disposeSource, 'frameWidth')
+        return Object.prototype.hasOwnProperty.call(this.disposeBrush, 'frameWidth')
     }
 
     private get cursorSide(): number {
@@ -120,12 +121,12 @@ export default class PreviewScene extends Phaser.Scene {
         let height: number
 
         if (this.isAnimationPalette) {
-            const source: PaletteSprite = this.disposeSource as PaletteSprite
-            width = source.frameWidth
-            height = source.frameHeight
+            const brush: PaletteSprite = this.disposeBrush as PaletteSprite
+            width   = brush.frameWidth
+            height  = brush.frameHeight
         }
         else {
-            const texture = this.textures.get(this.disposeSource!.key)
+            const texture = this.textures.get(this.disposeBrush!.key)
             if (!texture) {
                 return 0
             }
@@ -163,15 +164,20 @@ export default class PreviewScene extends Phaser.Scene {
         camera.pan(0, 0, 0)
     }
 
-    private setDisposeMode(mode: number, source: PaletteImage|PaletteSprite|null): void {
-        this.disposeMode = mode
-        this.disposeSource = source
-        
-        this.cursor.enable(!!mode)
+    private setSelectionType(type: number): void {
+        this.selectionType = type
+    }
 
+    private setDisposeBrush(brush: PaletteImage|PaletteSprite|null): void {
+        this.disposeBrush = brush
+    }
+
+    private updateDisposeCursor(): void {
+        this.cursor.enable(false)
         if (!this.isDisposeEnable) {
             return
         }
+        this.cursor.enable(true)
         this.cursor.setGridSide(this.cursorSide)
     }
 
@@ -242,20 +248,20 @@ export default class PreviewScene extends Phaser.Scene {
         let animsKey: string|undefined = undefined
 
         if (this.isAnimationPalette) {
-            const source: PaletteSprite = this.disposeSource as PaletteSprite
-            animsKey = source.key
+            const brush: PaletteSprite = this.disposeBrush as PaletteSprite
+            animsKey = brush.key
         }
 
-        switch (this.disposeMode) {
+        switch (this.selectionType) {
             case 1:
                 break
             
             case 2:
-                this.isometric.setWalltile(x, y, this.cursorSide, this.disposeSource!.key, undefined, animsKey)
+                this.isometric.setWalltile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
                 break
 
             case 3:
-                this.isometric.setFloortile(x, y, this.cursorSide, this.disposeSource!.key, undefined, animsKey)
+                this.isometric.setFloortile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
                 break
         }
     }
@@ -361,11 +367,13 @@ export default class PreviewScene extends Phaser.Scene {
         .on('receive-map-side', (side: number): void => {
             this.isometric.setWorldSize(side)
         })
-        .on('receive-dispose-mode', (mode: number, source: PaletteImage|PaletteSprite|null): void => {
-            this.setDisposeMode(mode, source)
+        .on('receive-selection-type', (type: number): void => {
+            this.setSelectionType(type)
+            this.updateDisposeCursor()
         })
-        .on('receive-cursor-side', (side: number): void => {
-            this.cursor.setGridSide(side)
+        .on('receive-dispose-brush', (brush: PaletteImage|PaletteSprite|null): void => {
+            this.disposeBrush = brush
+            this.updateDisposeCursor()
         })
     }
 
@@ -391,7 +399,8 @@ export default class PreviewScene extends Phaser.Scene {
             
             // 씬 기능 시작
             this.setCameraMoving()
-            this.setDisposeMode(0, null)
+            this.setSelectionType(0)
+            this.setDisposeBrush(null)
 
             // 이벤트 할당
             this.attachMouseEvent()
