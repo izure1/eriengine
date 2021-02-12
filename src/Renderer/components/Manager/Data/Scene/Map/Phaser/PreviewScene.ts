@@ -30,6 +30,11 @@ export interface PaletteSprite extends PaletteImage {
     repeat: number
 }
 
+interface Point2 {
+    x: number
+    y: number
+}
+
 interface DataTransferEvents {
     'load-map-fail':            (message: string) => void
     'load-map-success':         (map: Engine.GameProject.SceneMap) => void
@@ -61,9 +66,10 @@ export default class PreviewScene extends Phaser.Scene {
     private requireImages:  PaletteImage[] = []
     private requireSprites: PaletteSprite[] = []
 
+    private shiftKey: Phaser.Input.Keyboard.Key|null = null
     private disposeMode: number  = 0
     private disposeSource: PaletteImage|PaletteSprite|null = null
-
+    private disposeShiftOffset: Point2 = { x: 0, y: 0 }
 
     constructor(projectDirectory: string, storageKey: string, filePath: string) {
         super({ key: '__preview-scene__', active: true })
@@ -84,6 +90,56 @@ export default class PreviewScene extends Phaser.Scene {
     private get assetDirectory(): string {
         return path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
     }
+
+    private get isDisposeEnable(): boolean {
+        if (!this.disposeMode) {
+            return false
+        }
+        if (!this.disposeSource) {
+            return false
+        }
+        if (!this.textures.exists(this.disposeSource.key)) {
+            return false
+        }
+        return true
+    }
+
+    private get isAnimationPalette(): boolean {
+        if (!this.isDisposeEnable) {
+            return false
+        }
+        return Object.prototype.hasOwnProperty.call(this.disposeSource, 'frameWidth')
+    }
+
+    private get cursorSide(): number {
+        if (!this.isDisposeEnable) {
+            return 0
+        }
+
+        let width: number
+        let height: number
+
+        if (this.isAnimationPalette) {
+            const source: PaletteSprite = this.disposeSource as PaletteSprite
+            width = source.frameWidth
+            height = source.frameHeight
+        }
+        else {
+            const texture = this.textures.get(this.disposeSource!.key)
+            if (!texture) {
+                return 0
+            }
+            width = texture.source[0].width
+            height = texture.source[0].height
+
+            if (!width || !height) {
+                return 0
+            }
+        }
+
+        return this.getIsometricSideFromWidth(width)
+    }
+
 
     private setCameraMoving(): void {
         const camera                = this.cameras.main
@@ -110,67 +166,96 @@ export default class PreviewScene extends Phaser.Scene {
     private setDisposeMode(mode: number, source: PaletteImage|PaletteSprite|null): void {
         this.disposeMode = mode
         this.disposeSource = source
+        
         this.cursor.enable(!!mode)
+
+        if (!this.isDisposeEnable) {
+            return
+        }
+        this.cursor.setGridSide(this.cursorSide)
     }
 
-    private isAnimationPalette(source: PaletteImage|PaletteSprite): boolean {
-        return Object.prototype.hasOwnProperty.call(source, 'frameWidth')
+    private getDiagonal(width: number, height: number): number {
+        return Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
     }
 
     private getIsometricSideFromWidth(size: number): number {
         const rad: number = Phaser.Math.DegToRad(26.57)
         const w: number = size / 2
         const h: number = w / 4
-        return Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2))
+        return this.getDiagonal(w, h)
     }
 
-    private dispose(): void {
-        if (!this.disposeMode) {
-            return
-        }
-        if (!this.disposeSource) {
-            return
-        }
-        if (!this.textures.exists(this.disposeSource.key)) {
+    private dispose(e: Phaser.Input.Pointer): void {
+        if (!this.isDisposeEnable) {
             return
         }
 
-        const { x, y } = this.cursor.pointer
-        let animsKey: string|undefined = undefined
-        let width: number
-        let height: number
+        // shift키를 누른 상태로 작업했을 시, 직선으로 계산함
+        let x: number
+        let y: number
+        if (e.event.shiftKey && this.disposeShiftOffset) {
+            const distanceX: number = e.worldX - this.disposeShiftOffset.x
+            const distanceY: number = e.worldY - this.disposeShiftOffset.y
+            
+            // 정확히 상하/좌우로 이동하거나, 이동하지 않았을 경우
+            if (distanceX === 0 || distanceY === 0) {
+                x = this.cursor.pointerX
+                y = this.cursor.pointerY
+            }
+            else {
+                let deg: number
+                const distance: number  = this.getDiagonal(distanceX, distanceY)
 
-        if (this.isAnimationPalette(this.disposeSource)) {
-            const source: PaletteSprite = this.disposeSource as PaletteSprite
-            animsKey = source.key
-            width = source.frameWidth
-            height = source.frameHeight
+                // ↗
+                if (distanceX > 0 && distanceY < 0) {
+                    deg = -26.57
+                }
+                // ↘
+                else if (distanceX > 0 && distanceY > 0) {
+                    deg = 26.57
+                }
+                // ↙
+                else if (distanceX < 0 && distanceY > 0) {
+                    deg = 180 - 26.57
+                }
+                // ↖
+                else {
+                    deg = 180 + 26.57
+                }
+
+                const rad: number = Phaser.Math.DegToRad(deg)
+                const offset: Point2 = this.cursor.calcCursorOffset({
+                    x: Math.cos(rad) * distance,
+                    y: Math.sin(rad) * distance
+                })
+
+                x = this.disposeShiftOffset.x + offset.x
+                y = this.disposeShiftOffset.y + offset.y
+            }
         }
         else {
-            const texture = this.textures.get(this.disposeSource.key)
-            if (!texture) {
-                return
-            }
-            width = texture.source[0].width
-            height = texture.source[0].height
-
-            if (!width || !height) {
-                return
-            }
+            x = this.cursor.pointerX
+            y = this.cursor.pointerY
         }
 
-        const side = this.getIsometricSideFromWidth(width)
+        let animsKey: string|undefined = undefined
+
+        if (this.isAnimationPalette) {
+            const source: PaletteSprite = this.disposeSource as PaletteSprite
+            animsKey = source.key
+        }
 
         switch (this.disposeMode) {
             case 1:
                 break
             
             case 2:
-                this.isometric.setWalltile(x, y, side, this.disposeSource.key, undefined, animsKey)
+                this.isometric.setWalltile(x, y, this.cursorSide, this.disposeSource!.key, undefined, animsKey)
                 break
 
             case 3:
-                this.isometric.setFloortile(x, y, side, this.disposeSource.key, undefined, animsKey)
+                this.isometric.setFloortile(x, y, this.cursorSide, this.disposeSource!.key, undefined, animsKey)
                 break
         }
     }
@@ -216,14 +301,19 @@ export default class PreviewScene extends Phaser.Scene {
         this.watcher = null
     }
 
+    private updateDisposeOffset(x: number, y: number): void {
+        this.disposeShiftOffset = this.cursor.calcCursorOffset({ x, y })
+    }
+
     private onMouseLeftDown(e: Phaser.Input.Pointer): void {
+        this.updateDisposeOffset(e.worldX, e.worldY)
     }
     
     private onMouseRightDown(e: Phaser.Input.Pointer): void {
     }
-
+    
     private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
-        this.dispose()
+        this.dispose(e)
     }
 
     private async generateMapData(): Promise<boolean> {
@@ -256,6 +346,13 @@ export default class PreviewScene extends Phaser.Scene {
                     break
             }
         })
+    }
+
+    private attachKeyboardEvent(): void {
+        if (this.shiftKey) {
+            this.shiftKey.destroy()
+        }
+        this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
     }
 
     private attachTransferEvent(): void {
@@ -298,6 +395,7 @@ export default class PreviewScene extends Phaser.Scene {
 
             // 이벤트 할당
             this.attachMouseEvent()
+            this.attachKeyboardEvent()
             this.attachTransferEvent()
 
             // 플러그인 설정
