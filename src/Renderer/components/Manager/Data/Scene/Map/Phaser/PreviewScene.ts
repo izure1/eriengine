@@ -35,6 +35,13 @@ interface Point2 {
     y: number
 }
 
+interface Rect {
+    width: number
+    height: number
+    a: Point2
+    b: Point2
+}
+
 interface DataTransferEvents {
     'load-map-fail':            (message: string) => void
     'load-map-success':         (map: Engine.GameProject.SceneMap) => void
@@ -67,13 +74,20 @@ export default class PreviewScene extends Phaser.Scene {
     private requireImages:  PaletteImage[] = []
     private requireSprites: PaletteSprite[] = []
 
-    private selectionType: number = 0
     private shiftKey: Phaser.Input.Keyboard.Key|null = null
+
+    private dragStartOffset: Point2 = { x: 0, y: 0 }
+    private dragEndOffset: Point2 = { x: 0, y: 0 }
+    private selectionType: number = 0
+    private selectionRectangle: Phaser.GameObjects.Rectangle|null = null
+    private selectionActors: Set<Actor> = new Set
+    private selectionWalls: Set<Phaser.Physics.Matter.Sprite> = new Set
+    private selectionTiles: Set<Phaser.GameObjects.Sprite> = new Set
+
     private disposeBrush: PaletteImage|PaletteSprite|null = null
-    private disposeShiftOffset: Point2 = { x: 0, y: 0 }
 
     constructor(projectDirectory: string, storageKey: string, filePath: string) {
-        super({ key: '__preview-scene__', active: true })
+        super({ key: '__preview-scene__', active: false })
 
         this.projectDirectory = projectDirectory
         this.storageKey = storageKey
@@ -141,6 +155,33 @@ export default class PreviewScene extends Phaser.Scene {
         return this.getIsometricSideFromWidth(width)
     }
 
+    private get selectionRange(): Rect {
+        let width: number
+        let height: number
+        let a: Point2
+        let b: Point2
+
+        if (!this.selectionRectangle) {
+            width = 0
+            height = 0
+            a = { x: 0, y: 0 }
+            b = { x: 0, y: 0 }
+        }
+        else {
+            width   = this.selectionRectangle.displayWidth
+            height  = this.selectionRectangle.displayHeight
+            a       = this.selectionRectangle.getTopLeft()
+            b       = this.selectionRectangle.getBottomRight()
+        }
+
+        return {
+            width,
+            height,
+            a,
+            b
+        }
+    }
+
 
     private setCameraMoving(): void {
         const camera                = this.cameras.main
@@ -192,6 +233,133 @@ export default class PreviewScene extends Phaser.Scene {
         return this.getDiagonal(w, h)
     }
 
+    private generateSelectionRectangle(): void {
+        const fillColor: number     = Phaser.Display.Color.GetColor(0, 255, 0)
+
+        this.selectionRectangle = this.add.rectangle(0, 0, 0, 0, fillColor, 0.05)
+    }
+
+    private activeSelectionRectangle(activity: boolean): void {
+        if (!this.selectionRectangle) {
+            return
+        }
+        if (activity) {
+            if (!this.selectionType) {
+                return
+            }
+            if (this.disposeBrush) {
+                return
+            }
+        }
+        this.selectionRectangle?.setActive(activity)
+        this.selectionRectangle?.setVisible(activity)
+    }
+
+    private setSelectionRectanglePosition({ worldX, worldY }: Phaser.Input.Pointer): void {
+        if (!this.selectionRectangle) {
+            return
+        }
+        if (!this.selectionType) {
+            return
+        }
+        if (this.disposeBrush) {
+            return
+        }
+        this.selectionRectangle.setPosition(worldX, worldY)
+    }
+
+    private updateSelectionRectangleSize(pointer: Phaser.Input.Pointer): void {
+        if (!this.selectionRectangle) {
+            return
+        }
+        if (!this.selectionType) {
+            return
+        }
+        if (this.disposeBrush) {
+            return
+        }
+        const distanceX: number = pointer.worldX - this.selectionRectangle.x
+        const distanceY: number = pointer.worldY - this.selectionRectangle.y
+        const width: number     = Math.abs(distanceX)
+        const height: number    = Math.abs(distanceY)
+
+        const originX: number = distanceX > 0 ? 0 : 1
+        const originY: number = distanceY > 0 ? 0 : 1
+
+        this.selectionRectangle.setSize(width, height)
+        this.selectionRectangle.setOrigin(originX, originY)
+    }
+
+    private destroySelectionRectangle(): void {
+        if (!this.selectionRectangle) {
+            return
+        }
+        this.selectionRectangle.destroy()
+        this.selectionRectangle = null
+    }
+
+    private getObjectInRect<T extends Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Transform>(rect: Rect, objects: T[]): T[] {
+        const { width, height, a, b } = rect
+        
+        const list: T[] = []
+        for (const object of objects) {
+            const { x, y } = object
+            if (
+                x > a.x && x < b.x &&
+                y > a.y && y < b.y
+            ) {
+                list.push(object)
+            }
+        }
+        return list
+    }
+
+    private unselectObjects(): void {
+        for (const actor of this.selectionActors) {
+            actor.clearTint()
+        }
+        for (const wall of this.selectionWalls) {
+            wall.clearTint()
+        }
+        for (const tile of this.selectionTiles) {
+            tile.clearTint()
+        }
+
+        this.selectionActors.clear()
+        this.selectionWalls.clear()
+        this.selectionTiles.clear()
+    }
+
+    private selectObjects(): void {
+        if (!this.selectionType) {
+            return
+        }
+        if (this.disposeBrush) {
+            return
+        }
+
+        const fillColor: number = Phaser.Display.Color.GetColor32(255, 0, 0, 5)
+
+        switch (this.selectionType) {
+            case 1:
+                break
+            case 2: {
+                this.getObjectInRect(this.selectionRange, this.isometric.walls).forEach((wall): void => {
+                    wall.setTint(fillColor)
+                    this.selectionWalls.add(wall)
+                })
+                break
+            }
+            case 3: {
+                this.getObjectInRect(this.selectionRange, this.isometric.tiles).forEach((tile): void => {
+                    tile.setTint(fillColor)
+                    this.selectionTiles.add(tile)
+                })
+                break
+            }
+        }
+    }
+
     private dispose(e: Phaser.Input.Pointer): void {
         if (!this.isDisposeEnable) {
             return
@@ -200,9 +368,10 @@ export default class PreviewScene extends Phaser.Scene {
         // shift키를 누른 상태로 작업했을 시, 직선으로 계산함
         let x: number
         let y: number
-        if (e.event.shiftKey && this.disposeShiftOffset) {
-            const distanceX: number = e.worldX - this.disposeShiftOffset.x
-            const distanceY: number = e.worldY - this.disposeShiftOffset.y
+        if (e.event.shiftKey) {
+            const startOffset: Point2 = this.cursor.calcCursorOffset(this.dragStartOffset)
+            const distanceX: number = e.worldX - startOffset.x
+            const distanceY: number = e.worldY - startOffset.y
             
             // 정확히 상하/좌우로 이동하거나, 이동하지 않았을 경우
             if (distanceX === 0 || distanceY === 0) {
@@ -236,8 +405,8 @@ export default class PreviewScene extends Phaser.Scene {
                     y: Math.sin(rad) * distance
                 })
 
-                x = this.disposeShiftOffset.x + offset.x
-                y = this.disposeShiftOffset.y + offset.y
+                x = startOffset.x + offset.x
+                y = startOffset.y + offset.y
             }
         }
         else {
@@ -307,20 +476,41 @@ export default class PreviewScene extends Phaser.Scene {
         this.watcher = null
     }
 
-    private updateDisposeOffset(x: number, y: number): void {
-        this.disposeShiftOffset = this.cursor.calcCursorOffset({ x, y })
+    private updateDragStartOffset({ worldX, worldY }: Phaser.Input.Pointer): void {
+        this.dragStartOffset = { x: worldX, y: worldY }
+    }
+
+    private updateDragEndOffset({ worldX, worldY }: Phaser.Input.Pointer): void {
+        this.dragEndOffset = { x: worldX, y: worldY }
     }
 
     private onMouseLeftDown(e: Phaser.Input.Pointer): void {
-        this.updateDisposeOffset(e.worldX, e.worldY)
+        this.updateDragStartOffset(e)
         this.dispose(e)
+
+        if (!e.event.shiftKey) {
+            this.unselectObjects()
+        }
+        this.setSelectionRectanglePosition(e)
+        this.updateSelectionRectangleSize(e)
+        this.activeSelectionRectangle(true)
+    }
+
+    private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
+        this.dispose(e)
+        this.updateSelectionRectangleSize(e)
+    }
+
+    private onMouseLeftUp(e: Phaser.Input.Pointer): void {
+        this.updateDragEndOffset(e)
+        this.activeSelectionRectangle(false)
+        this.selectObjects()
     }
     
     private onMouseRightDown(e: Phaser.Input.Pointer): void {
     }
-    
-    private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
-        this.dispose(e)
+
+    private onMouseRightUp(e: Phaser.Input.Pointer): void {
     }
 
     private async generateMapData(): Promise<boolean> {
@@ -342,6 +532,17 @@ export default class PreviewScene extends Phaser.Scene {
                     break
                 case 2:
                     this.onMouseRightDown(e)
+                    break
+            }
+        })
+
+        this.input.on(Phaser.Input.Events.POINTER_UP, (e: Phaser.Input.Pointer): void => {
+            switch (e.button) {
+                case 0:
+                    this.onMouseLeftUp(e)
+                    break
+                case 2:
+                    this.onMouseRightUp(e)
                     break
             }
         })
@@ -394,6 +595,8 @@ export default class PreviewScene extends Phaser.Scene {
                 return
             }
 
+            this.generateSelectionRectangle()
+
             // 맵 파일 감지 시작
             this.generateWatcher()
             this.generateAnimation()
@@ -423,5 +626,6 @@ export default class PreviewScene extends Phaser.Scene {
     private onDestroy(): void {
         this.destroyCamera()
         this.destroyWatcher()
+        this.destroySelectionRectangle()
     }
 }
