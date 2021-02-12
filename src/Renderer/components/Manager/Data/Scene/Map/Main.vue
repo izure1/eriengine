@@ -67,14 +67,16 @@
         </v-toolbar>
 
         <v-toolbar
-            v-if="!!selectionType"
             class="canvas-toolbar ma-5"
             dark
             floating
             dense
         >
 
-            <v-btn icon>
+            <v-btn
+                :disabled="!selectionType"
+                icon
+            >
                 <v-menu
                     dark
                     offset-y
@@ -86,12 +88,12 @@
                                 <div v-on="menu.on">
                                     <div v-on="tooltip.on">
                                         <v-btn icon>
-                                            <v-icon>mdi-brush</v-icon>
+                                            <v-icon>mdi-format-paint</v-icon>
                                         </v-btn>
                                     </div>
                                 </div>
                             </template>
-                            <span class="caption">칠할 이미지를 선택합니다</span>
+                            <span class="caption">칠할 브러쉬를 선택합니다</span>
                         </v-tooltip>
                     </template>
                     <v-list
@@ -205,6 +207,12 @@
                             <v-list-item-content>
                                 <v-list-item-title>확대/축소</v-list-item-title>
                                 <v-list-item-subtitle>키보드 Q, R 키를 이용하여 확대/축소할 수 있습니다</v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Shift키 사용</v-list-item-title>
+                                <v-list-item-subtitle>키보드 Shift키를 이용하여 직선으로 설치할 수 있습니다</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item>
@@ -330,7 +338,7 @@ export default class SceneMapEditor extends Vue {
             description: '액터를 배치합니다',
             lists: [
                 {
-                    text: '액터 모드 사용',
+                    text: '액터 편집하기',
                     click: (button): void => {
                         this.setSelectionButton(button)
                         this.setSelectionType(1)
@@ -343,7 +351,7 @@ export default class SceneMapEditor extends Vue {
             description: '액터가 지나갈 수 없는 벽을 설치합니다',
             lists: [
                 {
-                    text: '벽 모드 사용',
+                    text: '벽 편집하기',
                     click: (button): void => {
                         this.setSelectionButton(button)
                         this.setSelectionType(2)
@@ -356,7 +364,7 @@ export default class SceneMapEditor extends Vue {
             description: '바닥 타일을 설치합니다',
             lists: [
                 {
-                    text: '바닥 타일 모드 사용',
+                    text: '바닥 타일 편집하기',
                     click: (button): void => {
                         this.setSelectionButton(button)
                         this.setSelectionType(3)

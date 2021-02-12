@@ -313,6 +313,7 @@ export default class PreviewScene extends Phaser.Scene {
 
     private onMouseLeftDown(e: Phaser.Input.Pointer): void {
         this.updateDisposeOffset(e.worldX, e.worldY)
+        this.dispose(e)
     }
     
     private onMouseRightDown(e: Phaser.Input.Pointer): void {
