@@ -1,6 +1,7 @@
 <template>
     <section>
         <section
+            @click.left="onMouseLeftButtonClick"
             @click.right="onMouseRightButtonClick"
             ref="game-canvas"
             class="game-canvas"
@@ -121,6 +122,29 @@
             </v-btn>
             
         </v-toolbar>
+
+        <v-card
+            v-if="isContextmenuOpen"
+            max-width="200"
+            :style="{
+                left: `${contextmenuOffset.x}px`,
+                top: `${contextmenuOffset.y}px`
+            }"
+            tile
+            dark
+        >
+            <v-list dense>
+                <v-list-item
+                    v-for="(contextmenu, i) in contextmenus"
+                    :key="`contextmenu-item-${i}`"
+                    @click="contextmenu.click"
+                >
+                    <v-list-item-content>
+                        <v-list-item-title>{{ contextmenu.text }}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+        </v-card>
 
         <v-dialog
             v-model="isBuilding"
@@ -297,6 +321,11 @@ interface ActionButton {
     lists: ActionList[]
 }
 
+interface Point2 {
+    x: number
+    y: number
+}
+
 @Component({
     components: {
         ChannelComponent
@@ -310,6 +339,9 @@ export default class SceneMapEditor extends Vue {
     private isBuiltFail: boolean = false
     private isTooltipOpen: boolean = false
     private isMapResizerOpen: boolean = false
+    private isContextmenuOpen: boolean = false
+
+    private contextmenuOffset: Point2 = { x: 0, y: 0 }
 
     private paletteImages: PaletteImage[]   = []
     private paletteSprites: PaletteSprite[] = []
@@ -383,6 +415,23 @@ export default class SceneMapEditor extends Vue {
                     }
                 }
             ]
+        }
+    ]
+
+    private contextmenus: ActionList[] = [
+        {
+            text: '속성',
+            click: (): void => {
+                //this.openProperties()
+                this.closeContextmenu()
+            }
+        },
+        {
+            text: '삭제',
+            click: (): void => {
+                this.requestDeleteSelection()
+                this.closeContextmenu()
+            }
         }
     ]
 
@@ -470,6 +519,24 @@ export default class SceneMapEditor extends Vue {
         this.isMapResizerOpen = true
     }
 
+    private openContextmenu(e: MouseEvent): void {
+        if (this.disposeBrush) {
+            return
+        }
+
+        const appbarHeight: number = 64
+        const fixedHeight: number = 30
+        const { offsetX, offsetY } = e
+
+        this.contextmenuOffset.x = offsetX
+        this.contextmenuOffset.y = offsetY - (appbarHeight + fixedHeight)
+        this.isContextmenuOpen = true
+    }
+
+    private closeContextmenu(): void {
+        this.isContextmenuOpen = false
+    }
+
 
     private resizeCanvas(): void {
         if (!this.game) {
@@ -491,7 +558,12 @@ export default class SceneMapEditor extends Vue {
         window.removeEventListener('resize', this.resizeCanvas)
     }
 
-    private onMouseRightButtonClick(): void {
+    private onMouseLeftButtonClick(e: MouseEvent): void {
+        this.closeContextmenu()
+    }
+
+    private onMouseRightButtonClick(e: MouseEvent): void {
+        this.openContextmenu(e)
         this.setDisposeBrush(null)
     }
 
@@ -540,10 +612,11 @@ export default class SceneMapEditor extends Vue {
         this.scene.transfer.emit('receive-map-side', this.mapSceneSide)
     }
 
-    private wait(interval: number): Promise<void> {
-        return new Promise((resolve): void => {
-            setTimeout(resolve, interval)
-        })
+    private requestDeleteSelection(): void {
+        if (!this.scene) {
+            return
+        }
+        this.scene.transfer.emit('receive-delete-selection')
     }
 
     private async start(): Promise<void> {

@@ -51,6 +51,8 @@ interface DataTransferEvents {
     'receive-dispose-brush':    (brush: PaletteImage|PaletteSprite|null) => void
     'receive-image-list':       (list: PaletteImage[]) => void
     'receive-sprite-list':      (list: PaletteSprite[]) => void
+    'receive-open-properties':  () => void
+    'receive-delete-selection': () => void
 }
 
 class DataTransfer extends TypedEmitter<DataTransferEvents> {}
@@ -207,6 +209,7 @@ export default class PreviewScene extends Phaser.Scene {
 
     private setSelectionType(type: number): void {
         this.selectionType = type
+        this.unselectObjects()
     }
 
     private setDisposeBrush(brush: PaletteImage|PaletteSprite|null): void {
@@ -358,6 +361,24 @@ export default class PreviewScene extends Phaser.Scene {
                 break
             }
         }
+    }
+
+    private deleteSelectionObjects(): void {
+        this.selectionActors.forEach((actor): void => {
+            actor.destroy()
+        })
+
+        this.selectionWalls.forEach((wall): void => {
+            wall.destroy()
+        })
+
+        this.selectionTiles.forEach((tile): void => {
+            tile.destroy()
+        })
+
+        this.selectionActors.clear()
+        this.selectionWalls.clear()
+        this.selectionTiles.clear()
     }
 
     private dispose(e: Phaser.Input.Pointer): void {
@@ -576,6 +597,9 @@ export default class PreviewScene extends Phaser.Scene {
         .on('receive-dispose-brush', (brush: PaletteImage|PaletteSprite|null): void => {
             this.disposeBrush = brush
             this.updateDisposeCursor()
+        })
+        .on('receive-delete-selection', (): void => {
+            this.deleteSelectionObjects()
         })
     }
 

@@ -112,7 +112,9 @@ export default class GeneratorComponent extends Vue {
             icon: 'mdi-plus',
             description: '파일 추가',
             action: (): void => {
-                this.add(this.getNewFilePath())
+                const filePath: string = this.getNewFilePath()
+                this.add(filePath)
+                this.modifyFileName(filePath)
             }
         },
         {
@@ -144,18 +146,7 @@ export default class GeneratorComponent extends Vue {
             icon: 'mdi-form-textbox',
             description: '이름을 변경합니다',
             action: async (src: string): Promise<void> => {
-                const basename: string      = path.basename(src)
-                const namewords: string[]   = basename.split('.')
-
-                const before: string        = namewords.shift()!
-                const after: string         = await this.receiveNaming(before, `.${namewords.join('.')}`)
-
-                const dist: string          = path.resolve(path.dirname(src), after)
-
-                const renaming: Engine.FileSystem.RenameSuccess|Engine.FileSystem.RenameFail = await ipcRenderer.invoke('rename', src, dist)
-                if (!renaming.success) {
-                    this.$store.dispatch('snackbar', renaming.message)
-                }
+                this.modifyFileName(src)
             }
         },
         {
@@ -198,6 +189,21 @@ export default class GeneratorComponent extends Vue {
 
     private openPath(filePath: string): void {
         shell.openPath(filePath)
+    }
+
+    private async modifyFileName(src: string): Promise<void> {
+        const basename: string      = path.basename(src)
+        const namewords: string[]   = basename.split('.')
+
+        const before: string        = namewords.shift()!
+        const after: string         = await this.receiveNaming(before, `.${namewords.join('.')}`)
+
+        const dist: string          = path.resolve(path.dirname(src), after)
+
+        const renaming: Engine.FileSystem.RenameSuccess|Engine.FileSystem.RenameFail = await ipcRenderer.invoke('rename', src, dist)
+        if (!renaming.success) {
+            this.$store.dispatch('snackbar', renaming.message)
+        }
     }
 
     private receiveNaming(defaultName?: string, defaultExt?: string): Promise<string> {
