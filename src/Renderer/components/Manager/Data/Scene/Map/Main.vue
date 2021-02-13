@@ -130,8 +130,9 @@
                 left: `${contextmenuOffset.x}px`,
                 top: `${contextmenuOffset.y}px`
             }"
-            tile
             dark
+            tile
+            flat
         >
             <v-list dense>
                 <v-list-item
@@ -145,6 +146,69 @@
                 </v-list-item>
             </v-list>
         </v-card>
+
+        <v-dialog
+            v-model="isPropertiesOpen"
+            :persistent="isPropertiesOpen"
+            max-width="450"
+        >
+            <v-card>
+                <v-card-title>속성</v-card-title>
+                <v-card-text>
+
+                    <div v-if="isSelectionType(1, 2)">
+                    <v-subheader>별칭(alias)</v-subheader>
+                    <p class="text-caption">
+                        별칭을 정합니다. 프로그래밍에서 이용됩니다.
+                    </p>
+                    <v-text-field
+                        v-model="propertyName"
+                        type="number"
+                        filled
+                        rounded
+                        dense
+                    />
+                    </div>
+                    
+                    <v-divider />
+                    <v-subheader>비율(scale)</v-subheader>
+                    <p class="text-caption">
+                        가로세로비를 유지한 채 크기를 조절합니다.
+                    </p>
+                    <v-text-field
+                        v-model="propertyScale"
+                        :rules="[ propertyOnlyPositiveNumber ]"
+                        type="number"
+                        filled
+                        rounded
+                        dense
+                    />
+
+                    <div v-if="isSelectionType(2)">
+                    <v-divider />
+                    <v-subheader>센서(isSensor)</v-subheader>
+                    <p class="text-caption">
+                        실제로 충돌하지 않지만, 이벤트를 얻어낼 수 있습니다.
+                        <br>
+                        이는 지역에 들어오면 작동을 하도록 프로그래밍하는데 사용됩니다.
+                    </p>
+                    <v-switch
+                        v-model="propertyIsSensor"
+                        label="센서"
+                        inset
+                        dense
+                    />
+                    </div>
+
+                </v-card-text>
+                <v-divider />
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn text>완료</v-btn>
+                    <v-btn text @click="closePropertiesSetting">취소</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
         <v-dialog
             v-model="isBuilding"
@@ -208,6 +272,7 @@
 
             </v-card>
         </v-dialog>
+
         <v-dialog
             v-model="isTooltipOpen"
             max-width="800"
@@ -266,6 +331,7 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+
         <v-dialog
             v-model="isMapResizerOpen"
             max-width="500"
@@ -284,6 +350,7 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        
     </section>
 </template>
 
@@ -326,6 +393,8 @@ interface Point2 {
     y: number
 }
 
+type Rule = (v: string) => string|boolean
+
 @Component({
     components: {
         ChannelComponent
@@ -340,8 +409,23 @@ export default class SceneMapEditor extends Vue {
     private isTooltipOpen: boolean = false
     private isMapResizerOpen: boolean = false
     private isContextmenuOpen: boolean = false
+    private isPropertiesOpen: boolean = false
 
     private contextmenuOffset: Point2 = { x: 0, y: 0 }
+    private propertyName: string = ''
+    private propertyIsSensor: boolean = false
+    private propertyScale: number = 1
+
+    private propertyOnlyPositiveNumber: Rule = (v: string) => {
+        const n: any = v
+        if (isNaN(n)) {
+            return '숫자만 입력할 수 있습니다'
+        }
+        if (Number(n) <= 0) {
+            return '0보다 큰 수만 입력할 수 있습니다'
+        }
+        return true
+    }
 
     private paletteImages: PaletteImage[]   = []
     private paletteSprites: PaletteSprite[] = []
@@ -361,19 +445,6 @@ export default class SceneMapEditor extends Vue {
                     text: '맵 크기 설정',
                     click: (): void => {
                         this.openMapResizer()
-                    }
-                }
-            ]
-        },
-        {
-            icon: 'mdi-human-edit',
-            description: '액터를 배치합니다',
-            lists: [
-                {
-                    text: '액터 편집하기',
-                    click: (button): void => {
-                        this.setSelectionButton(button)
-                        this.setSelectionType(1)
                     }
                 }
             ]
@@ -422,7 +493,7 @@ export default class SceneMapEditor extends Vue {
         {
             text: '속성',
             click: (): void => {
-                //this.openProperties()
+                this.openPropertiesSetting()
                 this.closeContextmenu()
             }
         },
@@ -537,6 +608,21 @@ export default class SceneMapEditor extends Vue {
         this.isContextmenuOpen = false
     }
 
+    private openPropertiesSetting(): void {
+        if (!this.selectionType) {
+            return
+        }
+
+        this.propertyName = '새로운 이름'
+        this.isPropertiesOpen = true
+        this.propertyScale = 1
+        this.propertyIsSensor = false
+    }
+
+    private closePropertiesSetting(): void {
+        this.isPropertiesOpen = false
+    }
+
 
     private resizeCanvas(): void {
         if (!this.game) {
@@ -590,6 +676,16 @@ export default class SceneMapEditor extends Vue {
         }
         this.selectionType = type
         this.scene.transfer.emit('receive-selection-type', type)
+    }
+
+    private isSelectionType(...types: number[]): boolean {
+        let ret: boolean = false
+        for (const type of types) {
+            if (type === this.selectionType) {
+                return true
+            }
+        }
+        return false
     }
 
     private setDisposeBrush(brush: PaletteImage|PaletteSprite|null): void {

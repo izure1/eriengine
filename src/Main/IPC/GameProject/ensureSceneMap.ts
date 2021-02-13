@@ -11,8 +11,7 @@ async function writeEmptySceneMap(projectDirPath: string, storageKey: string): P
     const map: Engine.GameProject.SceneMap = {
         side: 2000,
         walls: [],
-        floors: [],
-        actors: []
+        floors: []
     }
     return await writeSceneMap(projectDirPath, storageKey, map)
 }

@@ -1,6 +1,11 @@
 interface PathRequired { path: string }
 interface GameProjectState extends PathRequired, Engine.ActionState { config: Engine.GameProject.Config }
 
+interface Point2 {
+    x: number
+    y: number
+}
+
 declare namespace Engine {
     namespace GameProject {
         interface Config extends Engine.Type.Json {
@@ -21,9 +26,8 @@ declare namespace Engine {
 
         interface SceneMap {
             side: number
-            walls:  { name: string, x: number, y: number, scale: number }[]
+            walls:  { name: string, x: number, y: number, scale: number, alias: string, isSensor: boolean }[]
             floors: { name: string, x: number, y: number, scale: number }[]
-            actors: { name: string, x: number, y: number }[]
         }
 
         interface CreateProjectSuccess extends GameProjectState, Engine.ActionSuccessState {}

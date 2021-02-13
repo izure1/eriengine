@@ -15,7 +15,7 @@
     "@eriengine/plugin-dialogue": "^1.0.2",
     "@eriengine/plugin-fog-of-war": "^1.0.2",
     "@eriengine/plugin-isometric-cursor": "^1.0.8",
-    "@eriengine/plugin-isometric-scene": "^1.0.6",
+    "@eriengine/plugin-isometric-scene": "^1.0.7",
     "add-filename-increment": "^1.0.0",
     "an-array-of-english-words": "2.0.0",
     "command-exists": "^1.2.9",

@@ -10,11 +10,15 @@ import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 
 type ScriptCallback = (this: BaseScene, ...args: any) => void
 
+interface Point2 {
+    x: number
+    y: number
+}
+
 interface SceneMap {
     side: number
     walls:  { name: string, x: number, y: number, scale: number }[]
     floors: { name: string, x: number, y: number, scale: number }[]
-    actors: { name: string, x: number, y: number }[]
 }
 
 interface SceneStorage {
@@ -69,7 +73,7 @@ export default class BaseScene extends Phaser.Scene {
     protected fow!: FogOfWarPlugin
 
     protected __scripts: Map<string, ScriptCallback[]> = new Map
-    protected __map: SceneMap = { side: 2000, walls: [], floors: [], actors: [] }
+    protected __map: SceneMap = { side: 2000, walls: [], floors: [] }
 
     /** 게임데이터를 저장하는데 사용된 키 목록입니다 */
     protected get saveKeys(): string[] {

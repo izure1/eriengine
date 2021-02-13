@@ -8,8 +8,7 @@ import {
 export async function handler(projectDirPath: string, storageKey: string, content: Engine.GameProject.SceneMap = {
     side: 2000,
     walls: [],
-    floors: [],
-    actors: []
+    floors: []
 }): Promise<Engine.GameProject.WriteSceneMapSuccess|Engine.GameProject.WriteSceneMapFail> {
     const fileWrite = await addStorageJSON(projectDirPath, storageKey, PROJECT_SRC_STORAGE_SCENE_MAP_DIRECTORY_NAME, PROJECT_SRC_STORAGE_SCENE_MAP_NAME, content)
     if (!fileWrite.success) {

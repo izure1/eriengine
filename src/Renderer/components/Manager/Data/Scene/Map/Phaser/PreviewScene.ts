@@ -70,7 +70,7 @@ export default class PreviewScene extends Phaser.Scene {
     private projectDirectory: string = ''
     private storageKey: string = ''
     private mapFilePath: string = ''
-    private mapData: Engine.GameProject.SceneMap = { side: 2000, actors: [], walls: [], floors: [] }
+    private mapData: Engine.GameProject.SceneMap = { side: 2000, walls: [], floors: [] }
     private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
 
     private requireImages:  PaletteImage[] = []
@@ -240,6 +240,7 @@ export default class PreviewScene extends Phaser.Scene {
         const fillColor: number     = Phaser.Display.Color.GetColor(0, 255, 0)
 
         this.selectionRectangle = this.add.rectangle(0, 0, 0, 0, fillColor, 0.05)
+        this.selectionRectangle.setDepth(Phaser.Math.MAX_SAFE_INTEGER)
     }
 
     private activeSelectionRectangle(activity: boolean): void {
