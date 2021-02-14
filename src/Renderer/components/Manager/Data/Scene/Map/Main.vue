@@ -162,7 +162,8 @@
                     </p>
                     <v-text-field
                         v-model="propertyAlias"
-                        type="number"
+                        @keydown.stop
+                        type="text"
                         filled
                         rounded
                         dense
@@ -175,6 +176,7 @@
                     </p>
                     <v-text-field
                         v-model="propertyScale"
+                        @keydown.stop
                         :rules="[ propertyOnlyPositiveNumber ]"
                         type="number"
                         filled
@@ -609,9 +611,9 @@ export default class SceneMapEditor extends Vue {
             return
         }
         
-        let alias: string = ''
-        let scale: number = 1
-        let isSensor: boolean = false
+        let alias: string
+        let scale: number
+        let isSensor: boolean
 
         const size: number = this.scene.selectionWalls.size
         if (size === 0) {
@@ -619,13 +621,37 @@ export default class SceneMapEditor extends Vue {
             return
         }
 
-        else if (size === 1) {
-            const target = [ ...this.scene.selectionWalls ][0]
-            alias = ''
-            scale = target.scale
-            isSensor = target.isSensor()
+        else {
+            const std = [ ...this.scene.selectionWalls ][0]
+            let isOverlap: boolean = true
 
-            console.log(target)
+            for (const wall of this.scene.selectionWalls) {
+                if (wall.data.get('alias') !== std.data.get('alias')) {
+                    isOverlap = false
+                    break
+                }
+                if (wall.scale !== std.scale) {
+                    isOverlap = false
+                    break
+                }
+                if (wall.isSensor() !== std.isSensor()) {
+                    isOverlap = false
+                    break
+                }
+            }
+
+            // 선택된 모든 오브젝트의 속성이 완벽히 겹칠 경우
+            if (isOverlap) {
+                alias       = std.data.get('alias') || ''
+                scale       = std.scale
+                isSensor    = std.isSensor()
+            }
+            // 하나의 오브젝트의 속성이라도 일치하지 않을 경우 기본값 보여주기
+            else {
+                alias       = ''
+                scale       = 1
+                isSensor    = false
+            }
         }
 
         this.propertyAlias      = alias

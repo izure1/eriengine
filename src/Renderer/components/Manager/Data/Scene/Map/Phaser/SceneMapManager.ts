@@ -61,7 +61,7 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
 
     private createWallData(object: Phaser.Physics.Matter.Sprite): Engine.GameProject.SceneMapWall {
         const { x, y, scale } = object
-        const alias: string = '' // TODO
+        const alias: string = object.data.get('alias') || ''
         const isSensor: boolean = object.isSensor()
 
         return { key: object.texture.key, alias, x, y, scale, isSensor }

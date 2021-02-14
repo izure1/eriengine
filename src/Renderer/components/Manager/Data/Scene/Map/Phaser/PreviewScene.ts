@@ -112,7 +112,7 @@ export default class PreviewScene extends Phaser.Scene {
             }
         }
 
-        return this.getIsometricSideFromWidth(width)
+        return this.getIsometricSideFromWidth(width / 2)
     }
 
     private setCameraMoving(): void {
@@ -123,12 +123,12 @@ export default class PreviewScene extends Phaser.Scene {
 
         this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl({
             camera,
-            left:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-            right:      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-            up:         this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-            down:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-            zoomIn:     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q),
-            zoomOut:    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
+            left:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false),
+            right:      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false),
+            up:         this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, false),
+            down:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false),
+            zoomIn:     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q, false),
+            zoomOut:    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E, false),
             acceleration,
             drag,
             maxSpeed
@@ -166,11 +166,9 @@ export default class PreviewScene extends Phaser.Scene {
         return Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
     }
 
-    private getIsometricSideFromWidth(size: number): number {
+    private getIsometricSideFromWidth(width: number): number {
         const rad: number = Phaser.Math.DegToRad(26.57)
-        const w: number = size / 2
-        const h: number = w / 4
-        return this.getDiagonal(w, h)
+        return width / Math.cos(rad)
     }
 
     private unselectObjects(): void {
@@ -248,6 +246,7 @@ export default class PreviewScene extends Phaser.Scene {
 
             wall.setScale(scale)
             wall.setSensor(isSensor)
+            wall.data.set('alias', alias)
 
             this.mapData.modifyWallData(wall)
         }
@@ -323,13 +322,14 @@ export default class PreviewScene extends Phaser.Scene {
                 break
             
             case 2: {
-                const wall = this.isometric.setWalltile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
+                const wall = this.isometric.setWalltile(x, y, this.disposeBrush!.key, undefined, animsKey)
+                wall.setDataEnabled()
                 this.mapData.insertWallData(wall)
                 break
             }
 
             case 3: {
-                const floor = this.isometric.setFloortile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
+                const floor = this.isometric.setFloortile(x, y, this.disposeBrush!.key, undefined, animsKey)
                 this.mapData.insertFloorData(floor)
                 break
             }
@@ -492,8 +492,6 @@ export default class PreviewScene extends Phaser.Scene {
             if (!success) {
                 return
             }
-
-            console.log(this)
 
             // 맵 파일 감지 시작
             this.generateWatcher()
