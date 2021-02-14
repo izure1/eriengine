@@ -3,7 +3,7 @@ import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
 import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
+import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 
 export default function(width: number, height: number, scene: Phaser.Scene[], parent: HTMLElement): Phaser.Types.Core.GameConfig {
 
@@ -42,12 +42,17 @@ export default function(width: number, height: number, scene: Phaser.Scene[], pa
                 {
                     key: 'IsometricCursorPlugin',
                     mapping: 'cursor',
-                    plugin: IsometricCursorPlugin,
+                    plugin: IsometricCursorPlugin
+                },
+                {
+                    key: 'IsometricSelectPlugin',
+                    mapping: 'select',
+                    plugin: IsometricSelectPlugin
                 },
                 {
                     key: 'FogOfWarPlugin',
                     mapping: 'fow',
-                    plugin: FogOfWarPlugin,
+                    plugin: FogOfWarPlugin
                 }
             ]
         },

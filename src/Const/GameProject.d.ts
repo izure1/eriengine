@@ -6,6 +6,12 @@ interface Point2 {
     y: number
 }
 
+interface SceneMapItem {
+    key: string
+    x: number
+    y: number
+}
+
 declare namespace Engine {
     namespace GameProject {
         interface Config extends Engine.Type.Json {
@@ -24,10 +30,18 @@ declare namespace Engine {
             gameThemeBackgroundColor: string
         }
 
+        interface SceneMapWall extends SceneMapItem {
+            alias: string
+            scale: number
+            isSensor: boolean
+        }
+
+        interface SceneMapFloor extends SceneMapItem {}
+
         interface SceneMap {
             side: number
-            walls:  { name: string, x: number, y: number, scale: number, alias: string, isSensor: boolean }[]
-            floors: { name: string, x: number, y: number, scale: number }[]
+            walls:  SceneMapWall[]
+            floors: SceneMapFloor[]
         }
 
         interface CreateProjectSuccess extends GameProjectState, Engine.ActionSuccessState {}

@@ -1,92 +1,50 @@
 import path from 'path'
 import Phaser from 'phaser'
-import { TypedEmitter } from 'tiny-typed-emitter'
 import { ipcRenderer } from 'electron'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
 import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
+import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { FileWatcher } from '@/Utils/FileWatcher'
+
+import * as Types from './Vars/Types'
+import { SceneDataTransfer } from './SceneDataTransfer'
+import { SceneMapManager } from './SceneMapManager'
 
 import {
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_ASSET_DIRECTORY_NAME
 } from '@/Const'
 
-
-
-export interface PaletteImage {
-    key: string
-    asset: string
-}
-
-export interface PaletteSprite extends PaletteImage {
-    frameWidth: number
-    frameHeight: number
-    frameRate: number
-    start: number
-    end: number
-    repeat: number
-}
-
-interface Point2 {
-    x: number
-    y: number
-}
-
-interface Rect {
-    width: number
-    height: number
-    a: Point2
-    b: Point2
-}
-
-interface DataTransferEvents {
-    'load-map-fail':            (message: string) => void
-    'load-map-success':         (map: Engine.GameProject.SceneMap) => void
-    'receive-map-side':         (side: number) => void
-    'receive-selection-type':   (type: number) => void
-    'receive-dispose-mode':     (activity: boolean) => void
-    'receive-dispose-brush':    (brush: PaletteImage|PaletteSprite|null) => void
-    'receive-image-list':       (list: PaletteImage[]) => void
-    'receive-sprite-list':      (list: PaletteSprite[]) => void
-    'receive-open-properties':  () => void
-    'receive-delete-selection': () => void
-}
-
-class DataTransfer extends TypedEmitter<DataTransferEvents> {}
-
 export default class PreviewScene extends Phaser.Scene {
     private isometric!: IsometricScenePlugin
     private cursor!: IsometricCursorPlugin
+    private select!: IsometricSelectPlugin
     private actor!: ActorPlugin
     private fow!: FogOfWarPlugin
     private dialogue!: DialoguePlugin
 
-    transfer: DataTransfer = new DataTransfer
-    private watcher: FileWatcher|null = null
+    readonly transfer: SceneDataTransfer = new SceneDataTransfer
+    readonly mapData: SceneMapManager = new SceneMapManager({ side: 2000, walls: [], floors: [] })
 
+    private watcher: FileWatcher|null = null
     private projectDirectory: string = ''
     private storageKey: string = ''
     private mapFilePath: string = ''
-    private mapData: Engine.GameProject.SceneMap = { side: 2000, walls: [], floors: [] }
     private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
 
-    private requireImages:  PaletteImage[] = []
-    private requireSprites: PaletteSprite[] = []
+    private requireImages:  Types.PaletteImage[] = []
+    private requireSprites: Types.PaletteSprite[] = []
 
     private shiftKey: Phaser.Input.Keyboard.Key|null = null
 
-    private dragStartOffset: Point2 = { x: 0, y: 0 }
-    private dragEndOffset: Point2 = { x: 0, y: 0 }
+    private dragStartOffset: Types.Point2 = { x: 0, y: 0 }
     private selectionType: number = 0
-    private selectionRectangle: Phaser.GameObjects.Rectangle|null = null
-    private selectionActors: Set<Actor> = new Set
-    private selectionWalls: Set<Phaser.Physics.Matter.Sprite> = new Set
-    private selectionTiles: Set<Phaser.GameObjects.Sprite> = new Set
+    readonly selectionWalls: Set<Phaser.Physics.Matter.Sprite> = new Set
+    readonly selectionTiles: Set<Phaser.GameObjects.Sprite> = new Set
 
-    private disposeBrush: PaletteImage|PaletteSprite|null = null
+    private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
 
     constructor(projectDirectory: string, storageKey: string, filePath: string) {
         super({ key: '__preview-scene__', active: false })
@@ -137,7 +95,7 @@ export default class PreviewScene extends Phaser.Scene {
         let height: number
 
         if (this.isAnimationPalette) {
-            const brush: PaletteSprite = this.disposeBrush as PaletteSprite
+            const brush: Types.PaletteSprite = this.disposeBrush as Types.PaletteSprite
             width   = brush.frameWidth
             height  = brush.frameHeight
         }
@@ -156,34 +114,6 @@ export default class PreviewScene extends Phaser.Scene {
 
         return this.getIsometricSideFromWidth(width)
     }
-
-    private get selectionRange(): Rect {
-        let width: number
-        let height: number
-        let a: Point2
-        let b: Point2
-
-        if (!this.selectionRectangle) {
-            width = 0
-            height = 0
-            a = { x: 0, y: 0 }
-            b = { x: 0, y: 0 }
-        }
-        else {
-            width   = this.selectionRectangle.displayWidth
-            height  = this.selectionRectangle.displayHeight
-            a       = this.selectionRectangle.getTopLeft()
-            b       = this.selectionRectangle.getBottomRight()
-        }
-
-        return {
-            width,
-            height,
-            a,
-            b
-        }
-    }
-
 
     private setCameraMoving(): void {
         const camera                = this.cameras.main
@@ -212,8 +142,15 @@ export default class PreviewScene extends Phaser.Scene {
         this.unselectObjects()
     }
 
-    private setDisposeBrush(brush: PaletteImage|PaletteSprite|null): void {
+    private setDisposeBrush(brush: Types.PaletteImage|Types.PaletteSprite|null): void {
         this.disposeBrush = brush
+
+        if (!this.selectionType) {
+            this.select.enable(false)
+        }
+        else {
+            this.select.enable(!brush)
+        }
     }
 
     private updateDisposeCursor(): void {
@@ -236,92 +173,9 @@ export default class PreviewScene extends Phaser.Scene {
         return this.getDiagonal(w, h)
     }
 
-    private generateSelectionRectangle(): void {
-        const fillColor: number     = Phaser.Display.Color.GetColor(0, 255, 0)
-
-        this.selectionRectangle = this.add.rectangle(0, 0, 0, 0, fillColor, 0.05)
-        this.selectionRectangle.setDepth(Phaser.Math.MAX_SAFE_INTEGER)
-    }
-
-    private activeSelectionRectangle(activity: boolean): void {
-        if (!this.selectionRectangle) {
-            return
-        }
-        if (activity) {
-            if (!this.selectionType) {
-                return
-            }
-            if (this.disposeBrush) {
-                return
-            }
-        }
-        this.selectionRectangle?.setActive(activity)
-        this.selectionRectangle?.setVisible(activity)
-    }
-
-    private setSelectionRectanglePosition({ worldX, worldY }: Phaser.Input.Pointer): void {
-        if (!this.selectionRectangle) {
-            return
-        }
-        if (!this.selectionType) {
-            return
-        }
-        if (this.disposeBrush) {
-            return
-        }
-        this.selectionRectangle.setPosition(worldX, worldY)
-    }
-
-    private updateSelectionRectangleSize(pointer: Phaser.Input.Pointer): void {
-        if (!this.selectionRectangle) {
-            return
-        }
-        if (!this.selectionType) {
-            return
-        }
-        if (this.disposeBrush) {
-            return
-        }
-        const distanceX: number = pointer.worldX - this.selectionRectangle.x
-        const distanceY: number = pointer.worldY - this.selectionRectangle.y
-        const width: number     = Math.abs(distanceX)
-        const height: number    = Math.abs(distanceY)
-
-        const originX: number = distanceX > 0 ? 0 : 1
-        const originY: number = distanceY > 0 ? 0 : 1
-
-        this.selectionRectangle.setSize(width, height)
-        this.selectionRectangle.setOrigin(originX, originY)
-    }
-
-    private destroySelectionRectangle(): void {
-        if (!this.selectionRectangle) {
-            return
-        }
-        this.selectionRectangle.destroy()
-        this.selectionRectangle = null
-    }
-
-    private getObjectInRect<T extends Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Transform>(rect: Rect, objects: T[]): T[] {
-        const { width, height, a, b } = rect
-        
-        const list: T[] = []
-        for (const object of objects) {
-            const { x, y } = object
-            if (
-                x > a.x && x < b.x &&
-                y > a.y && y < b.y
-            ) {
-                list.push(object)
-            }
-        }
-        return list
-    }
-
     private unselectObjects(): void {
-        for (const actor of this.selectionActors) {
-            actor.clearTint()
-        }
+        this.select.unselect()
+
         for (const wall of this.selectionWalls) {
             wall.clearTint()
         }
@@ -329,12 +183,11 @@ export default class PreviewScene extends Phaser.Scene {
             tile.clearTint()
         }
 
-        this.selectionActors.clear()
         this.selectionWalls.clear()
         this.selectionTiles.clear()
     }
 
-    private selectObjects(): void {
+    private selectObjects(e: Phaser.Input.Pointer, selection: Types.Rect): void {
         if (!this.selectionType) {
             return
         }
@@ -342,44 +195,66 @@ export default class PreviewScene extends Phaser.Scene {
             return
         }
 
-        const fillColor: number = Phaser.Display.Color.GetColor32(255, 0, 0, 5)
+        const fillColor: number = Phaser.Display.Color.GetColor(255, 0, 0)
 
         switch (this.selectionType) {
             case 1:
                 break
             case 2: {
-                this.getObjectInRect(this.selectionRange, this.isometric.walls).forEach((wall): void => {
+                const walls: Phaser.Physics.Matter.Sprite[] = this.select.select(selection, this.isometric.walls) as Phaser.Physics.Matter.Sprite[]
+                for (const wall of walls) {
                     wall.setTint(fillColor)
                     this.selectionWalls.add(wall)
-                })
+                }
                 break
             }
             case 3: {
-                this.getObjectInRect(this.selectionRange, this.isometric.tiles).forEach((tile): void => {
+                const tiles: Phaser.GameObjects.Sprite[] = this.select.select(selection, this.isometric.tiles) as Phaser.GameObjects.Sprite[]
+                for (const tile of tiles) {
                     tile.setTint(fillColor)
                     this.selectionTiles.add(tile)
-                })
+                }
                 break
             }
         }
     }
 
     private deleteSelectionObjects(): void {
-        this.selectionActors.forEach((actor): void => {
-            actor.destroy()
-        })
-
         this.selectionWalls.forEach((wall): void => {
+            this.mapData.dropWallData(wall)
             wall.destroy()
         })
 
         this.selectionTiles.forEach((tile): void => {
+            this.mapData.dropFloorData(tile)
             tile.destroy()
         })
 
-        this.selectionActors.clear()
         this.selectionWalls.clear()
         this.selectionTiles.clear()
+    }
+
+    private setItemProperties({ alias, scale, isSensor }: Types.PaletteProperties): void {
+        for (const wall of this.selectionWalls) {
+            scale = Number(scale)
+            isSensor = Boolean(isSensor)
+
+            // 올바르지 않은 값이 넘어왔을 경우 객체를 삭제하고 데이터에서도 제거함
+            if (isNaN(scale) || typeof scale !== 'number') {
+                wall.destroy()
+                this.selectionWalls.delete(wall)
+                continue
+            }
+
+            wall.setScale(scale)
+            wall.setSensor(isSensor)
+
+            this.mapData.modifyWallData(wall)
+        }
+    }
+
+    private getCoordKey(x: number, y: number): string {
+        return `${x},${y}`
     }
 
     private dispose(e: Phaser.Input.Pointer): void {
@@ -439,7 +314,7 @@ export default class PreviewScene extends Phaser.Scene {
         let animsKey: string|undefined = undefined
 
         if (this.isAnimationPalette) {
-            const brush: PaletteSprite = this.disposeBrush as PaletteSprite
+            const brush: Types.PaletteSprite = this.disposeBrush as Types.PaletteSprite
             animsKey = brush.key
         }
 
@@ -447,13 +322,17 @@ export default class PreviewScene extends Phaser.Scene {
             case 1:
                 break
             
-            case 2:
-                this.isometric.setWalltile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
+            case 2: {
+                const wall = this.isometric.setWalltile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
+                this.mapData.insertWallData(wall)
                 break
+            }
 
-            case 3:
-                this.isometric.setFloortile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
+            case 3: {
+                const floor = this.isometric.setFloortile(x, y, this.cursorSide, this.disposeBrush!.key, undefined, animsKey)
+                this.mapData.insertFloorData(floor)
                 break
+            }
         }
     }
 
@@ -502,10 +381,6 @@ export default class PreviewScene extends Phaser.Scene {
         this.dragStartOffset = { x: worldX, y: worldY }
     }
 
-    private updateDragEndOffset({ worldX, worldY }: Phaser.Input.Pointer): void {
-        this.dragEndOffset = { x: worldX, y: worldY }
-    }
-
     private onMouseLeftDown(e: Phaser.Input.Pointer): void {
         this.updateDragStartOffset(e)
         this.dispose(e)
@@ -513,20 +388,13 @@ export default class PreviewScene extends Phaser.Scene {
         if (!e.event.shiftKey) {
             this.unselectObjects()
         }
-        this.setSelectionRectanglePosition(e)
-        this.updateSelectionRectangleSize(e)
-        this.activeSelectionRectangle(true)
     }
 
     private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
         this.dispose(e)
-        this.updateSelectionRectangleSize(e)
     }
 
     private onMouseLeftUp(e: Phaser.Input.Pointer): void {
-        this.updateDragEndOffset(e)
-        this.activeSelectionRectangle(false)
-        this.selectObjects()
     }
     
     private onMouseRightDown(e: Phaser.Input.Pointer): void {
@@ -541,7 +409,7 @@ export default class PreviewScene extends Phaser.Scene {
             this.transfer.emit('load-map-fail', sceneMapRead.message)
             return false
         }
-        this.mapData = sceneMapRead.content
+        this.mapData.setData(sceneMapRead.content)
         this.transfer.emit('load-map-success', this.mapData)
         return true
     }
@@ -589,18 +457,23 @@ export default class PreviewScene extends Phaser.Scene {
         // 데이터 송수신 인스턴스 이벤트 할당
         this.transfer
         .on('receive-map-side', (side: number): void => {
-            this.isometric.setWorldSize(side)
+            this.mapData.modifySide(side)
+            this.isometric.setWorldSize(this.mapData.side)
         })
         .on('receive-selection-type', (type: number): void => {
             this.setSelectionType(type)
+            this.setDisposeBrush(this.disposeBrush)
             this.updateDisposeCursor()
         })
-        .on('receive-dispose-brush', (brush: PaletteImage|PaletteSprite|null): void => {
-            this.disposeBrush = brush
+        .on('receive-dispose-brush', (brush: Types.PaletteImage|Types.PaletteSprite|null): void => {
+            this.setDisposeBrush(brush)
             this.updateDisposeCursor()
         })
         .on('receive-delete-selection', (): void => {
             this.deleteSelectionObjects()
+        })
+        .on('receive-properties', (properties: Types.PaletteProperties): void => {
+            this.setItemProperties(properties)
         })
     }
 
@@ -620,7 +493,7 @@ export default class PreviewScene extends Phaser.Scene {
                 return
             }
 
-            this.generateSelectionRectangle()
+            console.log(this)
 
             // 맵 파일 감지 시작
             this.generateWatcher()
@@ -639,6 +512,9 @@ export default class PreviewScene extends Phaser.Scene {
             // 플러그인 설정
             this.isometric.setWorldSize(this.mapData.side)
             this.cursor.enableCoordinate(true)
+            this.select.enable(false)
+
+            this.select.events.on('drag-end', this.selectObjects.bind(this))
         })
     
         this.events.once(Phaser.Scenes.Events.DESTROY, this.onDestroy.bind(this))
@@ -651,6 +527,5 @@ export default class PreviewScene extends Phaser.Scene {
     private onDestroy(): void {
         this.destroyCamera()
         this.destroyWatcher()
-        this.destroySelectionRectangle()
     }
 }

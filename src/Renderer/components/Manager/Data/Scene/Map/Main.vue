@@ -156,22 +156,20 @@
                 <v-card-title>속성</v-card-title>
                 <v-card-text>
 
-                    <div v-if="isSelectionType(1, 2)">
-                    <v-subheader>별칭(alias)</v-subheader>
+                    <v-subheader>별칭</v-subheader>
                     <p class="text-caption">
                         별칭을 정합니다. 프로그래밍에서 이용됩니다.
                     </p>
                     <v-text-field
-                        v-model="propertyName"
+                        v-model="propertyAlias"
                         type="number"
                         filled
                         rounded
                         dense
                     />
-                    </div>
                     
                     <v-divider />
-                    <v-subheader>비율(scale)</v-subheader>
+                    <v-subheader>비율</v-subheader>
                     <p class="text-caption">
                         가로세로비를 유지한 채 크기를 조절합니다.
                     </p>
@@ -184,9 +182,8 @@
                         dense
                     />
 
-                    <div v-if="isSelectionType(2)">
                     <v-divider />
-                    <v-subheader>센서(isSensor)</v-subheader>
+                    <v-subheader>센서</v-subheader>
                     <p class="text-caption">
                         실제로 충돌하지 않지만, 이벤트를 얻어낼 수 있습니다.
                         <br>
@@ -198,13 +195,12 @@
                         inset
                         dense
                     />
-                    </div>
 
                 </v-card-text>
                 <v-divider />
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn text>완료</v-btn>
+                    <v-btn text @click="savePropertiesSetting">완료</v-btn>
                     <v-btn text @click="closePropertiesSetting">취소</v-btn>
                 </v-card-actions>
             </v-card>
@@ -367,10 +363,7 @@ import PreviewScene from './Phaser/PreviewScene'
 import createConfig from './Phaser/createConfig'
 
 import ChannelComponent from '@/Renderer/components/Shell/Channel.vue'
-import {
-    PaletteImage,
-    PaletteSprite
-} from './Phaser/PreviewScene'
+import * as Types from './Phaser/Vars/Types'
 import {
     PROJECT_SRC_DATA_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME
@@ -386,11 +379,6 @@ interface ActionButton {
     icon: string
     description: string
     lists: ActionList[]
-}
-
-interface Point2 {
-    x: number
-    y: number
 }
 
 type Rule = (v: string) => string|boolean
@@ -411,8 +399,8 @@ export default class SceneMapEditor extends Vue {
     private isContextmenuOpen: boolean = false
     private isPropertiesOpen: boolean = false
 
-    private contextmenuOffset: Point2 = { x: 0, y: 0 }
-    private propertyName: string = ''
+    private contextmenuOffset: Types.Point2 = { x: 0, y: 0 }
+    private propertyAlias: string = ''
     private propertyIsSensor: boolean = false
     private propertyScale: number = 1
 
@@ -427,13 +415,13 @@ export default class SceneMapEditor extends Vue {
         return true
     }
 
-    private paletteImages: PaletteImage[]   = []
-    private paletteSprites: PaletteSprite[] = []
-    private paletteBrush: PaletteImage|null = null
+    private paletteImages: Types.PaletteImage[]   = []
+    private paletteSprites: Types.PaletteSprite[] = []
+    private paletteBrush: Types.PaletteImage|null = null
 
     private selectionButton: ActionButton|null = null
     private selectionType: number = 0
-    private disposeBrush: PaletteImage|PaletteSprite|null = null
+    private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
     private mapSceneSide: number = 2000
 
     private buttons: ActionButton[] = [
@@ -493,15 +481,19 @@ export default class SceneMapEditor extends Vue {
         {
             text: '속성',
             click: (): void => {
-                this.openPropertiesSetting()
                 this.closeContextmenu()
+                if (!this.isSelectionType(2)) {
+                    this.$store.dispatch('snackbar', '속성은 벽 타일만 사용할 수 있습니다')
+                    return
+                }
+                this.openPropertiesSetting()
             }
         },
         {
             text: '삭제',
             click: (): void => {
-                this.requestDeleteSelection()
                 this.closeContextmenu()
+                this.requestDeleteSelection()
             }
         }
     ]
@@ -526,10 +518,10 @@ export default class SceneMapEditor extends Vue {
         return this.$refs['game-canvas'] as HTMLElement
     }
 
-    private get palettes(): (PaletteImage|PaletteSprite)[] {
+    private get palettes(): (Types.PaletteImage|Types.PaletteSprite)[] {
         return [
-            ...Object.values(this.paletteSprites) as PaletteSprite[],
-            ...Object.values(this.paletteImages) as PaletteImage[]
+            ...Object.values(this.paletteSprites) as Types.PaletteSprite[],
+            ...Object.values(this.paletteImages) as Types.PaletteImage[]
         ]
     }
 
@@ -613,10 +605,48 @@ export default class SceneMapEditor extends Vue {
             return
         }
 
-        this.propertyName = '새로운 이름'
-        this.isPropertiesOpen = true
-        this.propertyScale = 1
-        this.propertyIsSensor = false
+        if (!this.scene) {
+            return
+        }
+        
+        let alias: string = ''
+        let scale: number = 1
+        let isSensor: boolean = false
+
+        const size: number = this.scene.selectionWalls.size
+        if (size === 0) {
+            this.$store.dispatch('snackbar', '먼저 대상을 선택해주세요')
+            return
+        }
+
+        else if (size === 1) {
+            const target = [ ...this.scene.selectionWalls ][0]
+            alias = ''
+            scale = target.scale
+            isSensor = target.isSensor()
+
+            console.log(target)
+        }
+
+        this.propertyAlias      = alias
+        this.propertyScale      = scale
+        this.propertyIsSensor   = isSensor
+
+        this.isPropertiesOpen   = true
+    }
+
+    private savePropertiesSetting(): void {
+        if (!this.scene) {
+            return
+        }
+
+        this.scene.transfer.emit('receive-properties', {
+            alias: this.propertyAlias,
+            scale: this.propertyScale,
+            isSensor: this.propertyIsSensor
+        })
+
+        this.closePropertiesSetting()
     }
 
     private closePropertiesSetting(): void {
@@ -688,7 +718,7 @@ export default class SceneMapEditor extends Vue {
         return false
     }
 
-    private setDisposeBrush(brush: PaletteImage|PaletteSprite|null): void {
+    private setDisposeBrush(brush: Types.PaletteImage|Types.PaletteSprite|null): void {
         if (!this.scene) {
             return
         }
@@ -743,8 +773,8 @@ export default class SceneMapEditor extends Vue {
             const spriteModule  = __non_webpack_require__(spriteModulePath)
             const imageModule   = __non_webpack_require__(imageModulePath)
 
-            this.paletteSprites = Object.values(spriteModule) as PaletteSprite[]
-            this.paletteImages  = Object.values(imageModule) as PaletteImage[]
+            this.paletteSprites = Object.values(spriteModule) as Types.PaletteSprite[]
+            this.paletteImages  = Object.values(imageModule) as Types.PaletteImage[]
 
         } catch(e) {
             this.isBuiltFail = true

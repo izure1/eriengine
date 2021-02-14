@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { Plugin as IsometricCursorPlugin } from '@eriengine/plugin-isometric-cursor'
+import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 
@@ -17,8 +17,8 @@ interface Point2 {
 
 interface SceneMap {
     side: number
-    walls:  { name: string, x: number, y: number, scale: number }[]
-    floors: { name: string, x: number, y: number, scale: number }[]
+    walls:  { name: string, alias: string, x: number, y: number, scale: number, isSensor: boolean }[]
+    floors: { name: string, x: number, y: number }[]
 }
 
 interface SceneStorage {
@@ -69,6 +69,7 @@ export default class BaseScene extends Phaser.Scene {
     protected actor!: ActorPlugin
     protected isometric!: IsometricScenePlugin
     protected cursor!: IsometricCursorPlugin
+    protected select!: IsometricSelectPlugin
     protected dialogue!: DialoguePlugin
     protected fow!: FogOfWarPlugin
 
