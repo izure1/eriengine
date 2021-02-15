@@ -11,6 +11,6 @@
     "gameDisplayResizable": {{ gameDisplayResizable }},
     "gameThemeTextColor": "{{ gameThemeTextColor }}",
     "gameThemeBackgroundColor": "{{ gameThemeBackgroundColor }}",
-    "dependencies": {
-    }
+    "dependencies": {},
+    "devDependencies": {}
 }

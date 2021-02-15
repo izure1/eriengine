@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import BaseActor from '@/BaseActor'
 
 {{ DATA_LISTS }}
 
@@ -65,7 +66,7 @@ export function onActorEnd(this: Actor): void {
  *  @param target       적중시킨 대상 액터입니다.
  *  @param information  적중시킨 스킬에 대한 정보입니다.
  */
-export function onActorHit(this: Actor, target: Actor, information: object): void {
+export function onActorHit(this: Actor, target: BaseActor, information: object): void {
     {{ onActorHit }}
 }
 
@@ -74,7 +75,7 @@ export function onActorHit(this: Actor, target: Actor, information: object): voi
  *  @param from         적중당한 스킬을 사용한 대상 액터입니다.
  *  @param information  적중당한 스킬에 대한 정보입니다.
  */
-export function onActorGetHit(this: Actor, from: Actor, information: object): void {
+export function onActorGetHit(this: Actor, from: BaseActor, information: object): void {
     {{ onActorGetHit }}
 }
 
@@ -84,7 +85,7 @@ export function onActorGetHit(this: Actor, from: Actor, information: object): vo
  *  패배를 선언하게 되면, 이 액터와 교전하고 있던 대상 액터들은 승리하게 될 것입니다.
  *  @param from  액터와 교전하고 있던 대상 액터들입니다.
  */
-export function onActorDefeat(this: Actor, ...from: Actor[]): void {
+export function onActorDefeat(this: Actor, ...from: BaseActor[]): void {
     {{ onActorDefeat }}
 }
 
@@ -93,6 +94,76 @@ export function onActorDefeat(this: Actor, ...from: Actor[]): void {
  *  교전하고 있던 대상 액터가 패배를 선언하면, 이 액터는 승리하게 됩니다.
  *  @param from  패배를 선언한 대상 액터입니다.
  */
-export function onActorWin(this: Actor, from: Actor): void {
+export function onActorWin(this: Actor, from: BaseActor): void {
     {{ onActorWin }}
+}
+
+
+
+//   ██████╗ ██████╗ ██╗     ██╗     ██╗██████╗ ███████╗
+//  ██╔════╝██╔═══██╗██║     ██║     ██║██╔══██╗██╔════╝
+//  ██║     ██║   ██║██║     ██║     ██║██║  ██║█████╗  
+//  ██║     ██║   ██║██║     ██║     ██║██║  ██║██╔══╝  
+//  ╚██████╗╚██████╔╝███████╗███████╗██║██████╔╝███████╗
+//   ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝╚═════╝ ╚══════╝
+//                                                      
+//  여기서부터 물리 충돌 관련 함수입니다.
+
+/**
+ *  액터가 다른 액터와 충돌했을 때 호출될 함수입니다.
+ *  @param data  충돌과 관련된 물리 정보입니다.
+ *  @param pair  충돌한 대상 액터입니다.
+ */
+export function onCollideWithActorStart(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: BaseActor): void {
+    {{ onCollideWithActorStart }}
+}
+
+/**
+ *  액터가 다른 액터와 충돌하고 있는 동안 호출될 함수입니다.
+ *  이 함수는 두 액터가 서로 떨어지기 전까지 매 프레임 업데이트마다 호출됩니다.
+ *  @param data  충돌과 관련된 물리 정보입니다.
+ *  @param pair  충돌한 대상 액터입니다.
+ */
+export function onCollideWithActorActive(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: BaseActor): void {
+    {{ onCollideWithActorActive }}
+}
+
+/**
+ *  액터가 다른 액터와 충돌이 끝났을 때 호출될 함수입니다.
+ *  @param data  충돌과 관련된 물리 정보입니다.
+ *  @param pair  충돌한 대상 액터입니다.
+ */
+export function onCollideWithActorEnd(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: BaseActor): void {
+    {{ onCollideWithActorEnd }}
+}
+
+/**
+ *  액터가 벽, 또는 센서와 충돌했을 때 호출될 함수입니다.
+ *  @param data     충돌과 관련된 물리 정보입니다.
+ *  @param pair     충돌한 대상 벽, 또는 센서입니다.
+ *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
+ */
+export function onCollideWithWallStart(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
+    {{ onCollideWithWallStart }}
+}
+
+/**
+ *  액터가 벽, 또는 센서와 충돌하고 있는 동안 호출될 함수입니다.
+ *  이 함수는 액터가 떨어지기 전까지 매 프레임 업데이트마다 호출됩니다.
+ *  @param data     충돌과 관련된 물리 정보입니다.
+ *  @param pair     충돌한 대상 벽, 또는 센서입니다.
+ *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
+ */
+export function onCollideWithWallActive(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
+    {{ onCollideWithWallActive }}
+}
+
+/**
+ *  액터가 벽, 또는 센서와 충돌이 끝났을 때 호출될 함수입니다.
+ *  @param data     충돌과 관련된 물리 정보입니다.
+ *  @param pair     충돌한 대상 벽, 또는 센서입니다.
+ *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
+ */
+export function onCollideWithWallEnd(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
+    {{ onCollideWithWallEnd }}
 }

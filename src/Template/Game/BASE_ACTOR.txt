@@ -75,5 +75,63 @@ export default abstract class BaseActor extends Actor {
         }
         callbacks.forEach((callback): void => callback.call(this, ...args))
     }
+
+    private getPairCollider(e: Phaser.Types.Physics.Matter.MatterCollisionData): Phaser.GameObjects.GameObject|null {
+        const { bodyA, bodyB } = e
+        for (const body of [ bodyA, bodyB ]) {
+            const { gameObject } = body
+            if (!gameObject) {
+                continue
+            }
+            if (body === this.body) {
+                continue
+            }
+            return gameObject
+        }
+        return null
+    }
+
+    protected attachCollideEvent(): void {
+
+        this.setOnCollide((e: Phaser.Types.Physics.Matter.MatterCollisionData): void => {
+            const pair = this.getPairCollider(e)
+            if (!pair) {
+                return
+            }
+            if (pair instanceof BaseActor) {
+                this.runScript(this.__scripts.get('onCollideWithActorStart'), e, pair)
+            }
+            if (pair.data && pair.data.has('alias')) {
+                this.runScript(this.__scripts.get('onCollideWithWallStart'), e, pair, pair.data.get('alias'))
+            }
+        })
+
+        this.setOnCollideActive((e: Phaser.Types.Physics.Matter.MatterCollisionData): void => {
+            const pair = this.getPairCollider(e)
+            if (!pair) {
+                return
+            }
+            if (pair instanceof BaseActor) {
+                this.runScript(this.__scripts.get('onCollideWithActorActive'), e, pair)
+            }
+            if (pair.data && pair.data.has('alias')) {
+                this.runScript(this.__scripts.get('onCollideWithWallActive'), e, pair, pair.data.get('alias'))
+            }
+        })
+        
+        this.setOnCollideEnd((e: Phaser.Types.Physics.Matter.MatterCollisionData): void => {
+            const pair = this.getPairCollider(e)
+            if (!pair) {
+                return
+            }
+            if (pair instanceof BaseActor) {
+                this.runScript(this.__scripts.get('onCollideWithActorEnd'), e, pair)
+            }
+            if (pair.data && pair.data.has('alias')) {
+                this.runScript(this.__scripts.get('onCollideWithWallEnd'), e, pair, pair.data.get('alias'))
+            }
+        })
+
+    }
     
 }
