@@ -17,8 +17,8 @@ interface Point2 {
 
 interface SceneMap {
     side: number
-    walls:  { name: string, alias: string, x: number, y: number, scale: number, isSensor: boolean }[]
-    floors: { name: string, x: number, y: number }[]
+    walls:  { key: string, alias: string, x: number, y: number, scale: number, isSensor: boolean }[]
+    floors: { key: string, x: number, y: number }[]
 }
 
 interface SceneStorage {
@@ -176,6 +176,29 @@ export default class BaseScene extends Phaser.Scene {
                 frameRate,
                 repeat
             })
+        }
+    }
+
+    protected createMap(): void {
+        this.isometric.setWorldSize(this.__map.side)
+
+        for (const { key, alias, x, y, scale, isSensor } of this.__map.walls)  {
+            let animsKey: string|undefined
+            if (this.anims.exists(key)) {
+                animsKey = key
+            }
+            const wall = this.isometric.setWalltile(x, y, key, undefined, animsKey)
+            wall.setScale(scale)
+            wall.setSensor(isSensor)
+            wall.setDataEnabled()
+            wall.data.set('alias', alias)
+        }
+        for (const { key, x, y } of this.__map.floors) {
+            let animsKey: string|undefined
+            if (this.anims.exists(key)) {
+                animsKey = key
+            }
+            this.isometric.setFloortile(x, y, key, undefined, animsKey)
         }
     }
 

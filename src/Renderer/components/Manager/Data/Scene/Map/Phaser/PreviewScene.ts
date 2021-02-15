@@ -6,7 +6,6 @@ import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
-import { FileWatcher } from '@/Utils/FileWatcher'
 
 import * as Types from './Vars/Types'
 import { SceneDataTransfer } from './SceneDataTransfer'
@@ -28,10 +27,8 @@ export default class PreviewScene extends Phaser.Scene {
     readonly transfer: SceneDataTransfer = new SceneDataTransfer
     readonly mapData: SceneMapManager = new SceneMapManager({ side: 2000, walls: [], floors: [] })
 
-    private watcher: FileWatcher|null = null
     private projectDirectory: string = ''
     private storageKey: string = ''
-    private mapFilePath: string = ''
     private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
 
     private requireImages:  Types.PaletteImage[] = []
@@ -46,12 +43,11 @@ export default class PreviewScene extends Phaser.Scene {
 
     private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
 
-    constructor(projectDirectory: string, storageKey: string, filePath: string) {
+    constructor(projectDirectory: string, storageKey: string) {
         super({ key: '__preview-scene__', active: false })
 
         this.projectDirectory = projectDirectory
         this.storageKey = storageKey
-        this.mapFilePath = filePath
 
         this.transfer
         .on('receive-image-list', (list): void => {
@@ -79,13 +75,6 @@ export default class PreviewScene extends Phaser.Scene {
         return true
     }
 
-    private get isAnimationPalette(): boolean {
-        if (!this.isDisposeEnable) {
-            return false
-        }
-        return Object.prototype.hasOwnProperty.call(this.disposeBrush, 'frameWidth')
-    }
-
     private get cursorSide(): number {
         if (!this.isDisposeEnable) {
             return 0
@@ -94,7 +83,7 @@ export default class PreviewScene extends Phaser.Scene {
         let width: number
         let height: number
 
-        if (this.isAnimationPalette) {
+        if (this.isAnimationPalette(this.disposeBrush!.key)) {
             const brush: Types.PaletteSprite = this.disposeBrush as Types.PaletteSprite
             width   = brush.frameWidth
             height  = brush.frameHeight
@@ -113,6 +102,31 @@ export default class PreviewScene extends Phaser.Scene {
         }
 
         return this.getIsometricSideFromWidth(width / 2)
+    }
+
+    private getPaletteFromKey(key: string): Types.PaletteImage|Types.PaletteSprite|null {
+        const map: Map<string, Types.PaletteImage|Types.PaletteSprite> = new Map
+
+        for (const image of this.requireImages) {
+            map.set(image.key, image)
+        }
+        for (const sprite of this.requireSprites) {
+            map.set(sprite.key, sprite)
+        }
+
+        if (!map.has(key)) {
+            return null
+        }
+        
+        return map.get(key)!
+    }
+
+    private isAnimationPalette(key: string): boolean {
+        const palette: Types.PaletteImage|Types.PaletteSprite|null = this.getPaletteFromKey(key)
+        if (!palette) {
+            return false
+        }
+        return Object.prototype.hasOwnProperty.call(this.getPaletteFromKey(key)!, 'frameWidth')
     }
 
     private setCameraMoving(): void {
@@ -232,108 +246,91 @@ export default class PreviewScene extends Phaser.Scene {
         this.selectionTiles.clear()
     }
 
-    private setItemProperties({ alias, scale, isSensor }: Types.PaletteProperties): void {
-        for (const wall of this.selectionWalls) {
-            scale = Number(scale)
-            isSensor = Boolean(isSensor)
+    private setWallProperties(wall: Phaser.Physics.Matter.Sprite, { alias, scale, isSensor }: Types.PaletteProperties): void {
+        scale = Number(scale)
+        isSensor = Boolean(isSensor)
 
-            // 올바르지 않은 값이 넘어왔을 경우 객체를 삭제하고 데이터에서도 제거함
-            if (isNaN(scale) || typeof scale !== 'number') {
-                wall.destroy()
-                this.selectionWalls.delete(wall)
-                continue
-            }
-
-            wall.setScale(scale)
-            wall.setSensor(isSensor)
-            wall.data.set('alias', alias)
-
-            this.mapData.modifyWallData(wall)
-        }
-    }
-
-    private getCoordKey(x: number, y: number): string {
-        return `${x},${y}`
-    }
-
-    private dispose(e: Phaser.Input.Pointer): void {
-        if (!this.isDisposeEnable) {
+        // 올바르지 않은 값이 넘어왔을 경우 객체를 삭제하고 데이터에서도 제거함
+        if (isNaN(scale) || typeof scale !== 'number') {
+            this.mapData.dropWallData(wall)
+            wall.destroy()
             return
         }
 
-        // shift키를 누른 상태로 작업했을 시, 직선으로 계산함
-        let x: number
-        let y: number
-        if (e.event.shiftKey) {
-            const startOffset: Point2 = this.cursor.calcCursorOffset(this.dragStartOffset)
-            const distanceX: number = e.worldX - startOffset.x
-            const distanceY: number = e.worldY - startOffset.y
-            
-            // 정확히 상하/좌우로 이동하거나, 이동하지 않았을 경우
-            if (distanceX === 0 || distanceY === 0) {
-                x = this.cursor.pointerX
-                y = this.cursor.pointerY
-            }
-            else {
-                let deg: number
-                const distance: number  = this.getDiagonal(distanceX, distanceY)
+        wall.setScale(scale)
+        wall.setSensor(isSensor)
+        wall.data.set('alias', alias)
 
-                // ↗
-                if (distanceX > 0 && distanceY < 0) {
-                    deg = -26.57
-                }
-                // ↘
-                else if (distanceX > 0 && distanceY > 0) {
-                    deg = 26.57
-                }
-                // ↙
-                else if (distanceX < 0 && distanceY > 0) {
-                    deg = 180 - 26.57
-                }
-                // ↖
-                else {
-                    deg = 180 + 26.57
-                }
+        this.mapData.modifyWallData(wall)
+    }
 
-                const rad: number = Phaser.Math.DegToRad(deg)
-                const offset: Point2 = this.cursor.calcCursorOffset({
-                    x: Math.cos(rad) * distance,
-                    y: Math.sin(rad) * distance
-                })
+    private calcStraightDisposeOffset(x: number, y: number): Types.Point2 {
+        const startOffset: Point2 = this.cursor.calcCursorOffset(this.dragStartOffset)
+        const distanceX: number = x - startOffset.x
+        const distanceY: number = y - startOffset.y
+        
+        let deg: number
+        const distance: number  = this.getDiagonal(distanceX, distanceY)
 
-                x = startOffset.x + offset.x
-                y = startOffset.y + offset.y
-            }
+        // ↗
+        if (distanceX > 0 && distanceY < 0) {
+            deg = -26.57
         }
+        // ↘
+        else if (distanceX > 0 && distanceY > 0) {
+            deg = 26.57
+        }
+        // ↙
+        else if (distanceX < 0 && distanceY > 0) {
+            deg = 180 - 26.57
+        }
+        // ↖
         else {
-            x = this.cursor.pointerX
-            y = this.cursor.pointerY
+            deg = 180 + 26.57
+        }
+
+        const rad: number = Phaser.Math.DegToRad(deg)
+        const offset: Point2 = this.cursor.calcCursorOffset({
+            x: Math.cos(rad) * distance,
+            y: Math.sin(rad) * distance
+        })
+
+        x = startOffset.x + offset.x
+        y = startOffset.y + offset.y
+
+        return { x, y }
+    }
+
+    private dispose(x: number, y: number, type: number, brushKey: string): Phaser.GameObjects.GameObject|null {
+        if (!this.getPaletteFromKey(brushKey)) {
+            return null
         }
 
         let animsKey: string|undefined = undefined
 
-        if (this.isAnimationPalette) {
-            const brush: Types.PaletteSprite = this.disposeBrush as Types.PaletteSprite
-            animsKey = brush.key
+        if (this.isAnimationPalette(brushKey)) {
+            animsKey = brushKey
         }
 
-        switch (this.selectionType) {
+        switch (type) {
             case 1:
                 break
             
             case 2: {
-                const wall = this.isometric.setWalltile(x, y, this.disposeBrush!.key, undefined, animsKey)
+                const wall = this.isometric.setWalltile(x, y, brushKey, undefined, animsKey)
                 wall.setDataEnabled()
                 this.mapData.insertWallData(wall)
-                break
+                return wall
             }
 
             case 3: {
-                const floor = this.isometric.setFloortile(x, y, this.disposeBrush!.key, undefined, animsKey)
+                const floor = this.isometric.setFloortile(x, y, brushKey, undefined, animsKey)
                 this.mapData.insertFloorData(floor)
-                break
+                return floor
             }
         }
+
+        return null
     }
 
     private updateCamera(delta: number): void {
@@ -346,11 +343,6 @@ export default class PreviewScene extends Phaser.Scene {
 
     private destroyCamera(): void {
         this.cameraControl?.destroy()
-    }
-
-    private generateWatcher(): void {
-        this.destroyWatcher()
-        this.watcher = new FileWatcher(this.mapFilePath, false).update(this.onMapDataChange.bind(this)).start().emit()
     }
 
     private generateAnimation(): void {
@@ -368,30 +360,40 @@ export default class PreviewScene extends Phaser.Scene {
         }
     }
 
-    private async onMapDataChange(): Promise<void> {
-        await this.generateMapData()
-    }
-
-    private destroyWatcher(): void {
-        this.watcher?.destroy()
-        this.watcher = null
-    }
-
     private updateDragStartOffset({ worldX, worldY }: Phaser.Input.Pointer): void {
         this.dragStartOffset = { x: worldX, y: worldY }
     }
 
     private onMouseLeftDown(e: Phaser.Input.Pointer): void {
         this.updateDragStartOffset(e)
-        this.dispose(e)
 
+        // dispose brush
+        if (this.disposeBrush) {
+            let { x, y } = this.cursor.calcCursorOffset({ x: e.worldX, y: e.worldY })
+            if (e.event.shiftKey) {
+                const offset = this.calcStraightDisposeOffset(x, y)
+                x = offset.x
+                y = offset.y
+            }
+            this.dispose(x, y, this.selectionType, this.disposeBrush.key)
+        }
         if (!e.event.shiftKey) {
             this.unselectObjects()
         }
     }
 
     private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
-        this.dispose(e)
+
+        // dispose brush
+        if (this.disposeBrush) {
+            let { x, y } = this.cursor.calcCursorOffset({ x: e.worldX, y: e.worldY })
+            if (e.event.shiftKey) {
+                const offset = this.calcStraightDisposeOffset(x, y)
+                x = offset.x
+                y = offset.y
+            }
+            this.dispose(x, y, this.selectionType, this.disposeBrush.key)
+        }
     }
 
     private onMouseLeftUp(e: Phaser.Input.Pointer): void {
@@ -411,6 +413,20 @@ export default class PreviewScene extends Phaser.Scene {
         }
         this.mapData.setData(sceneMapRead.content)
         this.transfer.emit('load-map-success', this.mapData)
+
+        this.setWorldSize(this.mapData.side)
+
+        for (const props of this.mapData.walls) {
+            const wall: Phaser.GameObjects.GameObject|null = this.dispose(props.x, props.y, 2, props.key)
+            if (!wall) {
+                continue
+            }
+            this.setWallProperties(wall as Phaser.Physics.Matter.Sprite, props)
+        }
+        for (const { key, x, y } of this.mapData.floors) {
+            this.dispose(x, y, 3, key)
+        }
+
         return true
     }
 
@@ -457,8 +473,7 @@ export default class PreviewScene extends Phaser.Scene {
         // 데이터 송수신 인스턴스 이벤트 할당
         this.transfer
         .on('receive-map-side', (side: number): void => {
-            this.mapData.modifySide(side)
-            this.isometric.setWorldSize(this.mapData.side)
+            this.setWorldSize(side)
         })
         .on('receive-selection-type', (type: number): void => {
             this.setSelectionType(type)
@@ -472,9 +487,33 @@ export default class PreviewScene extends Phaser.Scene {
         .on('receive-delete-selection', (): void => {
             this.deleteSelectionObjects()
         })
-        .on('receive-properties', (properties: Types.PaletteProperties): void => {
-            this.setItemProperties(properties)
+        .on('receive-wall-properties', (properties: Types.PaletteProperties): void => {
+            for (const wall of this.selectionWalls) {
+                this.setWallProperties(wall, properties)
+            }
         })
+        .on('receive-save-request', (): void => {
+            this.save()
+        })
+    }
+
+    private setWorldSize(side: number): void {
+        this.mapData.modifySide(side)
+        this.isometric.setWorldSize(side)
+    }
+
+    private async save(): Promise<void> {
+        if (!this.mapData) {
+            this.transfer.emit('save-map-fail', '데이터 인스턴스가 없습니다')
+            return
+        }
+        const mapData: Engine.GameProject.SceneMap = this.mapData.data
+        const mapWrite: Engine.GameProject.WriteSceneMapSuccess|Engine.GameProject.WriteSceneMapFail = await ipcRenderer.invoke('write-scene-map', this.projectDirectory, this.storageKey, mapData)
+        if (!mapWrite.success) {
+            this.transfer.emit('save-map-fail', mapWrite.message)
+            return
+        }
+        this.transfer.emit('save-map-success', mapData)
     }
 
     preload(): void {
@@ -494,7 +533,7 @@ export default class PreviewScene extends Phaser.Scene {
             }
 
             // 맵 파일 감지 시작
-            this.generateWatcher()
+            this.generateMapData()
             this.generateAnimation()
             
             // 씬 기능 시작
@@ -508,7 +547,6 @@ export default class PreviewScene extends Phaser.Scene {
             this.attachTransferEvent()
 
             // 플러그인 설정
-            this.isometric.setWorldSize(this.mapData.side)
             this.cursor.enableCoordinate(true)
             this.select.enable(false)
 
@@ -524,6 +562,5 @@ export default class PreviewScene extends Phaser.Scene {
 
     private onDestroy(): void {
         this.destroyCamera()
-        this.destroyWatcher()
     }
 }

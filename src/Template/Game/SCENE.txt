@@ -60,6 +60,7 @@ export default class NewScene extends BaseScene {
 
     create(): void {
         this.createAnimation()
+        this.createMap()
         this.runScript(this.__scripts.get('onSceneCreate'))
 
         // 이 아래에 작성하세요

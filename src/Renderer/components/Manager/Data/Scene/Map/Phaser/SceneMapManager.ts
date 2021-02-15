@@ -11,8 +11,17 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
         this.setData(sceneMap)
     }
 
+    get data(): Engine.GameProject.SceneMap {
+        const { side, walls, floors } = this
+        return {
+            side,
+            walls,
+            floors
+        }
+    }
+
     private getItemKey(x: number, y: number): string {
-        return `${x},${y}`
+        return `${x}:${y}`
     }
 
     setData(sceneMap: Engine.GameProject.SceneMap): this {

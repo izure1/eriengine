@@ -120,6 +120,15 @@
                     </v-list>
                 </v-menu>
             </v-btn>
+
+            <v-btn
+                v-if="isSaving"
+                :loading="isSaving"
+                :disabled="isSaving"
+                text
+            >
+                저장 중...
+            </v-btn>
             
         </v-toolbar>
 
@@ -317,14 +326,6 @@
                                 </v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
-                        <v-list-item>
-                            <v-list-item-content>
-                                <v-list-item-title>저장</v-list-item-title>
-                                <v-list-item-subtitle>
-                                    맵은 자동으로 저장됩니다.
-                                </v-list-item-subtitle>
-                            </v-list-item-content>
-                        </v-list-item>
                     </v-list>
                 </v-card-text>
             </v-card>
@@ -394,6 +395,7 @@ export default class SceneMapEditor extends Vue {
     @NonReactivity(null) private game!: Phaser.Game|null
     @NonReactivity(null) private scene!: PreviewScene|null
 
+    private isSaving: boolean = false
     private isBuilding: boolean = false
     private isBuiltFail: boolean = false
     private isTooltipOpen: boolean = false
@@ -435,6 +437,12 @@ export default class SceneMapEditor extends Vue {
                     text: '맵 크기 설정',
                     click: (): void => {
                         this.openMapResizer()
+                    }
+                },
+                {
+                    text: '저장하기',
+                    click: (): void => {
+                        this.save()
                     }
                 }
             ]
@@ -535,7 +543,7 @@ export default class SceneMapEditor extends Vue {
     private async createGame(): Promise<void> {
         const [ width, height ] = this.projectConfig.gameDisplaySize
 
-        const previewScene: PreviewScene = new PreviewScene(this.projectDirectory, this.storageKey, this.filePath)
+        const previewScene: PreviewScene = new PreviewScene(this.projectDirectory, this.storageKey)
         const config = createConfig(width, height, [ previewScene ], this.canvasParent)
 
         this.game   = new Phaser.Game(config)
@@ -550,6 +558,14 @@ export default class SceneMapEditor extends Vue {
         })
         .on('load-map-success', (map: Engine.GameProject.SceneMap): void => {
             this.mapSceneSide = map.side
+        })
+        .on('save-map-fail', (message: string): void => {
+            this.isSaving = false
+            this.$store.dispatch('snackbar', message)
+        })
+        .on('save-map-success', (): void => {
+            this.isSaving = false
+            this.$store.dispatch('snackbar', '저장되었습니다!')
         })
 
         this.resizeCanvas()
@@ -666,7 +682,7 @@ export default class SceneMapEditor extends Vue {
             return
         }
 
-        this.scene.transfer.emit('receive-properties', {
+        this.scene.transfer.emit('receive-wall-properties', {
             alias: this.propertyAlias,
             scale: this.propertyScale,
             isSensor: this.propertyIsSensor
@@ -709,6 +725,17 @@ export default class SceneMapEditor extends Vue {
         this.setDisposeBrush(null)
     }
 
+    private save(): void {
+        if (!this.scene) {
+            return
+        }
+        if (this.isSaving) {
+            return
+        }
+
+        this.isSaving = true
+        this.scene.transfer.emit('receive-save-request')
+    }
 
     private checkKeyExists(): boolean {
         if (!this.storageKey) {
