@@ -1,6 +1,6 @@
 {
   "name": "eriengine4",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "private": true,
   "scripts": {
     "lint": "vue-cli-service lint",
@@ -11,7 +11,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@eriengine/plugin-actor": "^1.0.4",
+    "@eriengine/plugin-actor": "^1.0.5",
     "@eriengine/plugin-dialogue": "^1.0.2",
     "@eriengine/plugin-fog-of-war": "^1.0.2",
     "@eriengine/plugin-isometric-cursor": "^1.1.3",
