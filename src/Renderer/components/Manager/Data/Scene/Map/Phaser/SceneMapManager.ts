@@ -84,8 +84,7 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     insertWallData(object: Phaser.Physics.Matter.Sprite): this {
         const has: boolean = !!this.getWall(object.x, object.y)
         if (has) {
-            this.modifyWallData(object)
-            return this
+            this.dropWallData(object)
         }
         const data: Engine.GameProject.SceneMapWall = this.createWallData(object)
         this.walls.push(data)
@@ -95,8 +94,7 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     insertFloorData(object: Phaser.GameObjects.Sprite): this {
         const has: boolean = !!this.getFloor(object.x, object.y)
         if (has) {
-            this.modifyFloorData(object)
-            return this
+            this.dropFloorData(object)
         }
         const data: Engine.GameProject.SceneMapFloor = this.createFloorData(object)
         this.floors.push(data)

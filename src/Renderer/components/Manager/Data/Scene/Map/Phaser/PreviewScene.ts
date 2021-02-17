@@ -39,7 +39,7 @@ export default class PreviewScene extends Phaser.Scene {
     private dragStartOffset: Types.Point2 = { x: 0, y: 0 }
     private selectionType: number = 0
     readonly selectionWalls: Set<Phaser.Physics.Matter.Sprite> = new Set
-    readonly selectionTiles: Set<Phaser.GameObjects.Sprite> = new Set
+    readonly selectionFloors: Set<Phaser.GameObjects.Sprite> = new Set
 
     private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
 
@@ -191,12 +191,12 @@ export default class PreviewScene extends Phaser.Scene {
         for (const wall of this.selectionWalls) {
             wall.clearTint()
         }
-        for (const tile of this.selectionTiles) {
-            tile.clearTint()
+        for (const floor of this.selectionFloors) {
+            floor.clearTint()
         }
 
         this.selectionWalls.clear()
-        this.selectionTiles.clear()
+        this.selectionFloors.clear()
     }
 
     private selectObjects(e: Phaser.Input.Pointer, selection: Types.Rect): void {
@@ -221,10 +221,10 @@ export default class PreviewScene extends Phaser.Scene {
                 break
             }
             case 3: {
-                const tiles: Phaser.GameObjects.Sprite[] = this.select.select(selection, this.isometric.tiles) as Phaser.GameObjects.Sprite[]
-                for (const tile of tiles) {
-                    tile.setTint(fillColor)
-                    this.selectionTiles.add(tile)
+                const floors: Phaser.GameObjects.Sprite[] = this.select.select(selection, this.isometric.floors) as Phaser.GameObjects.Sprite[]
+                for (const floor of floors) {
+                    floor.setTint(fillColor)
+                    this.selectionFloors.add(floor)
                 }
                 break
             }
@@ -237,13 +237,13 @@ export default class PreviewScene extends Phaser.Scene {
             wall.destroy()
         })
 
-        this.selectionTiles.forEach((tile): void => {
-            this.mapData.dropFloorData(tile)
-            tile.destroy()
+        this.selectionFloors.forEach((floor): void => {
+            this.mapData.dropFloorData(floor)
+            floor.destroy()
         })
 
         this.selectionWalls.clear()
-        this.selectionTiles.clear()
+        this.selectionFloors.clear()
     }
 
     private setWallProperties(wall: Phaser.Physics.Matter.Sprite, { alias, scale, isSensor }: Types.PaletteProperties): void {
