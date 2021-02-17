@@ -301,7 +301,7 @@ export default class PreviewScene extends Phaser.Scene {
         return { x, y }
     }
 
-    private dispose(x: number, y: number, type: number, brushKey: string): Phaser.GameObjects.GameObject|null {
+    private dispose(x: number, y: number, type: number, brushKey: string, insertData: boolean = true): Phaser.GameObjects.GameObject|null {
         if (!this.getPaletteFromKey(brushKey)) {
             return null
         }
@@ -319,13 +319,17 @@ export default class PreviewScene extends Phaser.Scene {
             case 2: {
                 const wall = this.isometric.setWalltile(x, y, brushKey, undefined, animsKey)
                 wall.setDataEnabled()
-                this.mapData.insertWallData(wall)
+                if (insertData) {
+                    this.mapData.insertWallData(wall)
+                }
                 return wall
             }
 
             case 3: {
                 const floor = this.isometric.setFloortile(x, y, brushKey, undefined, animsKey)
-                this.mapData.insertFloorData(floor)
+                if (insertData) {
+                    this.mapData.insertFloorData(floor)
+                }
                 return floor
             }
         }
@@ -417,14 +421,14 @@ export default class PreviewScene extends Phaser.Scene {
         this.setWorldSize(this.mapData.side)
 
         for (const props of this.mapData.walls) {
-            const wall: Phaser.GameObjects.GameObject|null = this.dispose(props.x, props.y, 2, props.key)
+            const wall: Phaser.GameObjects.GameObject|null = this.dispose(props.x, props.y, 2, props.key, false)
             if (!wall) {
                 continue
             }
             this.setWallProperties(wall as Phaser.Physics.Matter.Sprite, props)
         }
         for (const { key, x, y } of this.mapData.floors) {
-            this.dispose(x, y, 3, key)
+            this.dispose(x, y, 3, key, false)
         }
 
         return true
