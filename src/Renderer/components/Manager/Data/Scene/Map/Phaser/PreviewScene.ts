@@ -33,6 +33,7 @@ export default class PreviewScene extends Phaser.Scene {
 
     private requireImages:  Types.PaletteImage[] = []
     private requireSprites: Types.PaletteSprite[] = []
+    private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
 
     private shiftKey: Phaser.Input.Keyboard.Key|null = null
 
@@ -40,8 +41,6 @@ export default class PreviewScene extends Phaser.Scene {
     private selectionType: number = 0
     readonly selectionWalls: Set<Phaser.Physics.Matter.Sprite> = new Set
     readonly selectionFloors: Set<Phaser.GameObjects.Sprite> = new Set
-
-    private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
 
     constructor(projectDirectory: string, storageKey: string) {
         super({ key: '__preview-scene__', active: false })
@@ -520,6 +519,14 @@ export default class PreviewScene extends Phaser.Scene {
         this.transfer.emit('save-map-success', mapData)
     }
 
+    init(): void {
+        this.plugins.installScenePlugin('ActorPlugin', ActorPlugin, 'actor', this)
+        this.plugins.installScenePlugin('IsometricScenePlugin', IsometricScenePlugin, 'isometric', this)
+        this.plugins.installScenePlugin('IsometricCursorPlugin', IsometricCursorPlugin, 'cursor', this)
+        this.plugins.installScenePlugin('IsometricSelectPlugin', IsometricSelectPlugin, 'select', this)
+        this.plugins.installScenePlugin('FogOfWarPlugin', FogOfWarPlugin, 'fow', this)
+    }
+
     preload(): void {
         this.load.setBaseURL(this.assetDirectory)
         for (const { key, asset } of this.requireImages) {
@@ -537,7 +544,6 @@ export default class PreviewScene extends Phaser.Scene {
             }
 
             // 맵 파일 감지 시작
-            this.generateMapData()
             this.generateAnimation()
             
             // 씬 기능 시작
@@ -555,6 +561,9 @@ export default class PreviewScene extends Phaser.Scene {
             this.select.enable(false)
 
             this.select.events.on('drag-end', this.selectObjects.bind(this))
+
+            // gui 씬 생성
+            this.scene.launch('__gui-scene__', this)
         })
     
         this.events.once(Phaser.Scenes.Events.DESTROY, this.onDestroy.bind(this))

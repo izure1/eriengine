@@ -363,6 +363,7 @@ import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import NonReactivity from 'vue-nonreactivity-decorator'
 
 import PreviewScene from './Phaser/PreviewScene'
+import GuiScene from './Phaser/GuiScene'
 import createConfig from './Phaser/createConfig'
 
 import ChannelComponent from '@/Renderer/components/Shell/Channel.vue'
@@ -544,7 +545,7 @@ export default class SceneMapEditor extends Vue {
         const [ width, height ] = this.projectConfig.gameDisplaySize
 
         const previewScene: PreviewScene = new PreviewScene(this.projectDirectory, this.storageKey)
-        const config = createConfig(width, height, [ previewScene ], this.canvasParent)
+        const config = createConfig(width, height, [ previewScene, GuiScene ], this.canvasParent)
 
         this.game   = new Phaser.Game(config)
         this.scene  = previewScene

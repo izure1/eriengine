@@ -5,13 +5,13 @@ import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 
-export default function(width: number, height: number, scene: Phaser.Scene[], parent: HTMLElement): Phaser.Types.Core.GameConfig {
+export default function(width: number, height: number, scene: (Phaser.Scene|typeof Phaser.Scene)[], parent: HTMLElement): Phaser.Types.Core.GameConfig {
 
    return {
         type: Phaser.AUTO,
         width,
         height,
-        scene,
+        scene: scene as any,
         scale: {
             parent,
             fullscreenTarget: parent,
@@ -27,33 +27,6 @@ export default function(width: number, height: number, scene: Phaser.Scene[], pa
                 //     mapping: 'dialogue',
                 //     plugin: DialoguePlugin
                 // }
-            ],
-            scene: [
-                {
-                    key: 'ActorPlugin',
-                    mapping: 'actor',
-                    plugin: ActorPlugin
-                },
-                {
-                    key: 'IsometricScenePlugin',
-                    mapping: 'isometric',
-                    plugin: IsometricScenePlugin
-                },
-                {
-                    key: 'IsometricCursorPlugin',
-                    mapping: 'cursor',
-                    plugin: IsometricCursorPlugin
-                },
-                {
-                    key: 'IsometricSelectPlugin',
-                    mapping: 'select',
-                    plugin: IsometricSelectPlugin
-                },
-                {
-                    key: 'FogOfWarPlugin',
-                    mapping: 'fow',
-                    plugin: FogOfWarPlugin
-                }
             ]
         },
         physics: {
