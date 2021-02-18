@@ -11,7 +11,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@eriengine/plugin-actor": "^1.1.0",
+    "@eriengine/plugin-actor": "^1.2.0",
     "@eriengine/plugin-dialogue": "^1.1.0",
     "@eriengine/plugin-fog-of-war": "^1.1.0",
     "@eriengine/plugin-isometric-cursor": "^1.2.0",
