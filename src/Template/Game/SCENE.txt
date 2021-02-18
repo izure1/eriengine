@@ -45,6 +45,7 @@ export default class NewScene extends BaseScene {
     }
 
     init(data: object = {}): void {
+        super.init(data)
         this.runScript(this.__scripts.get('onSceneInit'), data)
         this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')))
 

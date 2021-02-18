@@ -283,4 +283,12 @@ export default class BaseScene extends Phaser.Scene {
         }
     }
 
+    init(data: object = {}): void {
+        this.plugins.installScenePlugin('ActorPlugin', ActorPlugin, 'actor', this)
+        this.plugins.installScenePlugin('IsometricScenePlugin', IsometricScenePlugin, 'isometric', this)
+        this.plugins.installScenePlugin('IsometricCursorPlugin', IsometricCursorPlugin, 'cursor', this)
+        this.plugins.installScenePlugin('IsometricSelectPlugin', IsometricSelectPlugin, 'select', this)
+        this.plugins.installScenePlugin('FogOfWarPlugin', FogOfWarPlugin, 'fow', this)
+    }
+
 }
