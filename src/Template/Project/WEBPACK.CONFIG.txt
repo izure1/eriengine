@@ -1,6 +1,7 @@
 const path = require('path')
 const glob = require('fast-glob')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const { ProvidePlugin } = require('webpack')
 const mode = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'production'
 
 module.exports = {
@@ -46,6 +47,9 @@ module.exports = {
                     to: path.resolve(__dirname, 'build', 'src', 'Asset')
                 }
             ]
+        }),
+        new ProvidePlugin({
+            process: 'process/browser',
         })
     ],
     devServer: {

@@ -15,6 +15,7 @@ import {
     PROJECT_WEBPACK_NAME,
     PROJECT_WEBPACKGEN_NAME,
     PROJECT_README_NAME,
+    PROJECT_TYPINGS_DIRECTORY_NAME,
     PROJECT_EXTEND_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_BASESCENE_NAME,
@@ -194,6 +195,7 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     // 디렉토리 생성하기
     const dirs: string[] = [
         path.resolve(directoryPath, PROJECT_EXTEND_DIRECTORY_NAME),
+        path.resolve(directoryPath, PROJECT_TYPINGS_DIRECTORY_NAME),
         path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME),
         path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME, PROJECT_SRC_ASSET_AUDIO_DIRECTORY_NAME),
         path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME, PROJECT_SRC_ASSET_FONT_DIRECTORY_NAME),

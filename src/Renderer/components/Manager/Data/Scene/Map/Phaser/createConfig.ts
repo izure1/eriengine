@@ -21,12 +21,37 @@ export default function(width: number, height: number, scene: (Phaser.Scene|type
             createContainer: true
         },
         plugins: {
-            global: [
-                // {
-                //     key: 'DialoguePlugin',
-                //     mapping: 'dialogue',
-                //     plugin: DialoguePlugin
-                // }
+            scene: [
+                {
+                    key: 'ActorPlugin',
+                    mapping: 'actor',
+                    plugin: ActorPlugin
+                },
+                {
+                    key: 'IsometricScenePlugin',
+                    mapping: 'isometric',
+                    plugin: IsometricScenePlugin
+                },
+                {
+                    key: 'IsometricCursorPlugin',
+                    mapping: 'cursor',
+                    plugin: IsometricCursorPlugin
+                },
+                {
+                    key: 'IsometricSelectPlugin',
+                    mapping: 'select',
+                    plugin: IsometricSelectPlugin
+                },
+                {
+                    key: 'FogOfWarPlugin',
+                    mapping: 'fow',
+                    plugin: FogOfWarPlugin
+                },
+                {
+                    key: 'DialoguePlugin',
+                    mapping: 'dialogue',
+                    plugin: DialoguePlugin
+                }
             ]
         },
         physics: {

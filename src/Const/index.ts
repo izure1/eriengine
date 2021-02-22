@@ -17,6 +17,9 @@ export const PROJECT_WEBPACK_NAME: string       = 'webpack.config.js'
 export const PROJECT_WEBPACKGEN_NAME: string    = 'webpack.gen.config.js'
 export const PROJECT_README_NAME: string        = 'README.txt'
 
+// typings
+export const PROJECT_TYPINGS_DIRECTORY_NAME: string = 'typings'
+
 // extend
 export const PROJECT_EXTEND_DIRECTORY_NAME: string      = 'extend'
 export const PROJECT_EXTEND_PACKAGE_NAME: string        = 'package.json'

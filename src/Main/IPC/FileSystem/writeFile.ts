@@ -1,8 +1,10 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import fs from 'fs-extra'
+import path from 'path'
 
 export async function handler(filePath: string, fileContent: string, encoding: Engine.Type.TransferableEncoding = 'utf-8'): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     try {
+        await fs.ensureDir(path.dirname(filePath))
         await fs.writeFile(filePath, fileContent, { encoding })
     } catch(e) {
         const { message } = e as Error

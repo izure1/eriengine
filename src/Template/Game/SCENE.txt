@@ -29,7 +29,7 @@ import BaseScene from '@/BaseScene'
  */
 export default class NewScene extends BaseScene {
     
-    /** 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다. 잘 모르겠다면 건드리지 마십시오. */
+    /** 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다. 절대 건드리지 마십시오. */
     static Key: string = __filename
 
     /**
@@ -39,13 +39,12 @@ export default class NewScene extends BaseScene {
     static Depth: number = 0
 
     constructor() {
-        super({ key: NewScene.Key, active: true })
+        super({ key: NewScene.Key, active: false })
         this.generateMap(Storages, '{{ STORAGE_KEY }}')
         this.generateScript(Storages, '{{ STORAGE_KEY }}')
     }
 
     init(data: object = {}): void {
-        super.init(data)
         this.runScript(this.__scripts.get('onSceneInit'), data)
         this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')))
 
