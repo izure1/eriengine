@@ -45,30 +45,26 @@ export default class NewScene extends BaseScene {
     }
 
     init(data: object = {}): void {
-        this.runScript(this.__scripts.get('onSceneInit'), data)
-        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')))
-
+        super.init(data)
         // 이 아래에 작성하세요
+
     }
 
     preload(): void {
-        this.loadAssets()
-        this.runScript(this.__scripts.get('onScenePreload'))
-
+        super.preload()
         // 이 아래에 작성하세요
+
     }
 
     create(): void {
-        this.createAnimation()
-        this.createMap()
-        this.runScript(this.__scripts.get('onSceneCreate'))
-
+        super.create()
         // 이 아래에 작성하세요
+
     }
 
     update(time: number, delta: number): void {
-        this.runScript(this.__scripts.get('onSceneUpdate'), time, delta)
-
+        super.update(time, delta)
         // 이 아래에 작성하세요
+        
     }
 }

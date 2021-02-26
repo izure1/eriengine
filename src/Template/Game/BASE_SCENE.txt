@@ -284,4 +284,24 @@ export default class BaseScene extends Phaser.Scene {
         }
     }
 
+    init(data: object = {}): void {
+        this.runScript(this.__scripts.get('onSceneInit'), data)
+        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')))
+    }
+
+    preload(): void {
+        this.runScript(this.__scripts.get('onScenePreload'))
+        this.loadAssets()
+    }
+
+    create(): void {
+        this.createAnimation()
+        this.createMap()
+        this.runScript(this.__scripts.get('onSceneCreate'))
+    }
+    
+    update(time: number, delta: number): void {
+        this.runScript(this.__scripts.get('onSceneUpdate'), time, delta)
+    }
+
 }

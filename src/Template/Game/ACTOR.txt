@@ -27,22 +27,18 @@ export default class SampleActor extends BaseActor {
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string|Phaser.Textures.Texture, frame?: string|number) {
         super(scene, x, y, texture, frame)
-        this.attachCollideEvent()
-        this.generateSkill(Skills)
         this.generateScript(Storages, '{{ STORAGE_KEY }}')
     }
 
     start(): void {
-        this.runScript(this.__scripts.get('onActorStart'))
-
+        super.start()
         // 이 아래에 작성하세요
 
         // this.run.useMoveKey('arrow') /* 커서로 액터를 움직일 수 있도록 만듭니다. wasd, arrow 둘 중 택할 수 있습니다. */
     }
 
     update(time: number, delta: number): void {
-        this.runScript(this.__scripts.get('onActorUpdate'), time, delta)
-
+        super.update(time, delta)
         // 이 아래에 작성하세요
 
         // this.playMovingAnimation()
@@ -50,9 +46,9 @@ export default class SampleActor extends BaseActor {
     }
 
     end(): void {
-        this.runScript(this.__scripts.get('onActorEnd'))
-
+        super.end()
         // 이 아래에 작성하세요
+        
     }
 
     protected playMovingAnimation(): void {
