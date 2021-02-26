@@ -12,10 +12,10 @@
   "main": "background.js",
   "dependencies": {
     "@eriengine/plugin-actor": "^1.2.0",
-    "@eriengine/plugin-dialogue": "^1.3.1",
+    "@eriengine/plugin-dialogue": "^1.4.1",
     "@eriengine/plugin-fog-of-war": "^1.1.0",
     "@eriengine/plugin-isometric-cursor": "^1.2.0",
-    "@eriengine/plugin-isometric-scene": "^1.2.0",
+    "@eriengine/plugin-isometric-scene": "^1.2.2",
     "add-filename-increment": "^1.0.0",
     "an-array-of-english-words": "2.0.0",
     "command-exists": "^1.2.9",

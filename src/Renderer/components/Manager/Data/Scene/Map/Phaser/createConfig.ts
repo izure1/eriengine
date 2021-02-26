@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
-import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+import { DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'

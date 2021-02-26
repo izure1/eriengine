@@ -582,11 +582,6 @@ export default class SceneMapEditor extends Vue {
             this.game.plugins.removeScenePlugin(sceneKey)
         }
 
-        const globalPlugins = [ ...this.game.plugins.plugins ]
-        for (const plugin of globalPlugins) {
-            this.game.plugins.removeGlobalPlugin(plugin.key)
-        }
-
         this.game.destroy(true)
         this.game = null
         this.scene = null

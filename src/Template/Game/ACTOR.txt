@@ -1,3 +1,4 @@
+import Phaser from 'phaser'
 import BaseActor from '@/BaseActor'
 
 {{ DATA_LISTS }}

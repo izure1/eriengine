@@ -22,15 +22,18 @@ interface FileWriteQueue {
     content: string|((path: string) => Promise<void>)
 }
 
-async function writeSceneFile(projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+async function writeSceneFile(projectDirPath: string, filePath: string, property: object): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
     const STORAGE_KEY: string   = getStorageKeyFromFilename(filePath)
+    const DEPTH: number = 0
     const files: FileWriteQueue[] = [
         {
             path: filePath,
             content: parseProperty(RAW_SCENE, {
                 STORAGE_KEY,
                 DATA_LISTS,
-                STORAGE_LISTS
+                STORAGE_LISTS,
+                DEPTH,
+                ...property
             })
         }
     ]
@@ -64,13 +67,13 @@ async function writeSceneFile(projectDirPath: string, filePath: string): Promise
     }
 }
 
-export async function handler(projectDirPath: string, filePath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> {
+export async function handler(projectDirPath: string, filePath: string, property: object = {}): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> {
     const directoryEnsure = await makeDirectory(path.dirname(filePath))
     if (!directoryEnsure.success) {
         return directoryEnsure as Engine.GameProject.AddSceneFail
     }
 
-    const fileWrite = await writeSceneFile(projectDirPath, filePath)
+    const fileWrite = await writeSceneFile(projectDirPath, filePath, property)
     if (!fileWrite.success) {
         return fileWrite as Engine.GameProject.AddSceneFail
     }
@@ -103,7 +106,7 @@ export async function handler(projectDirPath: string, filePath: string): Promise
 }
 
 export function ipc(): void {
-    ipcMain.handle('add-scene', async (e: IpcMainInvokeEvent, projectDirPath: string, filePath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> => {
+    ipcMain.handle('add-scene', async (e: IpcMainInvokeEvent, projectDirPath: string, filePath: string, property: object): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> => {
         return await handler(projectDirPath, filePath)
     })
 }

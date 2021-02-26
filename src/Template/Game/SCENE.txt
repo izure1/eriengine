@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
-import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 
 import BaseScene from '@/BaseScene'
@@ -36,7 +36,7 @@ export default class NewScene extends BaseScene {
      *  씬의 우선순위입니다. 이 값이 클수록, 작은 값을 가진 씬보다 위에 보여집니다.  
      *  가령 씬A의 Depth가 0이고, 씬B의 Depth가 1일 경우, 씬B가 씬A보다 위에 보여집니다.
      */
-    static Depth: number = 0
+    static Depth: number = {{ DEPTH }}
 
     constructor() {
         super({ key: NewScene.Key, active: false })

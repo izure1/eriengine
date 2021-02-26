@@ -3,7 +3,7 @@ import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
-import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 
 import Scenes from './{{ PROJECT_SRC_SCENELIST_NAME }}'
 import config from '../extend/package.json'
@@ -37,6 +37,7 @@ new Phaser.Game({
     dom: {
         createContainer: true
     },
+    disableContextMenu: true,
     plugins: {
         scene: [
             {
@@ -68,6 +69,11 @@ new Phaser.Game({
                 key: 'DialoguePlugin',
                 mapping: 'dialogue',
                 plugin: DialoguePlugin
+            },
+            {
+                key: 'ModalPlugin',
+                mapping: 'modal',
+                plugin: ModalPlugin
             }
         ]
     },

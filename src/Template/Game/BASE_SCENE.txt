@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
-import { Plugin as DialoguePlugin } from '@eriengine/plugin-dialogue'
+import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 
 {{ DATA_LISTS }}
@@ -71,6 +71,7 @@ export default class BaseScene extends Phaser.Scene {
     protected cursor!: IsometricCursorPlugin
     protected select!: IsometricSelectPlugin
     protected dialogue!: DialoguePlugin
+    protected modal!: ModalPlugin
     protected fow!: FogOfWarPlugin
 
     protected __scripts: Map<string, ScriptCallback[]> = new Map

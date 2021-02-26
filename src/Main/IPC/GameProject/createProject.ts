@@ -16,14 +16,20 @@ function createSceneName(name: string): string {
 }
 
 async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> {
-    const scenes: string[] = [
-        createSceneName('main'),
-        createSceneName('gui')
+    const scenes: { name: string, property: object } [] = [
+        {
+            name: createSceneName('main'),
+            property: { DEPTH: 0 }
+        },
+        {
+            name: createSceneName('gui'),
+            property: { DEPTH: 1 }
+        }
     ]
     const sceneRootDir: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME)
-    for (const key of scenes) {
-        const filePath: string = path.resolve(sceneRootDir, key)
-        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await addScene(projectDirPath, filePath)
+    for (const { name, property } of scenes) {
+        const filePath: string = path.resolve(sceneRootDir, name)
+        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await addScene(projectDirPath, filePath, property)
         if (!sceneAdd.success) {
             return sceneAdd as Engine.GameProject.AddSceneFail
         }
