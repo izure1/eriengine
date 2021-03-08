@@ -1,34 +1,58 @@
 <template>
-    <v-card flat :loading="isRunning"> 
-        <v-card-title>
-            {{ title }}
-            <v-btn icon v-if="!isRunning" @click="start">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-            <v-btn icon v-if="!isRunning && isJobSuccess" @click="openBuiltDirectory">
-                <v-icon>mdi-folder-open-outline</v-icon>
-            </v-btn>
-        </v-card-title>
-        <v-card-subtitle>
-            <p v-if="isRunning">작업 중...  {{ emoticon1 }}</p>
-            <p v-else-if="isJobSuccess" class="green--text lighten-5">성공적으로 작업을 완료했습니다  ＼(´ ∇`)ノ</p>
-            <p v-else class="red--text">
-                작업 실패.  ∑(゜△゜;)
-                <br>
-                오류에 대한 자세한 내용은 아래 로그를 확인하세요.
-                <br>
-                정확한 원인을 알 수 없다면 에리엔진 저장소에 아래 내용을 복사하여 질문해주세요.
-            </p>
-        </v-card-subtitle>
-        <v-card-text> 
-            <p v-if="isRunning">
-                결과물은 프로젝트 디렉토리의 <code>build</code> 폴더에 생성됩니다.
-                <br>
-                이 작업은 몇 분이 걸릴 수 있습니다.
-            </p>
-            <shell-channel-component :channel="streamChannel" :clear="lastClearTime" />
-        </v-card-text>
-    </v-card>
+    <div v-if="!isBottomsheet">
+        <v-card flat :loading="isRunning"> 
+            <v-card-title>
+                {{ title }}
+                <v-btn icon v-if="!isRunning" @click="start">
+                    <v-icon>mdi-refresh</v-icon>
+                </v-btn>
+                <v-btn icon v-if="!isRunning && isJobSuccess" @click="openBuiltDirectory">
+                    <v-icon>mdi-folder-open-outline</v-icon>
+                </v-btn>
+            </v-card-title>
+            <v-card-subtitle>
+                <p v-if="isRunning">작업 중...  {{ emoticon1 }}</p>
+                <p v-else-if="isJobSuccess" class="green--text lighten-5">성공적으로 작업을 완료했습니다  ＼(´ ∇`)ノ</p>
+                <p v-else class="red--text">
+                    작업 실패.  ∑(゜△゜;)
+                    <br>
+                    오류에 대한 자세한 내용은 아래 로그를 확인하세요.
+                    <br>
+                    정확한 원인을 알 수 없다면 에리엔진 저장소에 아래 내용을 복사하여 질문해주세요.
+                </p>
+            </v-card-subtitle>
+            <v-card-text> 
+                <p v-if="isRunning">
+                    결과물은 프로젝트 디렉토리의 <code>build</code> 폴더에 생성됩니다.
+                    <br>
+                    이 작업은 몇 분이 걸릴 수 있습니다.
+                </p>
+                <shell-channel-component :channel="streamChannel" :clear="lastClearTime" />
+            </v-card-text>
+        </v-card>
+    </div>
+    <v-bottom-sheet
+        v-else
+        inset
+        persistent
+        hide-overlay
+    >
+        <v-list>
+            <v-list-item>
+                <v-list-item-content>
+                    <p v-if="isRunning">작업 중...  {{ emoticon1 }}</p>
+                    <p v-else-if="isJobSuccess" class="green--text lighten-5">작업 완료</p>
+                    <p v-else class="red--text">작업 실패</p>
+                </v-list-item-content>
+                <v-spacer />
+                <v-list-item-icon>
+                    <v-btn icon>
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-list-item-icon>
+            </v-list-item>
+        </v-list>
+    </v-bottom-sheet>
 </template>
 
 <script lang="ts">
@@ -58,6 +82,7 @@ export default class BuildRunnerComponent extends Vue {
     private jobParameters!: Engine.Type.Transferable[]
     private streamChannel!: string
 
+    private isBottomsheet: boolean = false
     private isRunning: boolean = false
     private isJobSuccess: boolean = false
     private builtPath: string = ''
