@@ -1,4 +1,5 @@
 import nodePath from 'path'
+import normalize from 'normalize-path'
 
 interface ModuleMap {
     path: string
@@ -24,10 +25,11 @@ export function mappingDefaultExport(moduleDatas: ModuleMap[]): string {
  */
 function getRemovedTsExt(filePath: string): string {
     const parsed = nodePath.parse(filePath)
+    const path: string = parsed.ext === '.ts' ?
+        nodePath.join(parsed.dir, parsed.name) :
+        nodePath.join(parsed.dir, parsed.base)
     
-    return parsed.ext === '.ts' ?
-        nodePath.resolve(parsed.dir, parsed.name) :
-        nodePath.resolve(parsed.dir, parsed.base)
+    return normalize(path)
 }
 
 export function getModuleContentFromArray(list: string[], exportKey: string = '', mappingExport: (moduleDatas: ModuleMap[]) => string = mappingDefaultExport): string {
@@ -35,16 +37,16 @@ export function getModuleContentFromArray(list: string[], exportKey: string = ''
     const maps: ModuleMap[] = []
     for (let i: number = 0, len: number = list.length; i < len; i++) {
         const name: string = `M${i}`
-        const path: string = getRemovedTsExt(list[i])
+        const path: string = list[i]
     
         if (exportKey === '') {
-            modules += `import ${name} from '${path}'\n`
+            modules += `import ${name} from '${getRemovedTsExt(path)}'\n`
         }
         else if (exportKey === '*') {
-            modules += `import * as ${name} from '${path}'\n`
+            modules += `import * as ${name} from '${getRemovedTsExt(path)}'\n`
         }
         else {
-            modules += `import { ${exportKey} as ${name} } from '${path}'\n`
+            modules += `import { ${exportKey} as ${name} } from '${getRemovedTsExt(path)}'\n`
         }
         maps.push({ name, path })
     }
