@@ -28,7 +28,8 @@ new Phaser.Game({
             })
     ],
     scale: {
-        parent: '#canvas-wrapper',
+        fullscreenTarget: 'canvas-wrapper',
+        parent: 'canvas-wrapper',
         expandParent: true,
         zoom: 1,
         mode: Phaser.Scale.ScaleModes.FIT,
