@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
@@ -13,31 +13,31 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        setProjectDirectory(state, directoryPath: string) {
-            state.projectDirectory = directoryPath
+        setProjectDirectory(state, directoryPath: string): void {
+            state.projectDirectory = directoryPath;
         },
-        setProjectConfig(state, config: Engine.GameProject.Config) {
-            state.projectConfig = config
+        setProjectConfig(state, config: Engine.GameProject.Config): void {
+            state.projectConfig = config;
         },
-        setSnackbar(state, message: string) {
-            state.snackbar.active = true
-            state.snackbar.message = message
+        setSnackbar(state, message: string): void {
+            state.snackbar.active = true;
+            state.snackbar.message = message;
         }
     },
     actions: {
         openProject({ commit }, { path, config }): void {
-            commit('setProjectDirectory', path)
-            commit('setProjectConfig', config)
+            commit('setProjectDirectory', path);
+            commit('setProjectConfig', config);
         },
         setProjectConfig({ commit }, config: Engine.GameProject.Config): void {
-            commit('setProjectConfig', config)
+            commit('setProjectConfig', config);
         },
         closeProject({ commit }): void {
-            commit('setProjectDirectory', '')
-            commit('setProjectConfig', {})
+            commit('setProjectDirectory', '');
+            commit('setProjectConfig', {});
         },
         snackbar({ commit }, message: string): void {
-            commit('setSnackbar', message)
+            commit('setSnackbar', message);
         }
     },
     modules: {

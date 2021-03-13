@@ -1,14 +1,15 @@
-import path from 'path'
-import fs from 'fs-extra'
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { handler as makeDirectory } from '../FileSystem/makeDirectory'
-import { handler as writeFile } from '../FileSystem/writeFile'
-import { handler as copy } from '../FileSystem/copy'
-import { handler as generatePackageJson } from './generatePackageJson'
-import { parseProperty } from '@/Utils/parseProperty'
-import { ProcessSpawner } from '@/Utils/ProcessSpawner'
-import { writeToRenderer } from '@/Utils/stream'
+import path from 'path';
+import fs from 'fs-extra';
+import { ipcMain, IpcMainInvokeEvent } from 'electron';
+import { handler as makeDirectory } from '../FileSystem/makeDirectory';
+import { handler as writeFile } from '../FileSystem/writeFile';
+import { handler as copy } from '../FileSystem/copy';
+import { handler as generatePackageJson } from './generatePackageJson';
+import { parseProperty } from '@/Utils/parseProperty';
+import { ProcessSpawner } from '@/Utils/ProcessSpawner';
+import { writeToRenderer } from '@/Utils/stream';
 import {
+    ENGINE_BUILDING_SERVER_PORT,
     DATA_LISTS,
     STORAGE_LISTS,
     PROJECT_TSCONFIG_NAME,
@@ -41,17 +42,17 @@ import {
     PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME,
     PROJECT_SRC_IMAGELIST_NAME,
     PROJECT_SRC_ANIMSLIST_NAME
-} from '@/Const'
-import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
-import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
-import RAW_PROJECT_WEBPACKGEN from 'raw-loader!@/Template/Project/WEBPACK.GEN.CONFIG.txt'
-import RAW_PROJECT_README from 'raw-loader!@/Template/Project/README.txt'
-import RAW_TYPES from 'raw-loader!@/Template/Project/TYPES.txt'
-import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt'
-import RAW_BASE_SCENE from 'raw-loader!@/Template/Game/BASE_SCENE.txt'
-import RAW_BASE_ACTOR from 'raw-loader!@/Template/Game/BASE_ACTOR.txt'
+} from '@/Const';
+import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt';
+import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt';
+import RAW_PROJECT_WEBPACKGEN from 'raw-loader!@/Template/Project/WEBPACK.GEN.CONFIG.txt';
+import RAW_PROJECT_README from 'raw-loader!@/Template/Project/README.txt';
+import RAW_TYPES from 'raw-loader!@/Template/Project/TYPES.txt';
+import RAW_GAME from 'raw-loader!@/Template/Game/GAME.txt';
+import RAW_BASE_SCENE from 'raw-loader!@/Template/Game/BASE_SCENE.txt';
+import RAW_BASE_ACTOR from 'raw-loader!@/Template/Game/BASE_ACTOR.txt';
 
-declare const __static: string
+declare const __static: string;
 
 interface FileWriteQueue {
     path?: string
@@ -60,26 +61,26 @@ interface FileWriteQueue {
 
 async function ensureRequireModules(projectDirPath: string): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
     try {
-        const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
-        await spawner.spawn('npm i', { writeStream: writeToRenderer('ensure-require-modules') })
+        const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath });
+        await spawner.spawn('npm i', { writeStream: writeToRenderer('ensure-require-modules') });
     } catch(reason) {
         return {
             success: false,
             name: reason,
             message: reason
-        }
+        };
     }
 
     return {
         success: true,
         name: '프로젝트 서드파티모듈 설치 성공',
         message: '프로젝트에 필요한 서드파티모듈 설치를 성공했습니다'
-    }
+    };
 }
 
 async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject.Config): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
 
-    const srcDirPath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME)
+    const srcDirPath: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME);
     const files: FileWriteQueue[] = [
         // tsconfig.json
         {
@@ -89,7 +90,9 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
         // webpack.config.js
         {
             path: path.resolve(projectDirPath, PROJECT_WEBPACK_NAME),
-            content: parseProperty(RAW_PROJECT_WEBPACK, {})
+            content: parseProperty(RAW_PROJECT_WEBPACK, {
+                ENGINE_BUILDING_SERVER_PORT
+            })
         },
         // webpack.gen.config.js
         {
@@ -157,15 +160,15 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
                 }
             }
         }
-    ]
+    ];
 
     for (const { path, content } of files) {
         if (typeof content === 'function') {
             try {
-                await content(path)
+                await content(path);
             } catch(e) {
-                const { name, message } = e as Error
-                return { success: false, name, message }
+                const { name, message } = e as Error;
+                return { success: false, name, message };
             }
         }
         else {
@@ -174,11 +177,11 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
                     success: false,
                     name: '프로젝트 기본 파일 생성',
                     message: '파일이 생성될 경로가 지정되지 않았습니다'
-                }
+                };
             }
-            const fileWrite = await writeFile(path, content)
+            const fileWrite = await writeFile(path, content);
             if (!fileWrite.success) {
-                return fileWrite
+                return fileWrite;
             }
         }
     }
@@ -188,7 +191,7 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
         name: '프로젝트 기본 파일 생성',
         message: '프로젝트 기본 파일 생성에 성공했습니다',
         path: srcDirPath
-    }
+    };
 }
 
 export async function handler(directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
@@ -211,25 +214,25 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
         path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME),
         path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME),
         path.resolve(directoryPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME)
-    ]
+    ];
 
     for (const dirPath of dirs) {
-        const dirCreate = await makeDirectory(dirPath)
+        const dirCreate = await makeDirectory(dirPath);
         if (!dirCreate.success) {
-            return dirCreate as Engine.GameProject.CreateProjectFail
+            return dirCreate as Engine.GameProject.CreateProjectFail;
         }
     }
 
     // 기본 파일 생성
-    const baseFilesWrite = await ensureBaseFile(directoryPath, config)
+    const baseFilesWrite = await ensureBaseFile(directoryPath, config);
     if (!baseFilesWrite.success) {
-        return baseFilesWrite as Engine.GameProject.CreateProjectFail
+        return baseFilesWrite as Engine.GameProject.CreateProjectFail;
     }
 
     // 종속 모듈 설치
-    const moduleInstall = await ensureRequireModules(directoryPath)
+    const moduleInstall = await ensureRequireModules(directoryPath);
     if (!moduleInstall.success) {
-        return moduleInstall as Engine.GameProject.CreateProjectFail
+        return moduleInstall as Engine.GameProject.CreateProjectFail;
     }
 
     return {
@@ -238,11 +241,11 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
         message: '프로젝트 생성을 성공했습니다.',
         path: directoryPath,
         config
-    }
+    };
 }
 
 export function ipc(): void {
     ipcMain.handle('ensure-project', async (e: IpcMainInvokeEvent, directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> => {
-        return await handler(directoryPath, config)
-    })
+        return await handler(directoryPath, config);
+    });
 }
