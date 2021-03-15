@@ -9,14 +9,25 @@ let updateWin: BrowserWindow|null = null;
 async function createUpdateWindow(): Promise<void> {
     closeUpdateWindow();
     updateWin = new BrowserWindow({
-        //backgroundColor: '#eeeeee',
+        backgroundColor: '#eeeeee',
+        maxWidth: 400,
+        maxHeight: 200,
+        minWidth: 400,
+        minHeight: 200,
+        closable: false,
+        minimizable: false,
+        maximizable: false,
+        width: 400,
+        height: 200,
+        parent: BrowserWindow.getAllWindows()[0] || null,
+        modal: true,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            spellcheck: false,
+            webSecurity: false
         }
     });
-    updateWin.hide();
     updateWin.setMenu(null);
-    updateWin.once('ready-to-show', updateWin.show);
 
     const file: string = path.resolve(__static, 'update.html');
     await updateWin.loadURL(file);
@@ -40,7 +51,9 @@ autoUpdater.on('download-progress', (progressObj: Engine.Process.UpdateProgress)
 
 autoUpdater.on('update-downloaded', () => {
     closeUpdateWindow();
-    //autoUpdater.quitAndInstall();
+    setTimeout((): void => {
+        autoUpdater.quitAndInstall();
+    }, 1000);
 });
 
 autoUpdater.on('error', (error: Error): void => {
@@ -70,8 +83,8 @@ export async function handler(): Promise<Engine.Process.UpdateEngineSuccess|Engi
 
     return {
         success: true,
-        name: '',
-        message: ''
+        name: '엔진 업데이트',
+        message: '엔진 업데이트를 성공적으로 끝마쳤습니다.'
     };
 }
 

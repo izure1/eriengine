@@ -4,12 +4,13 @@
         <meta charset="utf-8">
     </head>
     <body>
-        <p id="message"></p>
-        <p id="error"></p>
+        <h4>업데이트 다운로드 중...</h4>
+        <code id="message"></code>
+        <code id="error"></code>
         <script>
             const { ipcRenderer } = require('electron');
             ipcRenderer.on('download-progress', (e, progress) => {
-                document.querySelector('#message').textContent = `${text}%`;
+                document.querySelector('#message').textContent = `${Number(progress).toFixed(2)}%`;
             });
             ipcRenderer.on('error', (e, error) => {
                 document.querySelector('#error').textContent = error;
