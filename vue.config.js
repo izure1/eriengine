@@ -19,7 +19,8 @@ module.exports = {
     electronBuilder: {
       builderOptions: {
         win: {
-          icon: path.resolve(__dirname, 'public', 'icon.png')
+          icon: path.resolve(__dirname, 'public', 'icon.png'),
+          artifactName: "${productName}-Setup-${version}.${ext}"
         }
       }
     }
