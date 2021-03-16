@@ -35,7 +35,7 @@ declare namespace Engine {
         interface CheckUpdateSuccess extends Engine.ActionSuccessState { available: boolean, updateInfo: UpdateCheckResult }
         interface CheckUpdateFail extends Engine.ActionFailState {}
 
-        interface UpdateEngineSuccess extends Engine.ActionSuccessState {}
-        interface UpdateEngineFail extends Engine.ActionFailState {}
+        interface DownloadUpdateSuccess extends Engine.ActionSuccessState {}
+        interface DownloadUpdateFail extends Engine.ActionFailState {}
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "eriengine4",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.8",
   "private": true,
   "scripts": {
     "lint": "vue-cli-service lint",
@@ -43,13 +43,13 @@
     "trash": "^7.0.0",
     "tree-kill": "^1.2.2",
     "valid-filename": "^3.1.0",
-    "vue": "^2.6.11",
-    "vue-class-component": "^7.2.3",
+    "vue": "^2.6.12",
+    "vue-class-component": "^7.2.6",
     "vue-nonreactivity-decorator": "^1.0.1",
-    "vue-property-decorator": "^8.4.2",
+    "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
-    "vuetify": "^2.4.0",
-    "vuex": "^3.4.0"
+    "vuetify": "^2.4.6",
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@mdi/font": "^5.8.55",
@@ -80,7 +80,7 @@
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.5",
     "vue-cli-plugin-vuetify": "~2.0.9",
     "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.6.0"
+    "vuetify-loader": "^1.7.2"
   },
   "eslintConfig": {
     "root": true,

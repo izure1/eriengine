@@ -147,6 +147,11 @@ export default class ProjectFileListComponent extends Vue {
                     path: `/manager/restructure/${this.projectDirectory}`
                 },
                 {
+                    name: '업데이트',
+                    description: '엔진을 업데이트합니다',
+                    path: '/manager/updater'
+                },
+                {
                     name: '종료',
                     description: '메인화면으로 돌아갑니다',
                     path: '/project/close'

@@ -1,8 +1,8 @@
 <template>
     <v-app id="project">
         <v-main>
-             <router-view />
-             <particles-bg-component />
+            <router-view />
+            <particles-bg-component />
         </v-main>
     </v-app>
 </template>

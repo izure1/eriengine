@@ -2,6 +2,10 @@ import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import compareVersions from 'compare-versions';
 
+/**
+ * 업데이트가 있는지 체크합니다. 현재 엔진의 버전보다 높은 버전이 릴리즈되었다면 정보를 받아옵니다.
+ * @returns 업데이트 정보입니다. available 속성을 이용하여 업데이트 가능여부를 알 수 있습니다.
+ */
 export async function handler(): Promise<Engine.Process.CheckUpdateSuccess|Engine.Process.CheckUpdateFail> {
     try {
         const updateCheckResult = await autoUpdater.checkForUpdates();

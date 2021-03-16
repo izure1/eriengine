@@ -83,7 +83,8 @@ function *generateIPC() {
     
     // Process
     yield require('./Main/IPC/Process/checkUpdate');
-    yield require('./Main/IPC/Process/updateEngine');
+    yield require('./Main/IPC/Process/downloadUpdate');
+    yield require('./Main/IPC/Process/installUpdate');
     yield require('./Main/IPC/Process/checkCommandExists');
     yield require('./Main/IPC/Process/getEngineAuth');
     yield require('./Main/IPC/Process/getEngineVersion');

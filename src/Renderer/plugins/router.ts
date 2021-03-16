@@ -1,32 +1,33 @@
-import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
-import Error404 from '@/Renderer/components/Error/404.vue'
-import DependenciesMain from '@/Renderer/components/Dependencies/Main.vue'
-import DependenciesCheck from '@/Renderer/components/Dependencies/Check/Main.vue'
-import DependenciesInstall from '@/Renderer/components/Dependencies/Install/Main.vue'
-import ProjectMain from '@/Renderer/components/Project/Main.vue'
-import ProjectJob from '@/Renderer/components/Project/Job/Main.vue'
-import ProjectNew from '@/Renderer/components/Project/New/Main.vue'
-import ProjectOpen from '@/Renderer/components/Project/Open/Main.vue'
-import ProjectClose from '@/Renderer/components/Project/Close/Main.vue'
-import Manager from '@/Renderer/components/Manager/Main.vue'
-import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue'
-import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue'
-import ManagerBuild from '@/Renderer/components/Manager/Build/Main.vue'
-import ManagerBuildRunner from '@/Renderer/components/Manager/Build/Runner.vue'
-import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue'
-import ManagerScene from '@/Renderer/components/Manager/Data/Scene/Main.vue'
-import ManagerSceneScript from '@/Renderer/components/Manager/Data/Scene/Script/Main.vue'
-import ManagerSceneMap from '@/Renderer/components/Manager/Data/Scene/Map/Main.vue'
-import ManagerActor from '@/Renderer/components/Manager/Data/Actor/Main.vue'
-import ManagerActorScript from '@/Renderer/components/Manager/Data/Actor/Script/Main.vue'
-import ManagerAnimation from '@/Renderer/components/Manager/Data/Animation/Main.vue'
-import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue'
-import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue'
-import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
-import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
+import Vue from 'vue';
+import VueRouter, { RouteConfig } from 'vue-router';
+import Error404 from '@/Renderer/components/Error/404.vue';
+import DependenciesMain from '@/Renderer/components/Dependencies/Main.vue';
+import DependenciesCheck from '@/Renderer/components/Dependencies/Check/Main.vue';
+import DependenciesInstall from '@/Renderer/components/Dependencies/Install/Main.vue';
+import ProjectMain from '@/Renderer/components/Project/Main.vue';
+import ProjectJob from '@/Renderer/components/Project/Job/Main.vue';
+import ProjectNew from '@/Renderer/components/Project/New/Main.vue';
+import ProjectOpen from '@/Renderer/components/Project/Open/Main.vue';
+import ProjectClose from '@/Renderer/components/Project/Close/Main.vue';
+import Manager from '@/Renderer/components/Manager/Main.vue';
+import ManagerConfig from '@/Renderer/components/Manager/Config/Main.vue';
+import ManagerRestructure from '@/Renderer/components/Manager/Restructure/Main.vue';
+import ManagerBuild from '@/Renderer/components/Manager/Build/Main.vue';
+import ManagerBuildRunner from '@/Renderer/components/Manager/Build/Runner.vue';
+import ManagerAsset from '@/Renderer/components/Manager/Asset/Main.vue';
+import ManagerScene from '@/Renderer/components/Manager/Data/Scene/Main.vue';
+import ManagerSceneScript from '@/Renderer/components/Manager/Data/Scene/Script/Main.vue';
+import ManagerSceneMap from '@/Renderer/components/Manager/Data/Scene/Map/Main.vue';
+import ManagerActor from '@/Renderer/components/Manager/Data/Actor/Main.vue';
+import ManagerActorScript from '@/Renderer/components/Manager/Data/Actor/Script/Main.vue';
+import ManagerAnimation from '@/Renderer/components/Manager/Data/Animation/Main.vue';
+import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue';
+import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue';
+import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue';
+import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue';
+import ManagerUpdater from '@/Renderer/components/Update/Main.vue';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
     {
@@ -172,6 +173,10 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'build/runner/:buildData',
                 component: ManagerBuildRunner
+            },
+            {
+                path: 'updater',
+                component: ManagerUpdater
             }
         ]
     },
@@ -179,12 +184,12 @@ const routes: Array<RouteConfig> = [
         path: '*',
         component: Error404
     }
-]
+];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
-})
+});
 
-export default router
+export default router;
