@@ -25,7 +25,9 @@ import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue';
 import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue';
 import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue';
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue';
-import ManagerUpdater from '@/Renderer/components/Update/Main.vue';
+import Updater from '@/Renderer/components/Update/Main.vue';
+import ManagerEngineNews from '@/Renderer/components/Manager/Engine/News.vue';
+import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Tutorial.vue';
 
 Vue.use(VueRouter);
 
@@ -176,7 +178,15 @@ const routes: Array<RouteConfig> = [
             },
             {
                 path: 'updater',
-                component: ManagerUpdater
+                component: Updater
+            },
+            {
+                path: 'engine/news',
+                component: ManagerEngineNews
+            },
+            {
+                path: 'engine/tutorial',
+                component: ManagerEngineTutorial
             }
         ]
     },

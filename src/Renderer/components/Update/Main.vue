@@ -1,7 +1,9 @@
 <template>
     <v-card flat>
         <v-card-title>업데이트 확인</v-card-title>
-        <v-card-subtitle>에리엔진에 릴리즈된 업데이트가 있는지 확인합니다.</v-card-subtitle>
+        <v-card-subtitle>
+            에리엔진에 릴리즈된 업데이트가 있는지 확인합니다.
+        </v-card-subtitle>
         <v-card-text>
             <v-alert
                 v-if="error"
@@ -66,11 +68,11 @@ export default class UpdaterComponent extends Vue {
     private async download(): Promise<boolean> {
         this.downloadProgress = 0.1;
         const download: Engine.Process.DownloadUpdateSuccess|Engine.Process.DownloadUpdateFail = await ipcRenderer.invoke('download-update');
-        if (!download.success) {
+        if (!download.success || !download.available) {
+            this.$store.dispatch('snackbar', '현재 가능한 업데이트가 없습니다.');
             this.downloadProgress = 0;
             return false;
         }
-        this.downloadProgress = 100;
         return true;
     }
 

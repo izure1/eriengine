@@ -79,7 +79,7 @@ export default class ProjectFileListComponent extends Vue {
     private isDrawerOpen: boolean = false
     private contextmenuGroups: ContextmenuGroup[] = [
         {
-            title: '월드',
+            title: '프로그래밍',
             menus: [
                 {
                     name: '씬',
@@ -147,15 +147,30 @@ export default class ProjectFileListComponent extends Vue {
                     path: `/manager/restructure/${this.projectDirectory}`
                 },
                 {
-                    name: '업데이트',
-                    description: '엔진을 업데이트합니다',
-                    path: '/manager/updater'
-                },
-                {
                     name: '종료',
                     description: '메인화면으로 돌아갑니다',
                     path: '/project/close'
                 }
+            ]
+        },
+        {
+            title: '엔진',
+            menus: [
+                {
+                    name: '새로운 소식',
+                    description: '엔진의 새로운 소식을 알려줍니다',
+                    path: '/manager/engine/news'
+                },
+                {
+                    name: '튜토리얼',
+                    description: '엔진의 사용법에 대해 소개합니다',
+                    path: '/manager/engine/tutorial'
+                },
+                {
+                    name: '업데이트',
+                    description: '엔진을 업데이트합니다',
+                    path: '/manager/updater'
+                },
             ]
         }
     ]

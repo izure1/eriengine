@@ -51,7 +51,9 @@ export async function handler(): Promise<Engine.Process.DownloadUpdateSuccess|En
     return {
         success: true,
         name: '엔진 업데이트',
-        message: '엔진 업데이트를 성공적으로 다운로드 받았습니다.'
+        message: '엔진 업데이트를 성공적으로 다운로드 받았습니다.',
+        available: checkUpdateResult.available,
+        updateInfo: checkUpdateResult.updateInfo
     };
 }
 
