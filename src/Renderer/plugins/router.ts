@@ -26,8 +26,7 @@ import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue';
 import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue';
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue';
 import Updater from '@/Renderer/components/Update/Main.vue';
-import ManagerEngineNews from '@/Renderer/components/Manager/Engine/News.vue';
-import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Tutorial.vue';
+import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Main.vue';
 
 Vue.use(VueRouter);
 
@@ -102,7 +101,7 @@ const routes: Array<RouteConfig> = [
         children: [
             {
                 path: '',
-                redirect: 'scene'
+                redirect: 'engine/tutorial'
             },
             {
                 path: 'scene',
@@ -179,10 +178,6 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'updater',
                 component: Updater
-            },
-            {
-                path: 'engine/news',
-                component: ManagerEngineNews
             },
             {
                 path: 'engine/tutorial',

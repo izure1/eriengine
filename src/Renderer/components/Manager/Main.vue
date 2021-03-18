@@ -157,11 +157,6 @@ export default class ProjectFileListComponent extends Vue {
             title: '엔진',
             menus: [
                 {
-                    name: '새로운 소식',
-                    description: '엔진의 새로운 소식을 알려줍니다',
-                    path: '/manager/engine/news'
-                },
-                {
                     name: '튜토리얼',
                     description: '엔진의 사용법에 대해 소개합니다',
                     path: '/manager/engine/tutorial'
