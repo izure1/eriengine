@@ -4,13 +4,13 @@ import normalize from 'normalize-path'
 import trash from 'trash'
 
 export async function handler(itemPath: string, confirm: boolean): Promise<Engine.FileSystem.TrashSuccess|Engine.FileSystem.TrashFail> {
-    const win: BrowserWindow|null = BrowserWindow.getFocusedWindow()
+    const win = BrowserWindow.getFocusedWindow()
     if (!win) {
         return { success: false, name: '삭제 실패', message: '메인 윈도우가 없습니다' }
     }
 
     if (confirm) {
-        const filename: string = path.basename(itemPath)
+        const filename = path.basename(itemPath)
         const delConfirm = await dialog.showMessageBox(win, {
             type: 'question',
             title: '파일 삭제',

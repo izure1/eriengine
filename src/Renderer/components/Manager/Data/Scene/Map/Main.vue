@@ -354,24 +354,24 @@
 </template>
 
 <script lang="ts">
-import path from 'path';
-import normalize from 'normalize-path';
-import Phaser from 'phaser';
-import { ipcRenderer } from 'electron';
-import { Vue, Component, Watch } from 'vue-property-decorator';
-import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename';
-import NonReactivity from 'vue-nonreactivity-decorator';
+import path from 'path'
+import normalize from 'normalize-path'
+import Phaser from 'phaser'
+import { ipcRenderer } from 'electron'
+import { Vue, Component, Watch } from 'vue-property-decorator'
+import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
+import NonReactivity from 'vue-nonreactivity-decorator'
 
-import PreviewScene from './Phaser/PreviewScene';
-import GuiScene from './Phaser/GuiScene';
-import createConfig from './Phaser/createConfig';
+import PreviewScene from './Phaser/PreviewScene'
+import GuiScene from './Phaser/GuiScene'
+import createConfig from './Phaser/createConfig'
 
-import ChannelComponent from '@/Renderer/components/Shell/Channel.vue';
-import * as Types from './Phaser/Vars/Types';
+import ChannelComponent from '@/Renderer/components/Shell/Channel.vue'
+import * as Types from './Phaser/Vars/Types'
 import {
     PROJECT_SRC_DATA_DIRECTORY_NAME,
     PROJECT_SRC_DIRECTORY_NAME
-} from '@/Const';
+} from '@/Const'
 
 
 interface ActionList {
@@ -385,7 +385,7 @@ interface ActionButton {
     lists: ActionList[]
 }
 
-type Rule = (v: string) => string|boolean;
+type Rule = (v: string) => string|boolean
 
 @Component({
     components: {
@@ -393,41 +393,41 @@ type Rule = (v: string) => string|boolean;
     }
 })
 export default class SceneMapEditor extends Vue {
-    @NonReactivity(null) private game!: Phaser.Game|null;
-    @NonReactivity(null) private scene!: PreviewScene|null;
+    @NonReactivity(null) private game!: Phaser.Game|null
+    @NonReactivity(null) private scene!: PreviewScene|null
 
-    private isSaving: boolean = false;
-    private isBuilding: boolean = false;
-    private isBuiltFail: boolean = false;
-    private isTooltipOpen: boolean = false;
-    private isMapResizerOpen: boolean = false;
-    private isContextmenuOpen: boolean = false;
-    private isPropertiesOpen: boolean = false;
+    private isSaving: boolean = false
+    private isBuilding: boolean = false
+    private isBuiltFail: boolean = false
+    private isTooltipOpen: boolean = false
+    private isMapResizerOpen: boolean = false
+    private isContextmenuOpen: boolean = false
+    private isPropertiesOpen: boolean = false
 
-    private contextmenuOffset: Types.Point2 = { x: 0, y: 0 };
-    private propertyAlias: string = '';
-    private propertyIsSensor: boolean = false;
-    private propertyScale: number = 1;
+    private contextmenuOffset: Types.Point2 = { x: 0, y: 0 }
+    private propertyAlias: string = ''
+    private propertyIsSensor: boolean = false
+    private propertyScale: number = 1
 
     private propertyOnlyPositiveNumber: Rule = (v: string) => {
-        const n: any = v;
+        const n: any = v
         if (isNaN(n)) {
-            return '숫자만 입력할 수 있습니다';
+            return '숫자만 입력할 수 있습니다'
         }
         if (Number(n) <= 0) {
-            return '0보다 큰 수만 입력할 수 있습니다';
+            return '0보다 큰 수만 입력할 수 있습니다'
         }
-        return true;
+        return true
     }
 
-    private paletteImages: Types.PaletteImage[]   = [];
-    private paletteSprites: Types.PaletteSprite[] = [];
-    private paletteBrush: Types.PaletteImage|null = null;
+    private paletteImages: Types.PaletteImage[]   = []
+    private paletteSprites: Types.PaletteSprite[] = []
+    private paletteBrush: Types.PaletteImage|null = null
 
-    private selectionButton: ActionButton|null = null;
-    private selectionType: number = 0;
-    private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null;
-    private mapSceneSide: number = 2000;
+    private selectionButton: ActionButton|null = null
+    private selectionType: number = 0
+    private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
+    private mapSceneSide: number = 2000
 
     private buttons: ActionButton[] = [
         {
@@ -437,13 +437,13 @@ export default class SceneMapEditor extends Vue {
                 {
                     text: '맵 크기 설정',
                     click: (): void => {
-                        this.openMapResizer();
+                        this.openMapResizer()
                     }
                 },
                 {
                     text: '저장하기',
                     click: (): void => {
-                        this.save();
+                        this.save()
                     }
                 }
             ]
@@ -455,8 +455,8 @@ export default class SceneMapEditor extends Vue {
                 {
                     text: '벽 편집하기',
                     click: (button): void => {
-                        this.setSelectionButton(button);
-                        this.setSelectionType(2);
+                        this.setSelectionButton(button)
+                        this.setSelectionType(2)
                     }
                 }
             ]
@@ -468,8 +468,8 @@ export default class SceneMapEditor extends Vue {
                 {
                     text: '바닥 타일 편집하기',
                     click: (button): void => {
-                        this.setSelectionButton(button);
-                        this.setSelectionType(3);
+                        this.setSelectionButton(button)
+                        this.setSelectionType(3)
                     }
                 }
             ]
@@ -481,7 +481,7 @@ export default class SceneMapEditor extends Vue {
                 {
                     text: '기본 사용법',
                     click: (): void => {
-                        this.openTooltip();
+                        this.openTooltip()
                     }
                 }
             ]
@@ -494,8 +494,8 @@ export default class SceneMapEditor extends Vue {
             click: (): void => {
                 this.closeContextmenu()
                 if (!this.isSelectionType(2)) {
-                    this.$store.dispatch('snackbar', '속성은 벽 타일만 사용할 수 있습니다');
-                    return;
+                    this.$store.dispatch('snackbar', '속성은 벽 타일만 사용할 수 있습니다')
+                    return
                 }
                 this.openPropertiesSetting()
             }
@@ -503,55 +503,55 @@ export default class SceneMapEditor extends Vue {
         {
             text: '삭제',
             click: (): void => {
-                this.closeContextmenu();
-                this.requestDeleteSelection();
+                this.closeContextmenu()
+                this.requestDeleteSelection()
             }
         }
     ]
 
     private get filePath(): string {
-        return decodeURIComponent(this.$route.params.filePath);
+        return decodeURIComponent(this.$route.params.filePath)
     }
 
     private get storageKey(): string {
-        return getStorageKeyFromFilename(this.filePath);
+        return getStorageKeyFromFilename(this.filePath)
     }
 
     private get projectDirectory(): string {
-        return this.$store.state.projectDirectory;
+        return this.$store.state.projectDirectory
     }
 
     private get projectConfig(): Engine.GameProject.Config {
-        return this.$store.state.projectConfig;
+        return this.$store.state.projectConfig
     }
 
     private get canvasParent(): HTMLElement {
-        return this.$refs['game-canvas'] as HTMLElement;
+        return this.$refs['game-canvas'] as HTMLElement
     }
 
     private get palettes(): (Types.PaletteImage|Types.PaletteSprite)[] {
         return [
             ...Object.values(this.paletteSprites) as Types.PaletteSprite[],
             ...Object.values(this.paletteImages) as Types.PaletteImage[]
-        ];
+        ]
     }
 
     private goBack(message: string): void {
-        this.$store.dispatch('snackbar', message);
-        this.$router.replace('/manager/scene').catch(() => null);
+        this.$store.dispatch('snackbar', message)
+        this.$router.replace('/manager/scene').catch(() => null)
     }
 
     private async createGame(): Promise<void> {
-        const [ width, height ] = this.projectConfig.gameDisplaySize;
+        const [ width, height ] = this.projectConfig.gameDisplaySize
 
-        const previewScene: PreviewScene = new PreviewScene(this.projectDirectory, this.storageKey);
-        const config = createConfig(width, height, [ previewScene, GuiScene ], this.canvasParent);
+        const previewScene = new PreviewScene(this.projectDirectory, this.storageKey)
+        const config = createConfig(width, height, [ previewScene, GuiScene ], this.canvasParent)
 
-        this.game   = new Phaser.Game(config);
-        this.scene  = previewScene;
+        this.game   = new Phaser.Game(config)
+        this.scene  = previewScene
 
-        this.scene.transfer.emit('receive-image-list', this.paletteImages);
-        this.scene.transfer.emit('receive-sprite-list', this.paletteSprites);
+        this.scene.transfer.emit('receive-image-list', this.paletteImages)
+        this.scene.transfer.emit('receive-sprite-list', this.paletteSprites)
 
         this.scene.transfer
         .on('load-map-fail', (message: string): void => {
@@ -567,290 +567,290 @@ export default class SceneMapEditor extends Vue {
         .on('save-map-success', (): void => {
             this.isSaving = false
             this.$store.dispatch('snackbar', '저장되었습니다!')
-        });
+        })
 
-        this.resizeCanvas();
+        this.resizeCanvas()
     }
 
     private destroyGame(): void {
         if (!this.game) {
-            return;
+            return
         }
 
-        const sceneKeys: string[] = [ ...this.game.plugins.scenePlugins ];
+        const sceneKeys = [ ...this.game.plugins.scenePlugins ]
         for (const sceneKey of sceneKeys) {
-            this.game.plugins.removeScenePlugin(sceneKey);
+            this.game.plugins.removeScenePlugin(sceneKey)
         }
 
-        this.game.destroy(true);
-        this.game = null;
-        this.scene = null;
+        this.game.destroy(true)
+        this.game = null
+        this.scene = null
     }
 
 
     private openTooltip(): void {
-        this.isTooltipOpen = true;
+        this.isTooltipOpen = true
     }
 
     private openMapResizer(): void {
-        this.isMapResizerOpen = true;
+        this.isMapResizerOpen = true
     }
 
     private openContextmenu(e: MouseEvent): void {
         if (this.disposeBrush) {
-            return;
+            return
         }
 
-        const appbarHeight: number = 64;
-        const fixedHeight: number = 30;
-        const { offsetX, offsetY } = e;
+        const appbarHeight = 64
+        const fixedHeight = 30
+        const { offsetX, offsetY } = e
 
-        this.contextmenuOffset.x = offsetX;
-        this.contextmenuOffset.y = offsetY - (appbarHeight + fixedHeight);
-        this.isContextmenuOpen = true;
+        this.contextmenuOffset.x = offsetX
+        this.contextmenuOffset.y = offsetY - (appbarHeight + fixedHeight)
+        this.isContextmenuOpen = true
     }
 
     private closeContextmenu(): void {
-        this.isContextmenuOpen = false;
+        this.isContextmenuOpen = false
     }
 
     private openPropertiesSetting(): void {
         if (!this.selectionType) {
-            return;
+            return
         }
 
         if (!this.scene) {
-            return;
+            return
         }
         
-        let alias: string;
-        let scale: number;
-        let isSensor: boolean;
+        let alias: string
+        let scale: number
+        let isSensor: boolean
 
-        const size: number = this.scene.selectionWalls.size;
+        const size = this.scene.selectionWalls.size
         if (size === 0) {
-            this.$store.dispatch('snackbar', '먼저 대상을 선택해주세요');
-            return;
+            this.$store.dispatch('snackbar', '먼저 대상을 선택해주세요')
+            return
         }
 
         else {
-            const std = [ ...this.scene.selectionWalls ][0];
-            let isOverlap: boolean = true;
+            const std = [ ...this.scene.selectionWalls ][0]
+            let isOverlap = true
 
             for (const wall of this.scene.selectionWalls) {
                 if (wall.data.get('alias') !== std.data.get('alias')) {
-                    isOverlap = false;
-                    break;
+                    isOverlap = false
+                    break
                 }
                 if (wall.scale !== std.scale) {
-                    isOverlap = false;
-                    break;
+                    isOverlap = false
+                    break
                 }
                 if (wall.isSensor() !== std.isSensor()) {
-                    isOverlap = false;
-                    break;
+                    isOverlap = false
+                    break
                 }
             }
 
             // 선택된 모든 오브젝트의 속성이 완벽히 겹칠 경우
             if (isOverlap) {
-                alias       = std.data.get('alias') ?? '';
-                scale       = std.scale;
-                isSensor    = std.isSensor();
+                alias       = std.data.get('alias') ?? ''
+                scale       = std.scale
+                isSensor    = std.isSensor()
             }
             // 하나의 오브젝트의 속성이라도 일치하지 않을 경우 기본값 보여주기
             else {
-                alias       = '';
-                scale       = 1;
-                isSensor    = false;
+                alias       = ''
+                scale       = 1
+                isSensor    = false
             }
         }
 
-        this.propertyAlias      = alias;
-        this.propertyScale      = scale;
-        this.propertyIsSensor   = isSensor;
+        this.propertyAlias      = alias
+        this.propertyScale      = scale
+        this.propertyIsSensor   = isSensor
 
-        this.isPropertiesOpen   = true;
+        this.isPropertiesOpen   = true
     }
 
     private savePropertiesSetting(): void {
         if (!this.scene) {
-            return;
+            return
         }
 
         this.scene.transfer.emit('receive-wall-properties', {
             alias: this.propertyAlias,
             scale: this.propertyScale,
             isSensor: this.propertyIsSensor
-        });
+        })
 
-        this.closePropertiesSetting();
+        this.closePropertiesSetting()
     }
 
     private closePropertiesSetting(): void {
-        this.isPropertiesOpen = false;
+        this.isPropertiesOpen = false
     }
 
 
     private resizeCanvas(): void {
         if (!this.game) {
-            return;
+            return
         }
 
-        const { width, height }     = getComputedStyle(this.canvasParent);
-        const clientWidth: number   = parseFloat(width);
-        const clientHeight: number  = parseFloat(height);
+        const { width, height } = getComputedStyle(this.canvasParent)
+        const clientWidth = parseFloat(width)
+        const clientHeight = parseFloat(height)
         
-        this.game.scale.setGameSize(clientWidth, clientHeight);
+        this.game.scale.setGameSize(clientWidth, clientHeight)
     }
 
     private watchResizeWindow(): void {
-        window.addEventListener('resize', this.resizeCanvas);
+        window.addEventListener('resize', this.resizeCanvas)
     }
 
     private unwatchResizeWindow(): void {
-        window.removeEventListener('resize', this.resizeCanvas);
+        window.removeEventListener('resize', this.resizeCanvas)
     }
 
     private onMouseLeftButtonClick(e: MouseEvent): void {
-        this.closeContextmenu();
+        this.closeContextmenu()
     }
 
     private onMouseRightButtonClick(e: MouseEvent): void {
-        this.openContextmenu(e);
-        this.setDisposeBrush(null);
+        this.openContextmenu(e)
+        this.setDisposeBrush(null)
     }
 
     private save(): void {
         if (!this.scene) {
-            return;
+            return
         }
         if (this.isSaving) {
-            return;
+            return
         }
 
-        this.isSaving = true;
-        this.scene.transfer.emit('receive-save-request');
+        this.isSaving = true
+        this.scene.transfer.emit('receive-save-request')
     }
 
     private checkKeyExists(): boolean {
         if (!this.storageKey) {
-            this.$router.replace('/manager/scene').catch(() => null);
-            return false;
+            this.$router.replace('/manager/scene').catch(() => null)
+            return false
         }
-        return true;
+        return true
     }
 
     private isSelectedButton(button: ActionButton): boolean {
-        return button === this.selectionButton;
+        return button === this.selectionButton
     }
 
     private setSelectionButton(button: ActionButton): void {
-        this.selectionButton = button;
+        this.selectionButton = button
     }
 
     private setSelectionType(type: number): void {
         if (!this.scene) {
-            return;
+            return
         }
-        this.selectionType = type;
-        this.scene.transfer.emit('receive-selection-type', type);
+        this.selectionType = type
+        this.scene.transfer.emit('receive-selection-type', type)
     }
 
     private isSelectionType(...types: number[]): boolean {
-        let ret: boolean = false;
+        let ret: boolean = false
         for (const type of types) {
             if (type === this.selectionType) {
-                return true;
+                return true
             }
         }
-        return false;
+        return false
     }
 
     private setDisposeBrush(brush: Types.PaletteImage|Types.PaletteSprite|null): void {
         if (!this.scene) {
-            return;
+            return
         }
-        this.disposeBrush = brush;
-        this.scene.transfer.emit('receive-dispose-brush', brush);
+        this.disposeBrush = brush
+        this.scene.transfer.emit('receive-dispose-brush', brush)
     }
 
     private getBrushKey(key: string): string {
-        const cwd: string = normalize(path.join(PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME));
-        return normalize(path.relative(cwd, key));
+        const cwd = normalize(path.join(PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME))
+        return normalize(path.relative(cwd, key))
     }
 
     private setMapSide(side: number): void {
         if (!this.scene) {
-            return;
+            return
         }
-        this.scene.transfer.emit('receive-map-side', this.mapSceneSide);
+        this.scene.transfer.emit('receive-map-side', this.mapSceneSide)
     }
 
     private requestDeleteSelection(): void {
         if (!this.scene) {
-            return;
+            return
         }
-        this.scene.transfer.emit('receive-delete-selection');
+        this.scene.transfer.emit('receive-delete-selection')
     }
 
     private async start(): Promise<void> {
-        this.isBuilding = false;
-        this.isBuiltFail = false;
+        this.isBuilding = false
+        this.isBuiltFail = false
 
         if (!this.checkKeyExists()) {
-            return;
+            return
         }
 
-        this.isBuilding = true;
+        this.isBuilding = true
 
-        const built: Engine.GameProject.GeneratePreviewListSuccess|Engine.GameProject.GeneratePreviewListFail = await ipcRenderer.invoke('build-gen', this.projectDirectory);
+        const built: Engine.GameProject.GeneratePreviewListSuccess|Engine.GameProject.GeneratePreviewListFail = await ipcRenderer.invoke('build-gen', this.projectDirectory)
         if (!built.success) {
-            this.isBuiltFail = true;
-            return;
+            this.isBuiltFail = true
+            return
         }
 
         try {
 
-            const spriteModulePath: string = path.resolve(built.path, 'sprite.js');
-            const imageModulePath: string = path.resolve(built.path, 'image.js');
+            const spriteModulePath = path.resolve(built.path, 'sprite.js')
+            const imageModulePath = path.resolve(built.path, 'image.js')
 
             // 모듈 캐시 삭제
-            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(spriteModulePath)];
-            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(imageModulePath)];
+            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(spriteModulePath)]
+            delete __non_webpack_require__.cache[__non_webpack_require__.resolve(imageModulePath)]
 
-            const spriteModule  = __non_webpack_require__(spriteModulePath);
-            const imageModule   = __non_webpack_require__(imageModulePath);
+            const spriteModule = __non_webpack_require__(spriteModulePath)
+            const imageModule = __non_webpack_require__(imageModulePath)
 
-            this.paletteSprites = Object.values(spriteModule) as Types.PaletteSprite[];
-            this.paletteImages  = Object.values(imageModule) as Types.PaletteImage[];
+            this.paletteSprites = Object.values(spriteModule) as Types.PaletteSprite[]
+            this.paletteImages = Object.values(imageModule) as Types.PaletteImage[]
 
-        } catch(e) {
-            this.isBuiltFail = true;
-            return;
+        } catch (e) {
+            this.isBuiltFail = true
+            return
         }
 
-        this.isBuilding = false;
-        this.isBuiltFail = false;
+        this.isBuilding = false
+        this.isBuiltFail = false
 
-        this.createGame();
-        this.openTooltip();
-        this.watchResizeWindow();
+        this.createGame()
+        this.openTooltip()
+        this.watchResizeWindow()
     }
 
 
     @Watch('mapSceneSide')
     private onChanageMapSceneSide(): void {
-        this.setMapSide(this.mapSceneSide);
+        this.setMapSide(this.mapSceneSide)
     }
 
     mounted(): void {
-        this.start();
+        this.start()
     }
 
     beforeDestroy(): void {
-        this.unwatchResizeWindow();
-        this.destroyGame();
+        this.unwatchResizeWindow()
+        this.destroyGame()
     }
 }
 </script>

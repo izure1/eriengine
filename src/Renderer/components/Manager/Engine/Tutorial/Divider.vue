@@ -8,51 +8,51 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import anime from 'animejs';
-import scrollMonitor, { ScrollContainer, ScrollWatcher } from 'scrollmonitor';
-import { isElement } from '@/Utils/typeGuard';
+import { Vue, Component } from 'vue-property-decorator'
+import anime from 'animejs'
+import scrollMonitor, { ScrollContainer, ScrollWatcher } from 'scrollmonitor'
+import { isElement } from '@/Utils/typeGuard'
 
 @Component
 export default class DividerComponent extends Vue {
-    private container: ScrollContainer|null = null;
-    private watcher: ScrollWatcher|null = null;
+    private container: ScrollContainer|null = null
+    private watcher: ScrollWatcher|null = null
 
     private get element(): HTMLElement|null {
-        const el: unknown = this.$refs['wrapper'];
+        const el: unknown = this.$refs['wrapper']
         if (isElement(el)) {
-            return el as HTMLElement;
+            return el as HTMLElement
         }
-        return null;
+        return null
     }
 
     private get viewport(): HTMLElement|null {
         if (!this.element) {
-            return null;
+            return null
         }
-        const el: unknown = document.querySelector('.main-view');
+        const el: unknown = document.querySelector('.main-view')
         if (isElement(el)) {
-            return el as HTMLElement;
+            return el as HTMLElement
         }
-        return null;
+        return null
     }
 
     private playAnimation(): void {
         if (!this.element) {
-            return;
+            return
         }
-        const targets: HTMLElement|null = this.element.querySelector('.animation-square');
+        const targets: HTMLElement|null = this.element.querySelector('.animation-square')
         anime({
             targets,
-            width: 20,
-            height: 20,
+            width: 40,
+            height: 40,
             translateX: {
-                value: [ 120, 180 ],
-                easing: 'linear'
+                value: 130,
+                easing: 'easeOutBack'
             },
             translateY: {
-                value: [ 0, 300 ],
-                easing: 'easeInOutQuint'
+                value: 130,
+                duration: 0
             },
             backgroundColor: '#ef007c',
             rotate: {
@@ -61,41 +61,40 @@ export default class DividerComponent extends Vue {
                 easing: 'easeInOutBack'
             },
             duration: 1000
-        });
-        console.log(targets);
+        })
     }
 
     private addViewportEnter(): void {
         if (!this.viewport) {
-            return;
+            return
         }
         if (!this.element) {
-            return;
+            return
         }
-        this.container = scrollMonitor.createContainer(this.viewport);
-        this.watcher = this.container.create(this.element);
+        this.container = scrollMonitor.createContainer(this.viewport)
+        this.watcher = this.container.create(this.element)
         this.watcher.enterViewport((): void => {
-            this.playAnimation();
-        });
+            this.playAnimation()
+        })
     }
 
     private removeViewportEvent(): void {
         if (this.watcher) {
-            this.watcher.destroy();
-            this.watcher = null;
+            this.watcher.destroy()
+            this.watcher = null
         }
         if (this.container) {
-            this.container.destroy();
-            this.container = null;
+            this.container.destroy()
+            this.container = null
         }
     }
 
     mounted(): void {
-        this.addViewportEnter();
+        this.addViewportEnter()
     }
 
     beforeDestroy(): void {
-        this.removeViewportEvent();
+        this.removeViewportEvent()
     }
 }
 </script>

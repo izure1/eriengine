@@ -22,8 +22,8 @@ interface FileWriteQueue {
     content: string|((path: string) => Promise<void>)
 }
 
-async function writeSceneFile(projectDirPath: string, filePath: string, property: object): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const STORAGE_KEY: string   = getStorageKeyFromFilename(filePath)
+async function writeSceneFile(_projectDirPath: string, filePath: string, property: object): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
+    const STORAGE_KEY = getStorageKeyFromFilename(filePath)
     const DEPTH: number = 0
     const files: FileWriteQueue[] = [
         {
@@ -78,7 +78,7 @@ export async function handler(projectDirPath: string, filePath: string, property
         return fileWrite as Engine.GameProject.AddSceneFail
     }
 
-    const storageKey: string = getStorageKeyFromFilename(filePath)
+    const storageKey = getStorageKeyFromFilename(filePath)
     if (!storageKey) {
         return {
             success: false,

@@ -8,14 +8,14 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {
-    const pkgPath: string = path.resolve(projectDirPath, PROJECT_EXTEND_DIRECTORY_NAME, PROJECT_EXTEND_PACKAGE_NAME)
+    const pkgPath = path.resolve(projectDirPath, PROJECT_EXTEND_DIRECTORY_NAME, PROJECT_EXTEND_PACKAGE_NAME)
     const pkgContent = await readJSON(pkgPath)
     if (!pkgContent.success) {
         return pkgContent as Engine.GameProject.ReadProjectFail
     }
 
     const config: Engine.GameProject.Config = pkgContent.content as Engine.GameProject.Config
-    const validConfig: Engine.GameProject.CheckValidProjectSuccess|Engine.GameProject.CheckValidProjectFail = await checkValidProject(config)
+    const validConfig = await checkValidProject(config)
 
     if (
         !validConfig.success ||

@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { ipcRenderer, shell } from 'electron'
+import { ipcRenderer } from 'electron'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 import FileGeneratorComponent, { ContextItemAction } from '@/Renderer/components/Manager/FileGenerator.vue'
 import {

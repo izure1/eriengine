@@ -12,7 +12,7 @@ import {
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.BuildDevSuccess|Engine.GameProject.BuildDevFail> {
 
-    const srcDirPath: string = path.resolve(projectDirPath, PROJECT_BUILD_DIRECTORY_NAME, PROJECT_BUILD_SRC_DIRECTORY_NAME)
+    const srcDirPath = path.resolve(projectDirPath, PROJECT_BUILD_DIRECTORY_NAME, PROJECT_BUILD_SRC_DIRECTORY_NAME)
     const srcDirDelete = await del(srcDirPath, false)
     if (!srcDirDelete.success) {
         return srcDirDelete as Engine.GameProject.BuildProdFail
@@ -20,7 +20,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
 
     try {
         const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
-        const command: string = 'npm run build:dev'
+        const command = 'npm run build:dev'
 
         await spawner.spawn(command, { writeStream: writeToRenderer('build'), deadWord: 'build-dev' })
     } catch(reason) {

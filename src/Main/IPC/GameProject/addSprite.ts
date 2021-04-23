@@ -8,7 +8,7 @@ import { parseProperty } from '@/Utils/parseProperty'
 import RAW_SPRITE from 'raw-loader!@/Template/Game/SPRITE.txt'
 
 async function writeSpriteFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_SPRITE, {
+    const fileContent = parseProperty(RAW_SPRITE, {
         DATA_LISTS
     })
 

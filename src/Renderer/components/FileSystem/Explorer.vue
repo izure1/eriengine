@@ -206,8 +206,8 @@ export default class ExplorerComponent extends Vue {
     }
 
     private get cwdOffset(): string {
-        const current: string   = normalize(this.currentPath)
-        const cwd: string       = normalize(this.cwd)
+        const current = normalize(this.currentPath)
+        const cwd = normalize(this.cwd)
         return current.replace(cwd, '')
     }
 
@@ -223,8 +223,8 @@ export default class ExplorerComponent extends Vue {
         }
 
         // 최상위 탐색 디렉토리가 아닐 경우, 상위 이동 경로를 추가해야 함
-        const cwd: string = this.getAbsolutePath(this.cwd)
-        const current: string = this.getAbsolutePath(this.currentPath)
+        const cwd = this.getAbsolutePath(this.cwd)
+        const current = this.getAbsolutePath(this.currentPath)
 
         this.files = directoryRead.files
         if (path.relative(cwd, current))  {
@@ -244,7 +244,7 @@ export default class ExplorerComponent extends Vue {
         if (path.isAbsolute(filename)) {
             return normalize(filename)
         }
-        const result: string = path.isAbsolute(filename) ? filename : path.resolve(this.currentPath, filename)
+        const result = path.isAbsolute(filename) ? filename : path.resolve(this.currentPath, filename)
         return normalize(result)
     }
 
@@ -252,13 +252,13 @@ export default class ExplorerComponent extends Vue {
         if (!path.isAbsolute(filename)) {
             return filename
         }
-        const result: string = path.relative(this.currentPath, filename)
+        const result = path.relative(this.currentPath, filename)
         return normalize(result)
     }
 
     private async open(filename: string): Promise<void> {
-        const dist: string = this.getAbsolutePath(filename)
-        const stat: fs.Stats = await fs.lstat(dist)
+        const dist = this.getAbsolutePath(filename)
+        const stat = await fs.lstat(dist)
         if (stat.isDirectory()) {
             this.openDirectory(dist)
         }

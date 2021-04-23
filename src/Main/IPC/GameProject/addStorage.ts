@@ -9,7 +9,7 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string, key: string = nanoid(10)): Promise<Engine.GameProject.AddStorageSuccess|Engine.GameProject.AddStorageFail> {
-    const storageDirPath: string = normalize(
+    const storageDirPath = normalize(
         path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key)
     )
 

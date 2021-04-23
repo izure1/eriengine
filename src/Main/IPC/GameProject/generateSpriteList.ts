@@ -12,16 +12,16 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string): Promise<Engine.GameProject.GenerateSpriteListSuccess|Engine.GameProject.GenerateSpriteListFail> {
-    const cwd: string       = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME))
-    const listPath: string  = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SPRITELIST_NAME))
+    const cwd = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME))
+    const declaredPath = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_SPRITELIST_NAME))
 
     try {
-        const list: string[]            = await glob('**/*.ts', { cwd, absolute: false })
-        const jsonWrite                 = await writeFile(listPath, getEnumContentFromArray(list))
+        const modulePaths = await glob('**/*.ts', { cwd, absolute: false })
+        const jsonWrite = await writeFile(declaredPath, getEnumContentFromArray(modulePaths))
         if (!jsonWrite.success) {
             return jsonWrite as Engine.GameProject.GenerateSpriteListFail
         }
-    } catch(e) {
+    } catch (e) {
         const { name, message } = e as Error
         return {
             success: false,
@@ -34,7 +34,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
         success: true,
         name: '스프라이트 리스트 생성 성공',
         message: '스프라이트 리스트 생성에 성공했습니다',
-        path: listPath
+        path: declaredPath
     }
 }
 

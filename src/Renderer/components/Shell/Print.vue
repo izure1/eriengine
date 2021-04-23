@@ -33,13 +33,13 @@ export default class ShellPrintComponent extends Vue {
     private converter = new Convert({ stream: true, fg: '#333', bg: '#eee' })
 
     private get encodedText(): string {
-        const html: string = this.converter.toHtml(this.print).replace(RegExp.uri, (match: string): string => `<a href="${match}" target="_blank">${match}</a>`)
+        const html = this.converter.toHtml(this.print).replace(RegExp.uri, (match: string): string => `<a href="${match}" target="_blank">${match}</a>`)
         return this.converter.toHtml(html)
     }
 
     private copy(): void {
         const el: Element = this.$refs.code as Element
-        const content: string|null = el?.textContent
+        const content = el?.textContent
         if (!content) {
             return
         }

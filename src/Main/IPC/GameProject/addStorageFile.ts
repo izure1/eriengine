@@ -9,7 +9,7 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string, key: string, dirname: string, filename: string, content: string): Promise<Engine.GameProject.AddStorageFileSuccess|Engine.GameProject.AddStorageFileFail> {
-    const storageDirPath: string = normalize(
+    const storageDirPath = normalize(
         path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key, dirname)
     )
 
@@ -18,7 +18,7 @@ export async function handler(projectDirPath: string, key: string, dirname: stri
         return directoryMake as Engine.GameProject.AddStorageFileFail
     }
 
-    const filePath: string = normalize(
+    const filePath = normalize(
         path.resolve(storageDirPath, filename)
     )
 

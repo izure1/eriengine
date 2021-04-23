@@ -32,9 +32,9 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     }
 
     private getItem(x: number, y: number, items: Engine.GameProject.SceneMapWall[]|Engine.GameProject.SceneMapFloor[]): Engine.GameProject.SceneMapWall|Engine.GameProject.SceneMapFloor|null {
-        const key: string = this.getItemKey(x, y)
+        const key = this.getItemKey(x, y)
         const item = items.find(({ x, y }): boolean => {
-            const itemKey: string = this.getItemKey(x, y)
+            const itemKey = this.getItemKey(x, y)
             return itemKey === key
         })
 
@@ -70,8 +70,8 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
 
     private createWallData(object: Phaser.Physics.Matter.Sprite): Engine.GameProject.SceneMapWall {
         const { x, y, scale } = object
-        const alias: string = object.data.get('alias') || ''
-        const isSensor: boolean = object.isSensor()
+        const alias = object.data.get('alias') || ''
+        const isSensor = object.isSensor()
 
         return { key: object.texture.key, alias, x, y, scale, isSensor }
     }
@@ -82,21 +82,21 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     }
 
     insertWallData(object: Phaser.Physics.Matter.Sprite): this {
-        const has: boolean = !!this.getWall(object.x, object.y)
+        const has = !!this.getWall(object.x, object.y)
         if (has) {
             this.dropWallData(object)
         }
-        const data: Engine.GameProject.SceneMapWall = this.createWallData(object)
+        const data = this.createWallData(object)
         this.walls.push(data)
         return this
     }
 
     insertFloorData(object: Phaser.GameObjects.Sprite): this {
-        const has: boolean = !!this.getFloor(object.x, object.y)
+        const has = !!this.getFloor(object.x, object.y)
         if (has) {
             this.dropFloorData(object)
         }
-        const data: Engine.GameProject.SceneMapFloor = this.createFloorData(object)
+        const data = this.createFloorData(object)
         this.floors.push(data)
         return this
     }
@@ -107,7 +107,7 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     }
 
     modifyWallData(object: Phaser.Physics.Matter.Sprite): this {
-        const key: string = this.getItemKey(object.x, object.y)
+        const key = this.getItemKey(object.x, object.y)
 
         this.walls = this.walls.map((wall: Engine.GameProject.SceneMapWall): Engine.GameProject.SceneMapWall => {
             if (key !== this.getItemKey(wall.x, wall.y)) {
@@ -120,7 +120,7 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     }
 
     modifyFloorData(object: Phaser.GameObjects.Sprite): this {
-        const key: string = this.getItemKey(object.x, object.y)
+        const key = this.getItemKey(object.x, object.y)
 
         this.floors = this.floors.map((floor: Engine.GameProject.SceneMapFloor): Engine.GameProject.SceneMapFloor => {
             if (key !== this.getItemKey(floor.x, floor.y)) {
@@ -133,23 +133,23 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     }
 
     dropWallData({ x, y }: Phaser.Physics.Matter.Sprite): this {
-        const wall: Engine.GameProject.SceneMapWall|null = this.getWall(x, y)
+        const wall = this.getWall(x, y)
         if (!wall) {
             return this
         }
 
-        const index: number = this.walls.indexOf(wall)
+        const index = this.walls.indexOf(wall)
         this.walls.splice(index, 1)
         return this
     }
 
     dropFloorData({ x, y }: Phaser.GameObjects.Sprite): this {
-        const floor: Engine.GameProject.SceneMapFloor|null = this.getFloor(x, y)
+        const floor = this.getFloor(x, y)
         if (!floor) {
             return this
         }
 
-        const index: number = this.floors.indexOf(floor)
+        const index = this.floors.indexOf(floor)
         this.floors.splice(index, 1)
         return this
     }

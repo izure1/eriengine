@@ -8,7 +8,7 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string, key: string, absolute: boolean = false): Promise<Engine.GameProject.GetStorageDirectoriesSuccess|Engine.GameProject.GetStorageDirectoriesFail> {
-    const cwd: string = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key))
+    const cwd = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key))
     const directoryRead = await readDirectory(cwd, { includeDirectories: true, absolute })
     if (!directoryRead.success) {
         return directoryRead as Engine.GameProject.GetStorageDirectoriesFail

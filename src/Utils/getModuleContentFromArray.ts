@@ -25,7 +25,7 @@ export function mappingDefaultExport(moduleDatas: ModuleMap[]): string {
  */
 function getRemovedTsExt(filePath: string): string {
     const parsed = nodePath.parse(filePath)
-    const path: string = parsed.ext === '.ts' ?
+    const path = parsed.ext === '.ts' ?
         nodePath.join(parsed.dir, parsed.name) :
         nodePath.join(parsed.dir, parsed.base)
     
@@ -35,9 +35,9 @@ function getRemovedTsExt(filePath: string): string {
 export function getModuleContentFromArray(list: string[], exportKey: string = '', mappingExport: (moduleDatas: ModuleMap[]) => string = mappingDefaultExport): string {
     let modules: string = ''
     const maps: ModuleMap[] = []
-    for (let i: number = 0, len: number = list.length; i < len; i++) {
-        const name: string = `M${i}`
-        const path: string = list[i]
+    for (let i = 0, len = list.length; i < len; i++) {
+        const name = `M${i}`
+        const path = list[i]
     
         if (exportKey === '') {
             modules += `import ${name} from '${getRemovedTsExt(path)}'\n`

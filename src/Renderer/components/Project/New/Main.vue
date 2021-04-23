@@ -406,7 +406,7 @@ export default class NewProjectComponent extends Vue {
 
     private getToday(): string {
         const getFixedNumber = (v: number) => v < 10 ? `0${v}` : v.toString()
-        const now: Date = new Date
+        const now = new Date
         return `${now.getFullYear()}${getFixedNumber(now.getMonth()+1)}${getFixedNumber(now.getDate())}`
     }
 

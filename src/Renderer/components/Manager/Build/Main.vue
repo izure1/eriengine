@@ -125,12 +125,12 @@ export default class BuildComponent extends Vue {
     }
 
     private createBuildDataToken(buildData: BuildData): string {
-        const stringify: string = JSON.stringify(buildData)
+        const stringify = JSON.stringify(buildData)
         return Base64.encode(stringify)
     }
 
     private runBuilder(button: BuildData): void {
-        const buildDataToken: string = this.createBuildDataToken(button)
+        const buildDataToken = this.createBuildDataToken(button)
         this.$router.replace(`/manager/build/runner/${buildDataToken}`).catch(() => null)
     }
 }

@@ -50,8 +50,8 @@ export default class DependenciesCheckComponent extends Vue {
     ]
 
     private goInstallPage(missings: Dependency[]): void {
-        const stringify: string = JSON.stringify([ ...missings ])
-        const encoded: string = Base64.encode(stringify)
+        const stringify = JSON.stringify([ ...missings ])
+        const encoded = Base64.encode(stringify)
         this.$router.replace(`/dependencies/install/${encoded}`).catch(() => null)
     }
 

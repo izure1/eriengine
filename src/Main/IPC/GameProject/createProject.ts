@@ -28,8 +28,8 @@ async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameP
     ]
     const sceneRootDir: string = path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME)
     for (const { name, property } of scenes) {
-        const filePath: string = path.resolve(sceneRootDir, name)
-        const sceneAdd: Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail = await addScene(projectDirPath, filePath, property)
+        const filePath = path.resolve(sceneRootDir, name)
+        const sceneAdd = await addScene(projectDirPath, filePath, property)
         if (!sceneAdd.success) {
             return sceneAdd as Engine.GameProject.AddSceneFail
         }
@@ -43,8 +43,8 @@ async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameP
 }
 
 export async function handler(directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
-    const projectDirName: string = parseProperty(PROJECT_DIRECTORY_NAME, config)
-    const projectDirPath: string = path.resolve(directoryPath, projectDirName)
+    const projectDirName = parseProperty(PROJECT_DIRECTORY_NAME, config)
+    const projectDirPath = path.resolve(directoryPath, projectDirName)
 
     const projectEnsure = await ensureProject(projectDirPath, config)
     if (!projectEnsure.success) {

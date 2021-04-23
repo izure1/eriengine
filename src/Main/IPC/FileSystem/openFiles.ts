@@ -1,7 +1,7 @@
 import { dialog, ipcMain, IpcMainInvokeEvent, BrowserWindow } from 'electron'
 
 export async function handler(filters: Engine.FileSystem.FileFilter[]): Promise<Engine.FileSystem.OpenFilesSuccess|Engine.FileSystem.OpenFilesFail> {
-    const win: BrowserWindow|null = BrowserWindow.getFocusedWindow()
+    const win = BrowserWindow.getFocusedWindow()
     if (!win) {
         return { success: false, name: '파일 열기 실패', message: '메인 윈도우가 없습니다' }
     }

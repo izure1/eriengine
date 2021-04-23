@@ -7,7 +7,7 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string, key: string, dirname: string, filename: string): Promise<Engine.GameProject.GetStoragePathSuccess|Engine.GameProject.GetStoragePathFail> {
-    const filePath: string = normalize(
+    const filePath = normalize(
         path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key, dirname, filename)
     )
 

@@ -13,16 +13,16 @@ export async function handler(cwd: string, { includeDirectories = true, includeF
 
         const stats: Map<string, fs.Stats> = new Map
         for (const file of files) {
-            const filePath: string = path.resolve(cwd, file)
+            const filePath = path.resolve(cwd, file)
             stats.set(file, await fs.lstat(filePath))
         }
 
         if (!includeDirectories) {
-            files = files.filter((file: string): boolean => !stats.get(file)!.isDirectory())
+            files = files.filter((file) => !stats.get(file)!.isDirectory())
         }
 
         if (!includeFiles) {
-            files = files.filter((file: string): boolean => !stats.get(file)!.isFile())
+            files = files.filter((file) => !stats.get(file)!.isFile())
         }
 
         if (!extensions.includes('*')) {

@@ -38,8 +38,8 @@ export class ProcessSpawner {
                 return reject('This spawner already running.')
             }
     
-            const args: string[] = commandline.split(' ')
-            const command: string = args.shift()!
+            const args = commandline.split(' ')
+            const command = args.shift()!
 
             this.isRunning = true
             this.spawner = spawn(command, args, this.options)
@@ -96,7 +96,7 @@ export class ProcessSpawner {
                         resolve()
                     }
                 })
-            } catch(e) {
+            } catch (e) {
                 reject(e)
             }
         })

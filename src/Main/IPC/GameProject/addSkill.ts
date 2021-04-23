@@ -8,7 +8,7 @@ import { parseProperty } from '@/Utils/parseProperty'
 import RAW_SKILL from 'raw-loader!@/Template/Game/SKILL.txt'
 
 async function writeSkillFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_SKILL, {
+    const fileContent = parseProperty(RAW_SKILL, {
         DATA_LISTS
     })
 

@@ -8,16 +8,15 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue'
 import { Vue, Component } from 'vue-property-decorator'
 import { ParticlesBg } from 'particles-bg-vue'
 
 enum ParticlesType {
-    ball        = 'ball',
-    circle      = 'circle',
-    cobweb      = 'cobweb',
-    polygon     = 'polygon',
-    square      = 'square'
+    Ball        = 'ball',
+    Circle      = 'circle',
+    Cobweb      = 'cobweb',
+    Polygon     = 'polygon',
+    Square      = 'square'
 }
 
 @Component({

@@ -20,11 +20,11 @@ export async function handler({ engineAuth, applicationId }: Engine.GameProject.
     }
 
     try {
-        const entryped = await getEngineAuth(applicationId)
-        if (!entryped.success) {
-            return entryped as Engine.GameProject.CheckValidProjectFail
+        const encrypted = await getEngineAuth(applicationId)
+        if (!encrypted.success) {
+            return encrypted as Engine.GameProject.CheckValidProjectFail
         }
-        if (entryped.auth !== engineAuth) {
+        if (encrypted.auth !== engineAuth) {
             return {
                 success: true,
                 name: '프로젝트 설정 확인',

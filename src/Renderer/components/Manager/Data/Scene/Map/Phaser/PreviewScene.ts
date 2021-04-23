@@ -129,10 +129,10 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     private setCameraMoving(): void {
-        const camera                = this.cameras.main
-        const acceleration: number  = 0.05
-        const drag: number          = 0.0005
-        const maxSpeed: number      = 1
+        const camera = this.cameras.main
+        const acceleration = 0.05
+        const drag = 0.0005
+        const maxSpeed = 1
 
         this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl({
             camera,
@@ -180,7 +180,7 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     private getIsometricSideFromWidth(width: number): number {
-        const rad: number = Phaser.Math.DegToRad(26.57)
+        const rad = Phaser.Math.DegToRad(26.57)
         return width / Math.cos(rad)
     }
 
@@ -206,7 +206,7 @@ export default class PreviewScene extends Phaser.Scene {
             return
         }
 
-        const fillColor: number = Phaser.Display.Color.GetColor(255, 0, 0)
+        const fillColor = Phaser.Display.Color.GetColor(255, 0, 0)
 
         switch (this.selectionType) {
             case 1:
@@ -264,12 +264,12 @@ export default class PreviewScene extends Phaser.Scene {
     }
 
     private calcStraightDisposeOffset(x: number, y: number): Types.Point2 {
-        const startOffset: Point2 = this.cursor.calcCursorOffset(this.dragStartOffset)
-        const distanceX: number = x - startOffset.x
-        const distanceY: number = y - startOffset.y
+        const startOffset = this.cursor.calcCursorOffset(this.dragStartOffset)
+        const distanceX = x - startOffset.x
+        const distanceY = y - startOffset.y
         
         let deg: number
-        const distance: number  = this.getDiagonal(distanceX, distanceY)
+        const distance = this.getDiagonal(distanceX, distanceY)
 
         // ↗
         if (distanceX > 0 && distanceY < 0) {
@@ -288,8 +288,8 @@ export default class PreviewScene extends Phaser.Scene {
             deg = 180 + 26.57
         }
 
-        const rad: number = Phaser.Math.DegToRad(deg)
-        const offset: Point2 = this.cursor.calcCursorOffset({
+        const rad = Phaser.Math.DegToRad(deg)
+        const offset = this.cursor.calcCursorOffset({
             x: Math.cos(rad) * distance,
             y: Math.sin(rad) * distance
         })
@@ -420,7 +420,7 @@ export default class PreviewScene extends Phaser.Scene {
         this.setWorldSize(this.mapData.side)
 
         for (const props of this.mapData.walls) {
-            const wall: Phaser.GameObjects.GameObject|null = this.dispose(props.x, props.y, 2, props.key, false)
+            const wall = this.dispose(props.x, props.y, 2, props.key, false)
             if (!wall) {
                 continue
             }
@@ -510,7 +510,7 @@ export default class PreviewScene extends Phaser.Scene {
             this.transfer.emit('save-map-fail', '데이터 인스턴스가 없습니다')
             return
         }
-        const mapData: Engine.GameProject.SceneMap = this.mapData.data
+        const mapData = this.mapData.data
         const mapWrite: Engine.GameProject.WriteSceneMapSuccess|Engine.GameProject.WriteSceneMapFail = await ipcRenderer.invoke('write-scene-map', this.projectDirectory, this.storageKey, mapData)
         if (!mapWrite.success) {
             this.transfer.emit('save-map-fail', mapWrite.message)

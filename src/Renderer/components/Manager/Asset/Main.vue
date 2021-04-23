@@ -87,8 +87,8 @@ export default class AssetMainComponent extends Vue {
 
         const fails: string[] = []
         for (const file of filesOpen.path) {
-            const name: string = path.basename(file)
-            const dist: string = path.resolve(directoryPath, name)
+            const name = path.basename(file)
+            const dist = path.resolve(directoryPath, name)
 
             const fileCopy: Engine.FileSystem.CopySuccess|Engine.FileSystem.CopyFail = await ipcRenderer.invoke('copy', file, dist)
             if (!fileCopy.success) {
@@ -96,10 +96,10 @@ export default class AssetMainComponent extends Vue {
             }
         }
 
-        const successNum: number = filesOpen.path.length - fails.length
-        const failsSample: string[] = fails.map((file: string): string => path.basename(file)).slice(0, 3)
+        const successNum = filesOpen.path.length - fails.length
+        const failsSample = fails.map((file: string): string => path.basename(file)).slice(0, 3)
 
-        let comment: string = `총 ${successNum}개의 파일을 추가했습니다.`
+        let comment = `총 ${successNum}개의 파일을 추가했습니다.`
         if (failsSample.length) {
             comment = `${failsSample.join(', ')} 등 ${fails.length}개를 제외한, ${comment}`
         }

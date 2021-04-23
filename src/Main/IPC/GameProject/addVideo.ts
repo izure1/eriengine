@@ -8,7 +8,7 @@ import { parseProperty } from '@/Utils/parseProperty'
 import RAW_VIDEO from 'raw-loader!@/Template/Game/VIDEO.txt'
 
 async function writeSpriteFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_VIDEO, {
+    const fileContent = parseProperty(RAW_VIDEO, {
         DATA_LISTS
     })
 

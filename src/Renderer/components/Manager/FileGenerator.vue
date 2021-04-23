@@ -121,8 +121,8 @@ export default class GeneratorComponent extends Vue {
             icon: 'mdi-folder-plus-outline',
             description: '폴더 추가',
             action: async (directoryPath: string): Promise<void> => {
-                const name: string = await this.receiveNaming()
-                const dirname: string = path.resolve(directoryPath, name)
+                const name = await this.receiveNaming()
+                const dirname = path.resolve(directoryPath, name)
 
                 const directoryMake: Engine.FileSystem.MakeDirectorySuccess|Engine.FileSystem.MakeDirectoryFail = await ipcRenderer.invoke('make-directory', dirname)
                 if (!directoryMake.success) {
@@ -192,13 +192,13 @@ export default class GeneratorComponent extends Vue {
     }
 
     private async modifyFileName(src: string): Promise<void> {
-        const basename: string      = path.basename(src)
-        const namewords: string[]   = basename.split('.')
+        const basename = path.basename(src)
+        const namewords = basename.split('.')
 
-        const before: string        = namewords.shift()!
-        const after: string         = await this.receiveNaming(before, `.${namewords.join('.')}`)
+        const before = namewords.shift()!
+        const after = await this.receiveNaming(before, `.${namewords.join('.')}`)
 
-        const dist: string          = path.resolve(path.dirname(src), after)
+        const dist = path.resolve(path.dirname(src), after)
 
         const renaming: Engine.FileSystem.RenameSuccess|Engine.FileSystem.RenameFail = await ipcRenderer.invoke('rename', src, dist)
         if (!renaming.success) {
@@ -217,8 +217,8 @@ export default class GeneratorComponent extends Vue {
 
     private openNamingDialog(defaultName: string = '', defaultExt: string = ''): void {
         this.isNamingDialogOpen = true
-        this.namingText         = defaultName
-        this.namingExt          = defaultExt
+        this.namingText = defaultName
+        this.namingExt = defaultExt
     }
 
     private cancelNaming(): void {

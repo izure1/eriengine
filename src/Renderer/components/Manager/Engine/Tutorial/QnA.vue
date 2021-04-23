@@ -26,8 +26,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import QuoteComponent from './Quote.vue';
+import { Vue, Component } from 'vue-property-decorator'
+import QuoteComponent from './Quote.vue'
 
 @Component({
     props: {

@@ -28,8 +28,8 @@
 </template>
 
 <script lang="ts">
-import { shell } from 'electron';
-import { Vue, Component } from 'vue-property-decorator';
+import { shell } from 'electron'
+import { Vue, Component } from 'vue-property-decorator'
 
 @Component({
     props: {
@@ -60,10 +60,10 @@ import { Vue, Component } from 'vue-property-decorator';
     }
 })
 export default class CardComponent extends Vue {
-    private uri!: string;
+    private uri!: string
     
     private openExternal(): void {
-        shell.openExternal(this.uri);
+        shell.openExternal(this.uri)
     }
 }
 </script>

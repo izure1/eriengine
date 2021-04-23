@@ -196,43 +196,43 @@ export default class ProjectFileListComponent extends Vue {
         }
         
         // 에셋 디렉토리 감지
-        const assetDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
+        const assetDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
         const assetWatcher = new FileWatcher(assetDir).update(() => ipcRenderer.invoke('generate-asset-list', this.projectDirectory)).start().emit()
 
         // 씬 디렉토리 감지
-        const sceneDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME)
+        const sceneDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME)
         const sceneWatcher = new FileWatcher(sceneDir).update(() => ipcRenderer.invoke('generate-scene-list', this.projectDirectory)).start().emit()
 
         // 액터 디렉토리 감지
-        const actorDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME)
+        const actorDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME)
         const actorWatcher = new FileWatcher(actorDir).update(() => ipcRenderer.invoke('generate-actor-list', this.projectDirectory)).start().emit()
 
         // 애니메이션 디렉토리 감지
-        const animsDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME)
+        const animsDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME)
         const animsWatcher = new FileWatcher(animsDir).update(() => ipcRenderer.invoke('generate-animation-list', this.projectDirectory)).start().emit()
 
         // 스킬 디렉토리 감지
-        const skillDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME)
+        const skillDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME)
         const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
 
         // 이미지 디렉토리 감지
-        const imageDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME)
+        const imageDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME)
         const imageWatcher = new FileWatcher(imageDir).update(() => ipcRenderer.invoke('generate-image-list', this.projectDirectory)).start().emit()
 
         // 오디오 디렉토리 감지
-        const audioDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME)
+        const audioDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME)
         const audioWatcher = new FileWatcher(audioDir).update(() => ipcRenderer.invoke('generate-audio-list', this.projectDirectory)).start().emit()
 
         // 비디오 디렉토리 감지
-        const videoDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME)
+        const videoDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME)
         const videoWatcher = new FileWatcher(videoDir).update(() => ipcRenderer.invoke('generate-video-list', this.projectDirectory)).start().emit()
 
         // 스토리지 디렉토리 감지
-        const storageDir: string = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME)
+        const storageDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME)
         const storageWatcher = new FileWatcher(storageDir).update(() => ipcRenderer.invoke('generate-storage-list', this.projectDirectory)).start().emit()
 
         // 설정 디렉토리 감지
-        const extendDir: string = path.resolve(this.projectDirectory, PROJECT_EXTEND_DIRECTORY_NAME)
+        const extendDir = path.resolve(this.projectDirectory, PROJECT_EXTEND_DIRECTORY_NAME)
         const extendWatcher = new FileWatcher(extendDir).update(async () => {
             const projectRead: Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail = await ipcRenderer.invoke('read-project', this.projectDirectory)
             if (!projectRead.success) {

@@ -129,25 +129,19 @@
             </v-row>
         </v-container>
 
-        <divider-component />
-
-        <v-container>
-            <v-card-title class="d-flex justify-center text-h4">외부저장소</v-card-title>
-        </v-container>
-
     </v-card>
 </template> 
 
 <script lang="ts">
-import { shell } from 'electron';
-import { Vue, Component } from 'vue-property-decorator';
-import ButtonCard from './ButtonCard.vue';
-import QnaComponent from './QnA.vue';
-import QuoteComponent from './Quote.vue';
-import DividerComponent from './Divider.vue';
+import { shell } from 'electron'
+import { Vue, Component } from 'vue-property-decorator'
+import ButtonCard from './ButtonCard.vue'
+import QnaComponent from './QnA.vue'
+import QuoteComponent from './Quote.vue'
+import DividerComponent from './Divider.vue'
 
-import bgEngineCardGithub from '@/Renderer/assets/bg-enginecard-github.png';
-import bgEngineCardHome from '@/Renderer/assets/bg-enginecard-home.png';
+import bgEngineCardGithub from '@/Renderer/assets/bg-enginecard-github.png'
+import bgEngineCardHome from '@/Renderer/assets/bg-enginecard-home.png'
 
 @Component({
     components: {
@@ -158,11 +152,11 @@ import bgEngineCardHome from '@/Renderer/assets/bg-enginecard-home.png';
     }
 })
 export default class EngineToturialComponent extends Vue {
-    private bgEngineCardGithub: string = bgEngineCardGithub;
-    private bgEngineCardHome: string = bgEngineCardHome;
+    private bgEngineCardGithub: string = bgEngineCardGithub
+    private bgEngineCardHome: string = bgEngineCardHome
 
     private openExternal(uri: string): void {
-        shell.openExternal(uri);
+        shell.openExternal(uri)
     }
 }
 </script>

@@ -8,11 +8,11 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirPath: string, key: string, dirname: string, absolute: boolean = false): Promise<Engine.GameProject.GetStorageDirectoriesSuccess|Engine.GameProject.GetStorageDirectoriesFail> {
-    const cwd: string = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key, dirname))
+    const cwd = normalize(path.resolve(projectDirPath, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME, key, dirname))
 
     try {
-        const files: string[] = await glob([ '**/*.ts', '**/*.json' ], { cwd, absolute })
-        const normalizeds: string[] = files.map((file: string): string => normalize(file))
+        const files = await glob([ '**/*.ts', '**/*.json' ], { cwd, absolute })
+        const normalizeds = files.map((file: string): string => normalize(file))
         return {
             success: true,
             name: '스토리지 파일 목록',

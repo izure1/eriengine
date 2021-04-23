@@ -8,7 +8,7 @@ import { parseProperty } from '@/Utils/parseProperty'
 import RAW_SCRIPT from 'raw-loader!@/Template/Game/ACTOR_SCRIPT.txt'
 
 async function writeScriptFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_SCRIPT, {
+    const fileContent = parseProperty(RAW_SCRIPT, {
         DATA_LISTS
     })
 

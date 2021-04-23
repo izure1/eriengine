@@ -8,7 +8,7 @@ import { parseProperty } from '@/Utils/parseProperty'
 import RAW_ANIMATION from 'raw-loader!@/Template/Game/ANIMATION.txt'
 
 async function writeAnimationFile(filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
-    const fileContent: string   = parseProperty(RAW_ANIMATION, {
+    const fileContent = parseProperty(RAW_ANIMATION, {
         DATA_LISTS
     })
 

@@ -18,7 +18,7 @@ export async function handler(projectDirPath: string, buildMode: 'dev'|'prod' = 
         return built as Engine.GameProject.BuildToWebFail
     }
 
-    const dist: string = normalize(path.resolve(built.path, '../', PROJECT_BUILD_WEB_DIRECTORY_NAME, sanitize(new Date().toUTCString())))
+    const dist = normalize(path.resolve(built.path, '../', PROJECT_BUILD_WEB_DIRECTORY_NAME, sanitize(new Date().toUTCString())))
     const dirCopy = await copy(built.path, dist)
     if (!dirCopy.success) {
         const stream = writeToRenderer('build')

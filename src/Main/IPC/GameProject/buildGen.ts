@@ -12,7 +12,7 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
 
     try {
         const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
-        const command: string = 'npm run build:gen'
+        const command = 'npm run build:gen'
 
         await spawner.spawn(command, { writeStream: writeToRenderer('build'), deadWord: 'build-gen' })
     } catch(reason) {

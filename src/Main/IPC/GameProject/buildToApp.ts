@@ -17,7 +17,7 @@ import {
     PROJECT_BUILD_APPLICATION_DIRECTORY_NAME,
     PROJECT_BUILD_SRC_MAIN_NAME,
     PROJECT_BUILD_SRC_INDEX_NAME,
-    PROJECT_PACAKGE_NAME
+    PROJECT_PACKAGE_NAME
 } from '@/Const'
 
 import RAW_PACKAGE from 'raw-loader!@/Template/Project/Build-App/PACKAGE.txt'
@@ -38,10 +38,10 @@ export async function handler(projectDirPath: string, buildMode: 'dev'|'prod'): 
     }
 
     // 파일이 출력될 디렉토리 경로
-    const output: string = normalize(path.resolve(built.path, '../', PROJECT_BUILD_APPLICATION_DIRECTORY_NAME, sanitize(new Date().toUTCString())))
+    const output = normalize(path.resolve(built.path, '../', PROJECT_BUILD_APPLICATION_DIRECTORY_NAME, sanitize(new Date().toUTCString())))
 
     // 설정 불러오기
-    const pkgPath: string = path.resolve(projectDirPath, PROJECT_EXTEND_DIRECTORY_NAME, PROJECT_EXTEND_PACKAGE_NAME)
+    const pkgPath = path.resolve(projectDirPath, PROJECT_EXTEND_DIRECTORY_NAME, PROJECT_EXTEND_PACKAGE_NAME)
     const pkgRead = await readJson(pkgPath)
     if (!pkgRead.success) {
         writeError(pkgRead.message)
@@ -50,14 +50,14 @@ export async function handler(projectDirPath: string, buildMode: 'dev'|'prod'): 
     const config: Engine.GameProject.Config = pkgRead.content as Engine.GameProject.Config
 
     // package.json 생성
-    const appPkgPath: string = path.resolve(built.path, PROJECT_PACAKGE_NAME)
-    const appPkgChunkContent: object = JSON.parse(
+    const appPkgPath = path.resolve(built.path, PROJECT_PACKAGE_NAME)
+    const appPkgChunkContent = JSON.parse(
         parseProperty(RAW_PACKAGE, {
             ...config,
             OUTPUT: output
         })
     )
-    const appPkgContent: object = merge(pkgRead.content, appPkgChunkContent)
+    const appPkgContent = merge(pkgRead.content, appPkgChunkContent) as object
 
     const appPkgWrite = await writeJson(appPkgPath, appPkgContent)
     if (!appPkgWrite.success) {
@@ -66,8 +66,8 @@ export async function handler(projectDirPath: string, buildMode: 'dev'|'prod'): 
     }
 
     // main.js 생성
-    const mainPath: string = path.resolve(built.path, PROJECT_BUILD_SRC_MAIN_NAME)
-    const mainContent: string = parseProperty(RAW_MAIN, {
+    const mainPath = path.resolve(built.path, PROJECT_BUILD_SRC_MAIN_NAME)
+    const mainContent = parseProperty(RAW_MAIN, {
         BUILD_MODE: buildMode,
         INDEX: PROJECT_BUILD_SRC_INDEX_NAME,
         WIDTH: config.gameDisplaySize[0],
