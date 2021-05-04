@@ -1,43 +1,43 @@
 const path = require('path')
 
 module.exports = {
-    mode: 'development',
-    target: 'web',
-    node: {
-        __dirname: true,
-        __filename: true
-    },
-    entry: {
-        sprite: path.resolve(__dirname, 'src', '{{ ANIMS_LIST }}'),
-        image: path.resolve(__dirname, 'src', '{{ IMAGE_LIST }}')
-    },
-    output: {
-        path: path.resolve(__dirname, 'cache', 'scene-palette'),
-        filename: '[name].js',
-        library: 'ScenePalette',
-        libraryTarget: 'umd',
-        libraryExport: 'default'
-    },
-    module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                exclude: path.resolve(__dirname, 'node_modules'),
-                use: [
-                    {
-                        loader: 'ts-loader'
-                    }
-                ]
-            }
+  mode: 'development',
+  target: 'web',
+  node: {
+    __dirname: true,
+    __filename: true
+  },
+  entry: {
+    sprite: path.resolve(__dirname, 'src', '{{ ANIMS_LIST }}'),
+    image: path.resolve(__dirname, 'src', '{{ IMAGE_LIST }}')
+  },
+  output: {
+    path: path.resolve(__dirname, 'cache', 'scene-palette'),
+    filename: '[name].js',
+    library: 'ScenePalette',
+    libraryTarget: 'umd',
+    libraryExport: 'default'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: path.resolve(__dirname, 'node_modules'),
+        use: [
+          {
+              loader: 'ts-loader'
+          }
         ]
-    },
-    resolve: {
-        extensions: ['.ts', '.js', '.json'],
-        alias: {
-            '@': path.resolve(__dirname, 'src')
-        }
-    },
-    performance: {
-        hints: false
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.json'],
+    alias: {
+      '@': path.resolve(__dirname, 'src')
     }
+  },
+  performance: {
+    hints: false
+  }
 }

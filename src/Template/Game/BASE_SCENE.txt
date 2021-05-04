@@ -1,15 +1,15 @@
-import Phaser from 'phaser';
-import * as localforage from 'localforage';
-import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor';
-import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene';
-import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor';
-import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue';
-import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war';
+import Phaser from 'phaser'
+import * as localforage from 'localforage'
+import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
+import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
+import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
+import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
 
-type ScriptCallback = (this: BaseScene, ...args: any) => void;
+type ScriptCallback = (this: BaseScene, ...args: any) => void
 
 interface Point2 {
     x: number
@@ -65,172 +65,172 @@ interface SaveData {
  */
 export default class BaseScene extends Phaser.Scene {
 
-    private static ApplicationId: string = '{{ APPLICATION_ID }}';
+    private static ApplicationId: string = '{{ APPLICATION_ID }}'
 
-    protected actor!: ActorPlugin;
-    protected isometric!: IsometricScenePlugin;
-    protected cursor!: IsometricCursorPlugin;
-    protected select!: IsometricSelectPlugin;
-    protected dialogue!: DialoguePlugin;
-    protected modal!: ModalPlugin;
-    protected fow!: FogOfWarPlugin;
+    protected actor!: ActorPlugin
+    protected isometric!: IsometricScenePlugin
+    protected cursor!: IsometricCursorPlugin
+    protected select!: IsometricSelectPlugin
+    protected dialogue!: DialoguePlugin
+    protected modal!: ModalPlugin
+    protected fow!: FogOfWarPlugin
 
-    protected __scripts: Map<string, ScriptCallback[]> = new Map;
-    protected __map: SceneMap = { side: 2000, walls: [], floors: [] };
+    protected __scripts: Map<string, ScriptCallback[]> = new Map
+    protected __map: SceneMap = { side: 2000, walls: [], floors: [] }
 
     /** 게임데이터를 저장하는데 사용된 키 목록입니다 */
     protected async saveKeys(): Promise<string[]> {
-        const keys = await localforage.keys();
+        const keys = await localforage.keys()
         return keys
             .filter((key: string): boolean => key.indexOf(this.saveKey('')) === 0)
-            .map((key: string): string => key.replace(this.saveKey(''), ''));
+            .map((key: string): string => key.replace(this.saveKey(''), ''))
     }
 
     protected generateMap(storages: typeof Storages, key: keyof typeof storages): void {
-        const storage: SceneStorage = storages[key] as unknown as SceneStorage;
+        const storage: SceneStorage = storages[key] as unknown as SceneStorage
         if (!storage) {
-            throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`;
+            throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`
         }
-        this.__map = Object.values(storage.Map)[0].default;
+        this.__map = Object.values(storage.Map)[0].default
     }
 
     protected generateScript(storages: typeof Storages, key: keyof typeof storages): void {
-        const storage: SceneStorage = storages[key] as unknown as SceneStorage;
+        const storage: SceneStorage = storages[key] as unknown as SceneStorage
         if (!storage) {
-            throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`;
+            throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`
         }
-        const script = storage.Script;
+        const script = storage.Script
         for (const name in script) {
-            const callbackData = script[name as keyof typeof script];
+            const callbackData = script[name as keyof typeof script]
             for (const type in callbackData) {
                 if (!this.__scripts.has(type)) {
-                    this.__scripts.set(type, []);
+                    this.__scripts.set(type, [])
                 }
-                const callback: ScriptCallback = callbackData[type as keyof typeof callbackData];
-                this.__scripts.get(type)!.push(callback);
+                const callback: ScriptCallback = callbackData[type as keyof typeof callbackData]
+                this.__scripts.get(type)!.push(callback)
             }
         }
     }
 
     protected runScript(callbacks?: ((...args: any) => void)[], ...args: any): void {
         if (!callbacks)  {
-            return;
+            return
         }
-        callbacks.forEach((callback): void => callback.call(this, args));
+        callbacks.forEach((callback): void => callback.call(this, args))
     }
 
     private loadImage(): void {
         for (const name in Images) {
-            const { key, asset } = Images[name as keyof typeof Images];
+            const { key, asset } = Images[name as keyof typeof Images]
             if (this.textures.exists(key)) {
-                continue;
+                continue
             }
-            this.load.image(key, asset);
+            this.load.image(key, asset)
         }
     }
 
     private loadAudio(): void {
         for (const name in Audios) {
-            const { key, asset } = Audios[name as keyof typeof Audios];
+            const { key, asset } = Audios[name as keyof typeof Audios]
             if (this.cache.audio.exists(key)) {
-                continue;
+                continue
             }
-            this.load.audio(key, asset);
+            this.load.audio(key, asset)
         }
     }
 
     private loadVideo(): void {
         for (const name in Videos) {
-            const { key, asset } = Videos[name as keyof typeof Videos];
+            const { key, asset } = Videos[name as keyof typeof Videos]
             if (this.cache.video.exists(key)) {
-                continue;
+                continue
             }
-            this.load.video(key, asset);
+            this.load.video(key, asset)
         }
     }
 
     private loadSpritesheet(): void {
         for (const name in Animations) {
-            const { key, asset, frameWidth, frameHeight } = Animations[name as keyof typeof Animations];
+            const { key, asset, frameWidth, frameHeight } = Animations[name as keyof typeof Animations]
             if (this.textures.exists(key)) {
-                continue;
+                continue
             }
-            this.load.spritesheet(key, asset, { frameWidth, frameHeight });
+            this.load.spritesheet(key, asset, { frameWidth, frameHeight })
         }
     }
 
     protected loadAssets(): void {
-        this.load.setPath('Asset/');
-        this.loadImage();
-        this.loadAudio();
-        this.loadVideo();
-        this.loadSpritesheet();
+        this.load.setPath('Asset/')
+        this.loadImage()
+        this.loadAudio()
+        this.loadVideo()
+        this.loadSpritesheet()
     }
 
     protected createAnimation(): void {
         for (const name in Animations) {
             const { key, frameRate, start, end, repeat } = Animations[name as keyof typeof Animations]
             if (this.anims.exists(key)) {
-                continue;
+                continue
             }
             this.anims.create({
                 key,
                 frames: this.anims.generateFrameNumbers(key, { start, end }),
                 frameRate,
                 repeat
-            });
+            })
         }
     }
 
     protected createMap(): void {
-        this.isometric.setWorldSize(this.__map.side);
+        this.isometric.setWorldSize(this.__map.side)
 
         for (const { key, alias, x, y, scale, isSensor } of this.__map.walls)  {
-            let animsKey: string|undefined;
+            let animsKey: string|undefined
             if (this.anims.exists(key)) {
-                animsKey = key;
+                animsKey = key
             }
-            const wall = this.isometric.setWalltile(x, y, key, undefined, animsKey);
-            wall.setScale(scale);
-            wall.setSensor(isSensor);
-            wall.setDataEnabled();
-            wall.data.set('alias', alias);
+            const wall = this.isometric.setWalltile(x, y, key, undefined, animsKey)
+            wall.setScale(scale)
+            wall.setSensor(isSensor)
+            wall.setDataEnabled()
+            wall.data.set('alias', alias)
         }
         for (const { key, x, y } of this.__map.floors) {
-            let animsKey: string|undefined;
+            let animsKey: string|undefined
             if (this.anims.exists(key)) {
-                animsKey = key;
+                animsKey = key
             }
-            this.isometric.setFloortile(x, y, key, undefined, animsKey);
+            this.isometric.setFloortile(x, y, key, undefined, animsKey)
         }
     }
 
     private saveKey(key: string): string {
-        return `${BaseScene.ApplicationId}-save-${key}`;
+        return `${BaseScene.ApplicationId}-save-${key}`
     }
 
     private createThumbnail(type: 'image/png'|'image/jpeg' = 'image/jpeg', quality: number = 0.5, size: number = 100): Promise<string> {
         return new Promise((resolve, reject): void => {
             this.renderer.snapshot((image): void => {
-                image = image as HTMLImageElement;
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+                image = image as HTMLImageElement
+                const canvas = document.createElement('canvas')
+                const ctx = canvas.getContext('2d')
                 if (!ctx) {
-                    return reject('CanvasRenderingContext2DSettings generate error.');
+                    return reject('CanvasRenderingContext2DSettings generate error.')
                 }
-                const ratio: number = image.naturalWidth / image.naturalHeight;
+                const ratio: number = image.naturalWidth / image.naturalHeight
                 if (image.naturalWidth > image.naturalHeight) {
-                    canvas.width    = size;
-                    canvas.height   = size / ratio;
+                    canvas.width    = size
+                    canvas.height   = size / ratio
                 }
                 else {
-                    canvas.width    = size * ratio;
-                    canvas.height   = size;
+                    canvas.width    = size * ratio
+                    canvas.height   = size
                 }
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL(type, quality));
-            }, 'image/png', 1);
-        });
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+                resolve(canvas.toDataURL(type, quality))
+            }, 'image/png', 1)
+        })
     }
 
     /**
@@ -240,44 +240,44 @@ export default class BaseScene extends Phaser.Scene {
      *  @param data     저장할 게임 데이터입니다.
      */
     protected async setSaveData(key: string, data: Types.Json): Promise<SaveData> {
-        key = this.saveKey(key);
-        const date: number          = Date.now();
-        const thumbnail: string     = await this.createThumbnail();
-        const saveData: SaveData    = { date, thumbnail, data };
+        key = this.saveKey(key)
+        const date: number          = Date.now()
+        const thumbnail: string     = await this.createThumbnail()
+        const saveData: SaveData    = { date, thumbnail, data }
         
-        await localforage.setItem(key, saveData);
-        return saveData;
+        await localforage.setItem(key, saveData)
+        return saveData
     }
 
     private isJson(raw: unknown): raw is Types.Json {
         if (typeof raw !== 'object') {
-            return false;
+            return false
         }
         if (raw === null) {
-            return false;
+            return false
         }
         try {
-            JSON.stringify(raw);
+            JSON.stringify(raw)
         } catch (e) {
-            return false;
+            return false
         }
-        return true;
+        return true
     }
 
     private isSaveData(json: unknown): json is SaveData {
         if (!this.isJson(json)) {
-            return false;
+            return false
         }
         if (!Object.prototype.hasOwnProperty.call(json, 'data')) {
-            return false;
+            return false
         }
         if (!Object.prototype.hasOwnProperty.call(json, 'date')) {
-            return false;
+            return false
         }
         if (!Object.prototype.hasOwnProperty.call(json, 'thumbnail')) {
-            return false;
+            return false
         }
-        return true;
+        return true
     }
 
     /**
@@ -285,12 +285,12 @@ export default class BaseScene extends Phaser.Scene {
      * @param key 게임 데이터를 저장할 키 값입니다.
      */
     protected async hasSaveData(key: string): Promise<boolean> {
-        key = this.saveKey(key);
-        const item: unknown = await localforage.getItem(key);
+        key = this.saveKey(key)
+        const item: unknown = await localforage.getItem(key)
         if (!this.isSaveData(item)) {
-            return false;
+            return false
         }
-        return true;
+        return true
     }
 
     /**
@@ -298,15 +298,15 @@ export default class BaseScene extends Phaser.Scene {
      *  @param key      게임 데이터를 저장하는데 사용된 키 값입니다.
      */
     protected async getSaveData(key: string): Promise<SaveData> {
-        key = this.saveKey(key);
-        const savedata: unknown = await localforage.getItem(key);
+        key = this.saveKey(key)
+        const savedata: unknown = await localforage.getItem(key)
         if (savedata === null) {
-            throw `'${key}' save key is unused.`;
+            throw `'${key}' save key is unused.`
         }
         if (!this.isSaveData(savedata)) {
-            throw `'${key}' save key is used, but it's using for external.`;
+            throw `'${key}' save key is used, but it's using for external.`
         }
-        return savedata;
+        return savedata
     }
 
     /**
@@ -314,38 +314,38 @@ export default class BaseScene extends Phaser.Scene {
      *  @param key      게임 데이터를 저장하는데 사용된 키 값입니다.
      */
     protected async removeSaveData(key: string): Promise<void> {
-        key = this.saveKey(key);
-        await localforage.removeItem(key);
+        key = this.saveKey(key)
+        await localforage.removeItem(key)
     }
 
     /**
      *  저장된 모든 게임 데이터를 삭제합니다.
      */
     protected async clearSaveData(): Promise<void> {
-        const keys: string[] = await this.saveKeys();
+        const keys: string[] = await this.saveKeys()
         for (const key of keys) {
-            this.removeSaveData(key);
+            this.removeSaveData(key)
         }
     }
 
     init(data: object = {}): void {
-        this.runScript(this.__scripts.get('onSceneInit'), data);
-        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')));
+        this.runScript(this.__scripts.get('onSceneInit'), data)
+        this.events.once(Phaser.Scenes.Events.DESTROY, () => this.runScript(this.__scripts.get('onSceneDestroy')))
     }
 
     preload(): void {
-        this.runScript(this.__scripts.get('onScenePreload'));
-        this.loadAssets();
+        this.runScript(this.__scripts.get('onScenePreload'))
+        this.loadAssets()
     }
 
     create(): void {
-        this.createAnimation();
-        this.createMap();
-        this.runScript(this.__scripts.get('onSceneCreate'));
+        this.createAnimation()
+        this.createMap()
+        this.runScript(this.__scripts.get('onSceneCreate'))
     }
     
     update(time: number, delta: number): void {
-        this.runScript(this.__scripts.get('onSceneUpdate'), time, delta);
+        this.runScript(this.__scripts.get('onSceneUpdate'), time, delta)
     }
 
 }

@@ -5,62 +5,62 @@ const { ProvidePlugin } = require('webpack')
 const mode = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'production'
 
 module.exports = {
-    mode,
-    target: 'web',
-    node: {
-        __dirname: true,
-        __filename: true
-    },
-    entry: {
-        main: path.resolve(__dirname, 'src', 'Game.ts')
-    },
-    output: {
-        path: path.resolve(__dirname, 'build', 'src', 'js'),
-        publicPath: '/js/',
-        filename: '[name].js',
-        library: 'Eriengine[name]',
-        libraryTarget: 'umd'
-    },
-    module: {
-        rules: [
-            {
-                test: /\.ts$/,
-                exclude: path.resolve(__dirname, 'node_modules'),
-                use: [
-                    {
-                        loader: 'ts-loader'
-                    }
-                ]
-            }
+  mode,
+  target: 'web',
+  node: {
+    __dirname: true,
+    __filename: true
+  },
+  entry: {
+    main: path.resolve(__dirname, 'src', 'Game.ts')
+  },
+  output: {
+    path: path.resolve(__dirname, 'build', 'src', 'js'),
+    publicPath: '/js/',
+    filename: '[name].js',
+    library: 'Eriengine[name]',
+    libraryTarget: 'umd'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: path.resolve(__dirname, 'node_modules'),
+        use: [
+          {
+            loader: 'ts-loader'
+          }
         ]
-    },
-    resolve: {
-        extensions: ['.ts', '.js', '.json'],
-        alias: {
-            '@': path.resolve(__dirname, 'src')
-        }
-    },
-    performance: {
-        hints: false
-    },
-    plugins: [
-        new CopyWebpackPlugin({
-            patterns: [
-                {
-                    from: path.resolve(__dirname, 'src', 'Asset'),
-                    to: path.resolve(__dirname, 'build', 'src', 'Asset'),
-                    noErrorOnMissing: true
-                }
-            ]
-        }),
-        new ProvidePlugin({
-            process: 'process/browser',
-        })
-    ],
-    devServer: {
-        contentBase: path.resolve(__dirname, 'build', 'src'),
-        hot: true,
-        open: true,
-        port: {{ ENGINE_BUILDING_SERVER_PORT }}
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.json'],
+    alias: {
+      '@': path.resolve(__dirname, 'src')
     }
+  },
+  performance: {
+    hints: false
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'src', 'Asset'),
+          to: path.resolve(__dirname, 'build', 'src', 'Asset'),
+          noErrorOnMissing: true
+        }
+      ]
+    }),
+    new ProvidePlugin({
+      process: 'process/browser',
+    })
+  ],
+  devServer: {
+    contentBase: path.resolve(__dirname, 'build', 'src'),
+    hot: true,
+    open: true,
+    port: {{ ENGINE_BUILDING_SERVER_PORT }}
+  }
 }

@@ -16,8 +16,8 @@
       "webpack-env"
     ],
     "typeRoots": [
-        "node_modules/@types",
-        "typings"
+      "node_modules/@types",
+      "typings"
     ],
     "paths": {
       "@/*": [

@@ -1,29 +1,29 @@
 {
-    "main": "index.js",
-    "scripts": {
-        "build:gen": "webpack --config webpack.gen.config.js",
-        "build:dev": "set NODE_ENV=development && webpack",
-        "build:prod": "set NODE_ENV=production && webpack",
-        "serve": "set NODE_ENV=development && npm run build:dev && npx webpack-cli serve"
-    },
-    "dependencies": {
-        "phaser": "^3.53.0",
-        "process": "^0.11.10",
-        "localforage": "^1.9.0",
-        "@eriengine/plugin-actor": "^1.3.0",
-        "@eriengine/plugin-dialogue": "^1.4.1",
-        "@eriengine/plugin-fog-of-war": "^1.1.0",
-        "@eriengine/plugin-isometric-scene": "^1.2.2",
-        "@eriengine/plugin-isometric-cursor": "^1.2.0"
-    },
-    "devDependencies": {
-        "typescript": "^4.1.3",
-        "ts-loader": "^8.0.14",
-        "webpack": "^5.11.1",
-        "webpack-cli": "^4.4.0",
-        "webpack-dev-server": "^3.11.2",
-        "@webpack-cli/serve": "^1.2.2",
-        "fast-glob": "^3.2.5",
-        "copy-webpack-plugin": "^7.0.0"
-    }
+  "main": "index.js",
+  "scripts": {
+    "build:gen": "webpack --config webpack.gen.config.js",
+    "build:dev": "set NODE_ENV=development && webpack",
+    "build:prod": "set NODE_ENV=production && webpack",
+    "serve": "set NODE_ENV=development && npm run build:dev && npx webpack-cli serve"
+  },
+  "dependencies": {
+    "phaser": "^3.54.0",
+    "process": "^0.11.10",
+    "localforage": "^1.9.0",
+    "@eriengine/plugin-actor": "^1.3.0",
+    "@eriengine/plugin-dialogue": "^1.4.1",
+    "@eriengine/plugin-fog-of-war": "^1.1.0",
+    "@eriengine/plugin-isometric-scene": "^1.2.2",
+    "@eriengine/plugin-isometric-cursor": "^1.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3",
+    "ts-loader": "^8.0.14",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.4.0",
+    "webpack-dev-server": "^3.11.2",
+    "@webpack-cli/serve": "^1.2.2",
+    "fast-glob": "^3.2.5",
+    "copy-webpack-plugin": "^7.0.0"
+  }
 }

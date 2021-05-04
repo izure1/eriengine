@@ -25,6 +25,8 @@ import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue'
 import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue'
 import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
+import ManagerToolMain from '@/Renderer/components/Manager/Tool/Main.vue'
+import ManagerToolIsometricalLayer from '@/Renderer/components/Manager/Tool/IsometricalLayer.vue'
 import Updater from '@/Renderer/components/Update/Main.vue'
 import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Main.vue'
 
@@ -182,6 +184,14 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'engine/tutorial',
                 component: ManagerEngineTutorial
+            },
+            {
+              path: 'tool',
+              component: ManagerToolMain
+            },
+            {
+              path: 'tool/isometrical-layer',
+              component: ManagerToolIsometricalLayer
             }
         ]
     },

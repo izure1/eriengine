@@ -16,9 +16,9 @@ new Phaser.Game({
         ...Object.values(Scenes)
             .map((scene) => scene.default)
             .sort((a, b): number => {
-                const filename: string = a.Key.replace(/\\/g, '/').split('/').pop()!
-                const tokens: string[] = filename.split('.')
-                const name: string = tokens[0]
+                const filename = a.Key.replace(/\\/g, '/').split('/').pop()!
+                const tokens = filename.split('.')
+                const name = tokens[0]
 
                 // 씬 이름이 'main'일 경우, 가장 처음으로 실행될 것
                 if (name.toLowerCase() === 'main') return -1

@@ -5,7 +5,12 @@ module.exports = {
     "vuetify"
   ],
   configureWebpack: {
-    target: 'electron-renderer'
+    target: 'electron-renderer',
+    resolve: {
+      alias: {
+        '~': path.join(__dirname, 'src')
+      }
+    }
   },
   chainWebpack: config => {
     config.module
