@@ -12,15 +12,15 @@ import { Vue, Component } from 'vue-property-decorator'
 import ParticlesBgComponent from '@/Renderer/components/Background/Particles.vue'
 
 @Component({
-    components: {
-        ParticlesBgComponent
-    }
+  components: {
+    ParticlesBgComponent
+  }
 })
 export default class DependenciesComponent extends Vue {}
 </script>
 
 <style lang="scss" scoped>
 .theme--light {
-    background: initial !important;
+  background: initial !important;
 }
 </style>

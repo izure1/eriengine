@@ -3,24 +3,24 @@ import { autoUpdater } from 'electron-updater'
 import { handler as checkUpdate } from './checkUpdate'
 
 function mainWindow(): BrowserWindow|undefined {
-    return BrowserWindow.getAllWindows()[0]
+  return BrowserWindow.getAllWindows()[0]
 }
 
 autoUpdater.autoDownload = false
 autoUpdater.on('download-progress', (progressObj: Engine.Process.UpdateProgress) => {
-    const main = mainWindow()
-    if (!main) {
-        return
-    }
-    main.webContents.send('download-update-progress', progressObj.percent)
+  const main = mainWindow()
+  if (!main) {
+    return
+  }
+  main.webContents.send('download-update-progress', progressObj.percent)
 })
 
 autoUpdater.on('error', (error: Error): void => {
-    const main = mainWindow()
-    if (!main) {
-        return
-    }
-    main.webContents.send('download-update-error', error.toString())
+  const main = mainWindow()
+  if (!main) {
+    return
+  }
+  main.webContents.send('download-update-error', error.toString())
 })
 
 /**
@@ -32,33 +32,32 @@ autoUpdater.on('error', (error: Error): void => {
  * @returns 다운로드 성공여부입니다.
  */
 export async function handler(): Promise<Engine.Process.DownloadUpdateSuccess|Engine.Process.DownloadUpdateFail> {
-    const checkUpdateResult = await checkUpdate()
-    if (!checkUpdateResult.success || !checkUpdateResult.available) {
-        return checkUpdateResult
-    }
+  const checkUpdateResult = await checkUpdate()
+  if (!checkUpdateResult.success) {
+    return checkUpdateResult
+  }
 
-    try {
-        await autoUpdater.downloadUpdate()
-    } catch (e) {
-        const { name, message } = e
-        return {
-            success: false,
-            name,
-            message
-        }
-    }
-
+  try {
+    await autoUpdater.downloadUpdate()
+  } catch (e) {
+    const { name, message } = e
     return {
-        success: true,
-        name: '엔진 업데이트',
-        message: '엔진 업데이트를 성공적으로 다운로드 받았습니다.',
-        available: checkUpdateResult.available,
-        updateInfo: checkUpdateResult.updateInfo
+      success: false,
+      name,
+      message
     }
+  }
+
+  return {
+    success: true,
+    name: '엔진 업데이트',
+    message: '엔진 업데이트를 성공적으로 다운로드 받았습니다.',
+    updateInfo: checkUpdateResult.updateInfo
+  }
 }
 
 export function ipc(): void {
-    ipcMain.handle('download-update', async (e: IpcMainInvokeEvent): Promise<Engine.Process.DownloadUpdateSuccess|Engine.Process.DownloadUpdateFail> => {
-        return await handler()
-    })
+  ipcMain.handle('download-update', async (e: IpcMainInvokeEvent): Promise<Engine.Process.DownloadUpdateSuccess|Engine.Process.DownloadUpdateFail> => {
+    return await handler()
+  })
 }

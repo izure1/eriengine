@@ -25,50 +25,50 @@ import { Vue, Component } from 'vue-property-decorator'
 import ShellChannelComponent from '@/Renderer/components/Shell/Channel.vue'
 
 @Component({
-    components: {
-        ShellChannelComponent
-    }
+  components: {
+    ShellChannelComponent
+  }
 })
 export default class RestructureComponent extends Vue {
-    private get cwd(): string {
-        return this.$route.params.cwd
+  private get cwd(): string {
+    return this.$route.params.cwd
+  }
+
+  private finally(message: string): void {
+    this.$store.dispatch('snackbar', message)
+    this.$router.replace('/manager').catch(() => null)
+  }
+
+  private goBack(): void {
+    this.$router.replace('/manager').catch(() => null)
+  }
+
+  private async readProject(): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {
+    return await ipcRenderer.invoke('read-project', this.cwd)
+  }
+
+  private async restructureProject(config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
+    return await ipcRenderer.invoke('ensure-project', this.cwd, config)
+  }
+
+  async created(): Promise<void> {
+    if (!this.cwd) {
+      return
     }
 
-    private finally(message: string): void {
-        this.$store.dispatch('snackbar', message)
-        this.$router.replace('/manager').catch(() => null)
+    const projectRead = await this.readProject()
+    if (!projectRead.success) {
+      this.finally(projectRead.message)
+      return
     }
 
-    private goBack(): void {
-        this.$router.replace('/manager').catch(() => null)
+    const projectRestructure = await this.restructureProject(projectRead.config)
+    if (!projectRestructure.success) {
+      this.finally(projectRestructure.message)
+      return
     }
 
-    private async readProject(): Promise<Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail> {
-        return await ipcRenderer.invoke('read-project', this.cwd)
-    }
-
-    private async restructureProject(config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
-        return await ipcRenderer.invoke('ensure-project', this.cwd, config)
-    }
-
-    async created(): Promise<void> {
-        if (!this.cwd) {
-            return
-        }
-
-        const projectRead = await this.readProject()
-        if (!projectRead.success) {
-            this.finally(projectRead.message)
-            return
-        }
-
-        const projectRestructure = await this.restructureProject(projectRead.config)
-        if (!projectRestructure.success) {
-            this.finally(projectRestructure.message)
-            return
-        }
-
-        this.finally('작업을 성공적으로 끝마쳤습니다')
-    }
+    this.finally('작업을 성공적으로 끝마쳤습니다')
+  }
 }
 </script>

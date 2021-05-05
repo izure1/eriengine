@@ -7,11 +7,11 @@ import { autoUpdater } from 'electron-updater'
  * 만일 다운로드된 업데이트가 없다면 앱은 강제종료되지만, 설치작업은 이루어지지 않습니다.
  */
 export async function handler(): Promise<void> {
-    autoUpdater.quitAndInstall()
+  autoUpdater.quitAndInstall()
 }
 
 export function ipc(): void {
-    ipcMain.handle('install-update', async (e: IpcMainInvokeEvent): Promise<void> => {
-        return await handler()
-    })
+  ipcMain.handle('install-update', async (e: IpcMainInvokeEvent): Promise<void> => {
+    return await handler()
+  })
 }

@@ -45,53 +45,53 @@ import { ipcRenderer } from 'electron'
 import ShellChannelComponent from '@/Renderer/components/Shell/Channel.vue'
 
 @Component({
-    components: {
-        ShellChannelComponent
-    }
+  components: {
+    ShellChannelComponent
+  }
 })
 export default class OpenProjectComponent extends Vue {
-    private isLoading: boolean = false
+  private isLoading: boolean = false
 
-    private async selectDirectory(): Promise<void> {
-        const directoryOpen: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
-        if (!directoryOpen.success) {
-            this.$store.dispatch('snackbar', directoryOpen.message)
-            return
-        }
-
-        this.isLoading = true
-
-        const projectRead: Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail = await ipcRenderer.invoke('read-project', directoryOpen.path)
-        if (!projectRead.success) {
-            this.isLoading = false
-            this.$store.dispatch('snackbar', projectRead.message)
-            return
-        }
-
-        const projectEnsure: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('ensure-project', directoryOpen.path, projectRead.config)
-        if (!projectEnsure.success) {
-            this.isLoading = false
-            this.$store.dispatch('snackbar', projectEnsure.message)
-            return
-        }
-
-        const { path, config } = projectRead
-        this.$store.dispatch('openProject', { path, config })
-        this.$router.replace('/manager').catch(() => null)
+  private async selectDirectory(): Promise<void> {
+    const directoryOpen: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
+    if (!directoryOpen.success) {
+      this.$store.dispatch('snackbar', directoryOpen.message)
+      return
     }
 
-    private goBack(): void {
-        this.$router.replace('/project/close').catch(() => null)
+    this.isLoading = true
+
+    const projectRead: Engine.GameProject.ReadProjectSuccess|Engine.GameProject.ReadProjectFail = await ipcRenderer.invoke('read-project', directoryOpen.path)
+    if (!projectRead.success) {
+      this.isLoading = false
+      this.$store.dispatch('snackbar', projectRead.message)
+      return
     }
 
-    mounted(): void {
-        this.selectDirectory()
+    const projectEnsure: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('ensure-project', directoryOpen.path, projectRead.config)
+    if (!projectEnsure.success) {
+      this.isLoading = false
+      this.$store.dispatch('snackbar', projectEnsure.message)
+      return
     }
+
+    const { path, config } = projectRead
+    this.$store.dispatch('openProject', { path, config })
+    this.$router.replace('/manager').catch(() => null)
+  }
+
+  private goBack(): void {
+    this.$router.replace('/project/close').catch(() => null)
+  }
+
+  mounted(): void {
+    this.selectDirectory()
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .open {
-    background-color: initial !important;
+  background-color: initial !important;
 }
 </style>

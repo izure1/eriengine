@@ -350,131 +350,131 @@ type Rule = (v: string) => boolean|string;
 
 @Component
 export default class NewProjectComponent extends Vue {
-    private isCreating: boolean = false
-    private step: number = 1
-    private license: string = LICENSE
-    private licenseAgree: boolean = false
-    private projectName: string = ''
-    private applicationId: string = this.setRefreshedDomain()
-    private gameDisplaySize: [number, number] = [1280, 720]
-    private gameDisplayResizable: boolean = true
-    private gameThemeTextColor: string = '#FFFFFFFF'
-    private gameThemeBackgroundColor: string = '#EF007CAA'
+  private isCreating: boolean = false
+  private step: number = 1
+  private license: string = LICENSE
+  private licenseAgree: boolean = false
+  private projectName: string = ''
+  private applicationId: string = this.setRefreshedDomain()
+  private gameDisplaySize: [number, number] = [1280, 720]
+  private gameDisplayResizable: boolean = true
+  private gameThemeTextColor: string = '#FFFFFFFF'
+  private gameThemeBackgroundColor: string = '#EF007CAA'
 
-    private get applicationIDRule(): Rule {
-        return (v: string|number) => v && /^([A-Za-z]{1}[A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*$/.test(v.toString()) || 'application ID 형식이 올바르지 않습니다.'
+  private get applicationIDRule(): Rule {
+    return (v: string|number) => v && /^([A-Za-z]{1}[A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*$/.test(v.toString()) || 'application ID 형식이 올바르지 않습니다.'
+  }
+
+  private get projectNameRule(): Rule {
+    return (v: string|number) => v && /^.([a-z]|\d)*$/.test(v.toString()) || '프로젝트 이름 형식이 올바르지 않습니다.'
+  }
+
+  private get projectNameRequiredRule(): Rule {
+    return (v: string|number) => !!v || '프로젝트 이름은 필수입니다.'
+  }
+
+  private get displaySize(): string {
+    return this.gameDisplaySize.join('×')
+  }
+
+  private get isAllValid(): boolean {
+    let done: boolean = true
+
+    if (this.licenseAgree !== true) done = false
+    if (this.projectNameRequiredRule(this.projectName) !== true) done = false
+    if (this.projectNameRule(this.projectName) !== true) done = false
+    if (this.applicationIDRule(this.applicationId) !== true) done = false
+
+    return done
+  }
+
+  private isComplete(step: number): boolean {
+    return step < this.step
+  }
+
+  private goMain(): void {
+    this.$router.replace('/').catch(() => null)
+  }
+
+  private goNextStep(): void {
+    this.step++
+  }
+
+  private goBeforeStep(): void {
+    this.step--
+  }
+
+  private getToday(): string {
+    const getFixedNumber = (v: number) => v < 10 ? `0${v}` : v.toString()
+    const now = new Date
+    return `${now.getFullYear()}${getFixedNumber(now.getMonth()+1)}${getFixedNumber(now.getDate())}`
+  }
+
+  private getDomain(id: string): string {
+    return `${id}.In_${this.getToday()}.eriengine.izure.org`
+  }
+
+  private setRefreshedDomain(): string {
+    this.applicationId = this.getDomain(getRandomSentence(3))
+    return this.applicationId
+  }
+
+  private setDisplaySize(width: number, height: number): void {
+    this.gameDisplaySize = [width, height]
+  }
+
+  private async createProject(): Promise<void> {
+    const open: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
+    if (!open.success) {
+      this.$store.dispatch('snackbar', open.message)
+      return
     }
 
-    private get projectNameRule(): Rule {
-        return (v: string|number) => v && /^.([a-z]|\d)*$/.test(v.toString()) || '프로젝트 이름 형식이 올바르지 않습니다.'
+    this.goNextStep()
+
+    const engineAuth: Engine.Process.GetEngineAuthSuccess|Engine.Process.GetEngineAuthFail = await ipcRenderer.invoke('get-engine-auth', this.applicationId)
+    if (!engineAuth.success) {
+      this.$store.dispatch('snackbar', engineAuth.message)
+      return 
     }
 
-    private get projectNameRequiredRule(): Rule {
-        return (v: string|number) => !!v || '프로젝트 이름은 필수입니다.'
+    const engineVersion: Engine.Process.GetEngineVersionSuccess|Engine.Process.GetEngineVersionFail = await ipcRenderer.invoke('get-engine-version')
+    if (!engineVersion.success) {
+      this.$store.dispatch('snackbar', engineVersion.message)
+      return
     }
 
-    private get displaySize(): string {
-        return this.gameDisplaySize.join('×')
+    const config: Engine.GameProject.Config = {
+      engineAuth: engineAuth.auth,
+      engineVersion: engineVersion.version,
+      name: this.projectName,
+      applicationId: this.applicationId,
+      gameDisplaySize: this.gameDisplaySize,
+      gameDisplayResizable: this.gameDisplayResizable,
+      gameMaximizable: true,
+      gameThemeTextColor: this.gameThemeTextColor,
+      gameThemeBackgroundColor: this.gameThemeBackgroundColor,
+      version: '1.0.0',
+      author: '',
+      license: '',
+      description: '에리엔진으로 만들어진 게임 프로젝트'
     }
 
-    private get isAllValid(): boolean {
-        let done: boolean = true
+    this.isCreating = true
 
-        if (this.licenseAgree !== true) done = false
-        if (this.projectNameRequiredRule(this.projectName) !== true) done = false
-        if (this.projectNameRule(this.projectName) !== true) done = false
-        if (this.applicationIDRule(this.applicationId) !== true) done = false
+    const projectCreate: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('create-project', open.path, config)
+    if (!projectCreate.success) {
+      this.$store.dispatch('snackbar', projectCreate.message)
 
-        return done
+      this.goBeforeStep()
+      this.isCreating = false
+
+      return
     }
 
-    private isComplete(step: number): boolean {
-        return step < this.step
-    }
-
-    private goMain(): void {
-        this.$router.replace('/').catch(() => null)
-    }
-
-    private goNextStep(): void {
-        this.step++
-    }
-
-    private goBeforeStep(): void {
-        this.step--
-    }
-
-    private getToday(): string {
-        const getFixedNumber = (v: number) => v < 10 ? `0${v}` : v.toString()
-        const now = new Date
-        return `${now.getFullYear()}${getFixedNumber(now.getMonth()+1)}${getFixedNumber(now.getDate())}`
-    }
-
-    private getDomain(id: string): string {
-        return `${id}.In_${this.getToday()}.eriengine.izure.org`
-    }
-
-    private setRefreshedDomain(): string {
-        this.applicationId = this.getDomain(getRandomSentence(3))
-        return this.applicationId
-    }
-
-    private setDisplaySize(width: number, height: number): void {
-        this.gameDisplaySize = [width, height]
-    }
-
-    private async createProject(): Promise<void> {
-        const open: Engine.FileSystem.OpenDirectorySuccess|Engine.FileSystem.OpenDirectoryFail = await ipcRenderer.invoke('open-directory')
-        if (!open.success) {
-            this.$store.dispatch('snackbar', open.message)
-            return
-        }
-
-        this.goNextStep()
-
-        const engineAuth: Engine.Process.GetEngineAuthSuccess|Engine.Process.GetEngineAuthFail = await ipcRenderer.invoke('get-engine-auth', this.applicationId)
-        if (!engineAuth.success) {
-            this.$store.dispatch('snackbar', engineAuth.message)
-            return 
-        }
-
-        const engineVersion: Engine.Process.GetEngineVersionSuccess|Engine.Process.GetEngineVersionFail = await ipcRenderer.invoke('get-engine-version')
-        if (!engineVersion.success) {
-            this.$store.dispatch('snackbar', engineVersion.message)
-            return
-        }
-
-        const config: Engine.GameProject.Config = {
-            engineAuth: engineAuth.auth,
-            engineVersion: engineVersion.version,
-            name: this.projectName,
-            applicationId: this.applicationId,
-            gameDisplaySize: this.gameDisplaySize,
-            gameDisplayResizable: this.gameDisplayResizable,
-            gameMaximizable: true,
-            gameThemeTextColor: this.gameThemeTextColor,
-            gameThemeBackgroundColor: this.gameThemeBackgroundColor,
-            version: '1.0.0',
-            author: '',
-            license: '',
-            description: '에리엔진으로 만들어진 게임 프로젝트'
-        }
-
-        this.isCreating = true
-
-        const projectCreate: Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail = await ipcRenderer.invoke('create-project', open.path, config)
-        if (!projectCreate.success) {
-            this.$store.dispatch('snackbar', projectCreate.message)
-
-            this.goBeforeStep()
-            this.isCreating = false
-
-            return
-        }
-
-        this.$store.dispatch('snackbar', '프로젝트를 성공적으로 생성했습니다')
-        this.$router.replace('/project/close').catch(() => null)
-    }
+    this.$store.dispatch('snackbar', '프로젝트를 성공적으로 생성했습니다')
+    this.$router.replace('/project/close').catch(() => null)
+  }
 }
 </script>
 
