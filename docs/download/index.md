@@ -1,6 +1,6 @@
 ## 다운로드
 
-다운로드는 에리엔진 저장소의 [릴리즈 페이지](https://github.com/izure1/eriengine4/releases)에서 다운로드 하실 수 있습니다.
+다운로드는 에리엔진 저장소의 [릴리즈 페이지](https://github.com/izure1/eriengine/releases)에서 다운로드 하실 수 있습니다.
 
 또한 추후 자동 업데이트를 지원할 예정입니다.
 
@@ -16,6 +16,6 @@
 아래 가이드라인을 따르세요.
 
 1. [Node.js](https://nodejs.org/ko/download/)를 설치합니다.
-2. 본 저장소에서 [에리엔진 소스코드를 다운](https://github.com/izure1/eriengine4/archive/master.zip)받습니다.
+2. 본 저장소에서 [에리엔진 소스코드를 다운](https://github.com/izure1/eriengine/archive/master.zip)받습니다.
 3. 다운받은 소스코드 디렉토리에서 `npm i` 명령어를 호출하여 의존모듈을 설치합니다.
 4. 이후 `npm run electron:build` 명령어를 호출하여 엔진을 빌드합니다.

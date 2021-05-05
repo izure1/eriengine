@@ -17,13 +17,13 @@
 빌드된 게임은 웹, 윈도우, 안드로이드 등 크로스플랫폼을 지원합니다.
 
 ## 설치
-기본적으로 Windows10 버전의 프리빌트된 버전을 배포합니다. 이는 [릴리스 페이지](https://github.com/izure1/eriengine4/releases)에서 확인할 수 있습니다.
+기본적으로 Windows10 버전의 프리빌트된 버전을 배포합니다. 이는 [릴리스 페이지](https://github.com/izure1/eriengine/releases)에서 확인할 수 있습니다.
 
 만약 그 외의 운영체제에서 사용하고 싶다면 소스코드를 직접 빌드하는 방법이 있습니다.  
 아래 가이드라인을 따르세요.
 
 1. [Node.js](https://nodejs.org/ko/download/)를 설치합니다.
-2. 본 저장소에서 [에리엔진 소스코드를 다운](https://github.com/izure1/eriengine4/archive/master.zip)받습니다.
+2. 본 저장소에서 [에리엔진 소스코드를 다운](https://github.com/izure1/eriengine/archive/master.zip)받습니다.
 3. 다운받은 소스코드 디렉토리에서 `npm i` 명령어를 호출하여 의존모듈을 설치합니다.
 4. 이후 `npm run electron:build` 명령어를 호출하여 엔진을 빌드합니다.
 
@@ -37,4 +37,4 @@
 
 ## 기여자 목록
 아래는 이 저장소를 도와주신 기여자 목록입니다.  
-<img src="https://contributors-img.web.app/image?repo=izure1/eriengine4">
+<img src="https://contributors-img.web.app/image?repo=izure1/eriengine">

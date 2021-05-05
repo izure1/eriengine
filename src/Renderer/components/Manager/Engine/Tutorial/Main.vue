@@ -113,7 +113,7 @@
 
                 <button-card
                     :background-image="bgEngineCardGithub"
-                    uri="https://github.com/izure1/eriengine4"
+                    uri="https://github.com/izure1/eriengine"
                 >
                     <template #title>저장소</template>
                     <template #subtitle>Github에서 에리엔진의 정보를 얻어보세요.</template>

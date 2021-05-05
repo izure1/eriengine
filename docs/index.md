@@ -19,7 +19,7 @@
 ## 위키
 위키는 에리엔진 개발자라면 누구나 참여할 수 있습니다.  
 위키는 강좌도 포함하고 있으므로 처음 접하는 분이라면 관심을 가져도 좋을 듯 합니다.  
-[이곳](https://izure1.github.io/eriengine4/wiki/)을 참고하여 주십시오.
+[이곳](https://izure1.github.io/eriengine/wiki/)을 참고하여 주십시오.
 
 ## 라이센스
 에리엔진은 **MIT 라이선스**를 따릅니다.  
@@ -30,4 +30,4 @@
 ## 기여자 목록
 아래는 이 저장소를 도와주신 기여자 목록입니다.
 
-<img src="https://contributors-img.web.app/image?repo=izure1/eriengine4">
+<img src="https://contributors-img.web.app/image?repo=izure1/eriengine">
