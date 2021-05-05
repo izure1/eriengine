@@ -26,7 +26,7 @@ declare class Scene extends Scenes[].default {}
  *  씬에서 사용할 데이터를 설정하는 용도로 사용하십시오.
  */
 export function onSceneInit(this: Scene): void {
-    {{ onSceneInit }}
+  {{ onSceneInit }}
 }
 
 /**
@@ -37,7 +37,7 @@ export function onSceneInit(this: Scene): void {
  *  다만 에셋과 데이터로 관리한 이미지, 스프라이트, 오디오, 비디오, 애니메이션 등은 자동으로 로드됩니다. 따라서 추가로 로드할 필요가 없습니다.
  */
 export function onScenePreload(this: Scene): void {
-    {{ onScenePreload }}
+  {{ onScenePreload }}
 }
 
 /**
@@ -47,7 +47,7 @@ export function onScenePreload(this: Scene): void {
  *  가령 플레이어 객체를 만들고 싶다면, 플레이어 액터 클래스를 만들고, 씬에 플레이어 멤버변수를 추가한 뒤, 이곳에서 생성하십시오.
  */
 export function onSceneCreate(this: Scene): void {
-    {{ onSceneCreate }}
+  {{ onSceneCreate }}
 }
 
 /**
@@ -57,7 +57,7 @@ export function onSceneCreate(this: Scene): void {
  *  @param delta    이전 프레임과 현재 프레임 사이에 흐른 시간(ms)입니다. 60프레임이므로, 일반적으로 16ms입니다.
  */
 export function onSceneUpdate(this: Scene, time: number, delta: number): void {
-    {{ onSceneUpdate }}
+  {{ onSceneUpdate }}
 }
 
 /**
@@ -65,5 +65,5 @@ export function onSceneUpdate(this: Scene, time: number, delta: number): void {
  *  씬에서 생성한 오브젝트는 자동으로 파괴됩니다. 하지만 직접 파괴할 데이터가 있다면 이곳에서 처리하십시오.
  */
 export function onSceneDestroy(this: Scene): void {
-    {{ onSceneDestroy }}
+  {{ onSceneDestroy }}
 }

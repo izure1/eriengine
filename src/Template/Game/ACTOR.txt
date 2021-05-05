@@ -25,51 +25,51 @@ import BaseActor from '@/BaseActor'
 
 export default class SampleActor extends BaseActor {
 
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string|Phaser.Textures.Texture, frame?: string|number) {
-        super(scene, x, y, texture, frame)
-        this.generateScript(Storages, '{{ STORAGE_KEY }}')
+  constructor(scene: Phaser.Scene, x: number, y: number, texture: string|Phaser.Textures.Texture, frame?: string|number) {
+    super(scene, x, y, texture, frame)
+    this.generateScript(Storages, '{{ STORAGE_KEY }}')
+  }
+
+  start(): void {
+    super.start()
+    // 이 아래에 작성하세요
+
+    // this.run.useMoveKey('arrow') /* 커서로 액터를 움직일 수 있도록 만듭니다. wasd, arrow 둘 중 택할 수 있습니다. */
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+    // 이 아래에 작성하세요
+
+    // this.playMovingAnimation()
+    // this.run.stop()
+  }
+
+  end(): void {
+    super.end()
+    // 이 아래에 작성하세요
+    
+  }
+
+  protected playMovingAnimation(): void {
+
+    if (!this.run.isMoving) {
+      this.play(Animations[].key, true)
+    }
+    if (this.run.isMovingLeft) {
+      // this.flipX = false
+      // this.play(Animations[].key, true)
+    }
+    if (this.run.isMovingRight) {
+      // this.flipX = true
+      // this.play(Animations[].key, true)
+    }
+    if (this.run.isMovingDown) {
+      // this.play(Animations[].key, true)
+    }
+    if (this.run.isMovingUp) {
+      // this.play(Animations[].key, true)
     }
 
-    start(): void {
-        super.start()
-        // 이 아래에 작성하세요
-
-        // this.run.useMoveKey('arrow') /* 커서로 액터를 움직일 수 있도록 만듭니다. wasd, arrow 둘 중 택할 수 있습니다. */
-    }
-
-    update(time: number, delta: number): void {
-        super.update(time, delta)
-        // 이 아래에 작성하세요
-
-        // this.playMovingAnimation()
-        // this.run.stop()
-    }
-
-    end(): void {
-        super.end()
-        // 이 아래에 작성하세요
-        
-    }
-
-    protected playMovingAnimation(): void {
-
-        if (!this.run.isMoving) {
-            this.play(Animations[].key, true)
-        }
-        if (this.run.isMovingLeft) {
-            // this.flipX = false
-            // this.play(Animations[].key, true)
-        }
-        if (this.run.isMovingRight) {
-            // this.flipX = true
-            // this.play(Animations[].key, true)
-        }
-        if (this.run.isMovingDown) {
-            // this.play(Animations[].key, true)
-        }
-        if (this.run.isMovingUp) {
-            // this.play(Animations[].key, true)
-        }
-
-    }
+  }
 }

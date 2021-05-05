@@ -10,82 +10,82 @@ import config from '../extend/package.json'
 
 
 new Phaser.Game({
-    width: config.gameDisplaySize[0],
-    height: config.gameDisplaySize[1],
-    scene: [
-        ...Object.values(Scenes)
-            .map((scene) => scene.default)
-            .sort((a, b): number => {
-                const filename = a.Key.replace(/\\/g, '/').split('/').pop()!
-                const tokens = filename.split('.')
-                const name = tokens[0]
+  width: config.gameDisplaySize[0],
+  height: config.gameDisplaySize[1],
+  scene: [
+    ...Object.values(Scenes)
+        .map((scene) => scene.default)
+        .sort((a, b): number => {
+          const filename = a.Key.replace(/\\/g, '/').split('/').pop()!
+          const tokens = filename.split('.')
+          const name = tokens[0]
 
-                // 씬 이름이 'main'일 경우, 가장 처음으로 실행될 것
-                if (name.toLowerCase() === 'main') return -1
-                
-                // 그 외의 경우, Scene.Depth 속성을 따를 것
-                else return a.Depth - b.Depth
-            })
-    ],
-    scale: {
-        fullscreenTarget: 'canvas-wrapper',
-        parent: 'canvas-wrapper',
-        expandParent: true,
-        zoom: 1,
-        mode: Phaser.Scale.ScaleModes.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
-    },
-    dom: {
-        createContainer: true
-    },
-    disableContextMenu: true,
-    plugins: {
-        scene: [
-            {
-                key: 'ActorPlugin',
-                mapping: 'actor',
-                plugin: ActorPlugin
-            },
-            {
-                key: 'IsometricScenePlugin',
-                mapping: 'isometric',
-                plugin: IsometricScenePlugin
-            },
-            {
-                key: 'IsometricCursorPlugin',
-                mapping: 'cursor',
-                plugin: IsometricCursorPlugin
-            },
-            {
-                key: 'IsometricSelectPlugin',
-                mapping: 'select',
-                plugin: IsometricSelectPlugin
-            },
-            {
-                key: 'FogOfWarPlugin',
-                mapping: 'fow',
-                plugin: FogOfWarPlugin
-            },
-            {
-                key: 'DialoguePlugin',
-                mapping: 'dialogue',
-                plugin: DialoguePlugin
-            },
-            {
-                key: 'ModalPlugin',
-                mapping: 'modal',
-                plugin: ModalPlugin
-            }
-        ]
-    },
-    physics: {
-        default: 'matter',
-        matter: {
-            debug: false,
-            gravity: {
-                x: 0,
-                y: 0
-            }
-        }
+          // 씬 이름이 'main'일 경우, 가장 처음으로 실행될 것
+          if (name.toLowerCase() === 'main') return -1
+          
+          // 그 외의 경우, Scene.Depth 속성을 따를 것
+          else return a.Depth - b.Depth
+        })
+  ],
+  scale: {
+    fullscreenTarget: 'canvas-wrapper',
+    parent: 'canvas-wrapper',
+    expandParent: true,
+    zoom: 1,
+    mode: Phaser.Scale.ScaleModes.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+  dom: {
+    createContainer: true
+  },
+  disableContextMenu: true,
+  plugins: {
+    scene: [
+      {
+        key: 'ActorPlugin',
+        mapping: 'actor',
+        plugin: ActorPlugin
+      },
+      {
+        key: 'IsometricScenePlugin',
+        mapping: 'isometric',
+        plugin: IsometricScenePlugin
+      },
+      {
+        key: 'IsometricCursorPlugin',
+        mapping: 'cursor',
+        plugin: IsometricCursorPlugin
+      },
+      {
+        key: 'IsometricSelectPlugin',
+        mapping: 'select',
+        plugin: IsometricSelectPlugin
+      },
+      {
+        key: 'FogOfWarPlugin',
+        mapping: 'fow',
+        plugin: FogOfWarPlugin
+      },
+      {
+        key: 'DialoguePlugin',
+        mapping: 'dialogue',
+        plugin: DialoguePlugin
+      },
+      {
+        key: 'ModalPlugin',
+        mapping: 'modal',
+        plugin: ModalPlugin
+      }
+    ]
+  },
+  physics: {
+    default: 'matter',
+    matter: {
+      debug: false,
+      gravity: {
+        x: 0,
+        y: 0
+      }
     }
+  }
 })

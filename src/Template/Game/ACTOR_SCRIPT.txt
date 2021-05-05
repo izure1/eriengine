@@ -30,7 +30,7 @@ declare class Actor extends Actors[].default {}
  *  액터가 생성되었을 때 호출될 함수입니다.
  */
 export function onActorStart(this: Actor): void {
-    {{ onActorStart }}
+  {{ onActorStart }}
 }
 
 /**
@@ -40,14 +40,14 @@ export function onActorStart(this: Actor): void {
  *  @param delta    이전 프레임과 현재 프레임 사이에 흐른 시간(ms)입니다. 60프레임이므로, 일반적으로 16ms입니다.
  */
 export function onActorUpdate(this: Actor, time: number, delta: number): void {
-    {{ onActorUpdate }}
+  {{ onActorUpdate }}
 }
 
 /**
  *  액터가 파괴될 때 호출될 함수입니다.
  */
 export function onActorEnd(this: Actor): void {
-    {{ onActorEnd }}
+  {{ onActorEnd }}
 }
 
 
@@ -67,7 +67,7 @@ export function onActorEnd(this: Actor): void {
  *  @param information  적중시킨 스킬에 대한 정보입니다.
  */
 export function onActorHit(this: Actor, target: BaseActor, information: object): void {
-    {{ onActorHit }}
+  {{ onActorHit }}
 }
 
 /**
@@ -76,7 +76,7 @@ export function onActorHit(this: Actor, target: BaseActor, information: object):
  *  @param information  적중당한 스킬에 대한 정보입니다.
  */
 export function onActorGetHit(this: Actor, from: BaseActor, information: object): void {
-    {{ onActorGetHit }}
+  {{ onActorGetHit }}
 }
 
 /**
@@ -86,7 +86,7 @@ export function onActorGetHit(this: Actor, from: BaseActor, information: object)
  *  @param from  액터와 교전하고 있던 대상 액터들입니다.
  */
 export function onActorDefeat(this: Actor, ...from: BaseActor[]): void {
-    {{ onActorDefeat }}
+  {{ onActorDefeat }}
 }
 
 /**
@@ -95,7 +95,7 @@ export function onActorDefeat(this: Actor, ...from: BaseActor[]): void {
  *  @param from  패배를 선언한 대상 액터입니다.
  */
 export function onActorWin(this: Actor, from: BaseActor): void {
-    {{ onActorWin }}
+  {{ onActorWin }}
 }
 
 
@@ -115,7 +115,7 @@ export function onActorWin(this: Actor, from: BaseActor): void {
  *  @param pair  충돌한 대상 액터입니다.
  */
 export function onCollideWithActorStart(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: BaseActor): void {
-    {{ onCollideWithActorStart }}
+  {{ onCollideWithActorStart }}
 }
 
 /**
@@ -125,7 +125,7 @@ export function onCollideWithActorStart(this: Actor, data: Phaser.Types.Physics.
  *  @param pair  충돌한 대상 액터입니다.
  */
 export function onCollideWithActorActive(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: BaseActor): void {
-    {{ onCollideWithActorActive }}
+  {{ onCollideWithActorActive }}
 }
 
 /**
@@ -134,7 +134,7 @@ export function onCollideWithActorActive(this: Actor, data: Phaser.Types.Physics
  *  @param pair  충돌한 대상 액터입니다.
  */
 export function onCollideWithActorEnd(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: BaseActor): void {
-    {{ onCollideWithActorEnd }}
+  {{ onCollideWithActorEnd }}
 }
 
 /**
@@ -144,7 +144,7 @@ export function onCollideWithActorEnd(this: Actor, data: Phaser.Types.Physics.Ma
  *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
  */
 export function onCollideWithWallStart(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
-    {{ onCollideWithWallStart }}
+  {{ onCollideWithWallStart }}
 }
 
 /**
@@ -155,7 +155,7 @@ export function onCollideWithWallStart(this: Actor, data: Phaser.Types.Physics.M
  *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
  */
 export function onCollideWithWallActive(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
-    {{ onCollideWithWallActive }}
+  {{ onCollideWithWallActive }}
 }
 
 /**
@@ -165,5 +165,5 @@ export function onCollideWithWallActive(this: Actor, data: Phaser.Types.Physics.
  *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
  */
 export function onCollideWithWallEnd(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
-    {{ onCollideWithWallEnd }}
+  {{ onCollideWithWallEnd }}
 }
