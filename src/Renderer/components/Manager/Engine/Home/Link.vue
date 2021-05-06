@@ -74,7 +74,7 @@ export default class EngineHomeLinkComponent extends Vue {
   }
 
   private openComponent(uri: string): void {
-    this.$router.replace(uri).catch(null)
+    this.$router.replace(uri).catch(() => null)
   }
 }
 </script>
