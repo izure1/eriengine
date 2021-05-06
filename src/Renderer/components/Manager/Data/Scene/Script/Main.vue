@@ -22,67 +22,67 @@ import {
 } from '@/Const'
 
 @Component({
-    components: {
-        FileGeneratorComponent
-    }
+  components: {
+    FileGeneratorComponent
+  }
 })
 export default class ScriptMainComponent extends Vue {
-    private cwd: string = ''
-    private extraActions: ContextItemAction[] = [
-        {
-            icon: 'mdi-arrow-left',
-            description: '뒤로가기',
-            action: (): void => {
-                this.goBack()
-            }
-        }
-    ]
-
-    private get filePath(): string {
-        return decodeURIComponent(this.$route.params.filePath)
-    }
-
-    private get storageKey(): string {
-        return getStorageKeyFromFilename(this.filePath)
-    }
-
-    private async add(filePath: string): Promise<void> {
-        if (!this.storageKey) {
-            return
-        }
-        const scriptAdd: Engine.GameProject.AddSceneScriptSuccess|Engine.GameProject.AddSceneScriptFail = await ipcRenderer.invoke('add-scene-script', filePath, this.storageKey)
-        if (!scriptAdd.success) {
-            this.$store.dispatch('snackbar', scriptAdd.message)
-            return
-        }
-    }
-
-    private goBack(): void {
-        this.$router.replace('/manager/scene').catch(() => null)
-    }
-
-    private checkKey(): void {
-        if (this.storageKey) {
-            return
-        }
-        this.$store.dispatch('snackbar', '파일명에 스토리지 정보가 없습니다')
+  private cwd: string = ''
+  private extraActions: ContextItemAction[] = [
+    {
+      icon: 'mdi-arrow-left',
+      description: '뒤로가기',
+      action: (): void => {
         this.goBack()
+      }
+    }
+  ]
+
+  private get filePath(): string {
+    return decodeURIComponent(this.$route.params.filePath)
+  }
+
+  private get storageKey(): string {
+    return getStorageKeyFromFilename(this.filePath)
+  }
+
+  private async add(filePath: string): Promise<void> {
+    if (!this.storageKey) {
+      return
+    }
+    const scriptAdd: Engine.GameProject.AddSceneScriptSuccess|Engine.GameProject.AddSceneScriptFail = await ipcRenderer.invoke('add-scene-script', filePath, this.storageKey)
+    if (!scriptAdd.success) {
+      this.$store.dispatch('snackbar', scriptAdd.message)
+      return
+    }
+  }
+
+  private goBack(): void {
+    this.$router.replace('/manager/scene').catch(() => null)
+  }
+
+  private checkKey(): void {
+    if (this.storageKey) {
+      return
+    }
+    this.$store.dispatch('snackbar', '파일명에 스토리지 정보가 없습니다')
+    this.goBack()
+  }
+
+  private async setCwd(): Promise<void> {
+    const pathGet: Engine.GameProject.GetStoragePathSuccess|Engine.GameProject.GetStoragePathFail = await ipcRenderer.invoke('get-storage-path', this.$store.state.projectDirectory, this.storageKey, PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME, '')
+    if (!pathGet.success) {
+      this.$store.dispatch('snackbar', pathGet.message)
+      this.goBack()
+      return
     }
 
-    private async setCwd(): Promise<void> {
-        const pathGet: Engine.GameProject.GetStoragePathSuccess|Engine.GameProject.GetStoragePathFail = await ipcRenderer.invoke('get-storage-path', this.$store.state.projectDirectory, this.storageKey, PROJECT_SRC_STORAGE_SCENE_SCRIPT_DIRECTORY_NAME, '')
-        if (!pathGet.success) {
-            this.$store.dispatch('snackbar', pathGet.message)
-            this.goBack()
-            return
-        }
+    this.cwd = pathGet.path
+  }
 
-        this.cwd = pathGet.path
-    }
-
-    created(): void {
-        this.checkKey()
-        this.setCwd()
-    }
+  created(): void {
+    this.checkKey()
+    this.setCwd()
+  }
 }
 </script>

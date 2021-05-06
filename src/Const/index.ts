@@ -1,8 +1,8 @@
 import path from 'path'
 
 interface Module {
-    name: string
-    version: string
+  name: string
+  version: string
 }
 
 export const ENGINE_AUTH_SECRETKEY: string = 'eriengine4'

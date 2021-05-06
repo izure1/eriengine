@@ -7,63 +7,63 @@ import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelect
 
 export default function(width: number, height: number, scene: (Phaser.Scene|typeof Phaser.Scene)[], parent: HTMLElement): Phaser.Types.Core.GameConfig {
 
-   return {
-        type: Phaser.AUTO,
-        width,
-        height,
-        scene: scene as any,
-        scale: {
-            parent,
-            fullscreenTarget: parent,
-            zoom: 1
+  return {
+    type: Phaser.AUTO,
+    width,
+    height,
+    scene: scene as any,
+    scale: {
+      parent,
+      fullscreenTarget: parent,
+      zoom: 1
+    },
+    dom: {
+      createContainer: true
+    },
+    plugins: {
+      scene: [
+        {
+          key: 'ActorPlugin',
+          mapping: 'actor',
+          plugin: ActorPlugin
         },
-        dom: {
-            createContainer: true
+        {
+          key: 'IsometricScenePlugin',
+          mapping: 'isometric',
+          plugin: IsometricScenePlugin
         },
-        plugins: {
-            scene: [
-                {
-                    key: 'ActorPlugin',
-                    mapping: 'actor',
-                    plugin: ActorPlugin
-                },
-                {
-                    key: 'IsometricScenePlugin',
-                    mapping: 'isometric',
-                    plugin: IsometricScenePlugin
-                },
-                {
-                    key: 'IsometricCursorPlugin',
-                    mapping: 'cursor',
-                    plugin: IsometricCursorPlugin
-                },
-                {
-                    key: 'IsometricSelectPlugin',
-                    mapping: 'select',
-                    plugin: IsometricSelectPlugin
-                },
-                {
-                    key: 'FogOfWarPlugin',
-                    mapping: 'fow',
-                    plugin: FogOfWarPlugin
-                },
-                {
-                    key: 'DialoguePlugin',
-                    mapping: 'dialogue',
-                    plugin: DialoguePlugin
-                }
-            ]
+        {
+          key: 'IsometricCursorPlugin',
+          mapping: 'cursor',
+          plugin: IsometricCursorPlugin
         },
-        physics: {
-            default: 'matter',
-            matter: {
-                debug: true,
-                gravity: {
-                    x: 0,
-                    y: 0
-                }
-            }
+        {
+          key: 'IsometricSelectPlugin',
+          mapping: 'select',
+          plugin: IsometricSelectPlugin
+        },
+        {
+          key: 'FogOfWarPlugin',
+          mapping: 'fow',
+          plugin: FogOfWarPlugin
+        },
+        {
+          key: 'DialoguePlugin',
+          mapping: 'dialogue',
+          plugin: DialoguePlugin
         }
+      ]
+    },
+    physics: {
+      default: 'matter',
+      matter: {
+        debug: true,
+        gravity: {
+          x: 0,
+          y: 0
+        }
+      }
     }
+  }
 
 }
