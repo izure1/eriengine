@@ -13,7 +13,7 @@
             >
               <v-list-item-content>
                 <v-list-item-title class="primary--text">
-                  <a href="#" v-if="isExternal(uri)"
+                  <a href="javascript:void(0)" v-if="isExternal(uri)"
                     @click="openExternal(uri)"
                   >
                     {{ text }}
