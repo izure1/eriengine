@@ -28,6 +28,7 @@ import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
 import ManagerToolMain from '@/Renderer/components/Manager/Tool/Main.vue'
 import ManagerToolIsometricalLayer from '@/Renderer/components/Manager/Tool/IsometricalLayer.vue'
 import Updater from '@/Renderer/components/Update/Main.vue'
+import ManagerEngineHome from '@/Renderer/components/Manager/Engine/Home/Main.vue'
 import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Main.vue'
 
 Vue.use(VueRouter)
@@ -103,7 +104,7 @@ const routes: Array<RouteConfig> = [
         children: [
             {
                 path: '',
-                redirect: 'engine/tutorial'
+                redirect: 'engine/home'
             },
             {
                 path: 'scene',
@@ -180,6 +181,10 @@ const routes: Array<RouteConfig> = [
             {
                 path: 'updater',
                 component: Updater
+            },
+            {
+              path: 'engine/home',
+              component: ManagerEngineHome
             },
             {
                 path: 'engine/tutorial',

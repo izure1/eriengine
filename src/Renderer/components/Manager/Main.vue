@@ -157,9 +157,9 @@ export default class ProjectFileListComponent extends Vue {
       title: '엔진',
       menus: [
         {
-          name: '튜토리얼',
-          description: '엔진의 사용법에 대해 소개합니다',
-          path: '/manager/engine/tutorial'
+          name: '홈',
+          description: '엔진 홈으로 돌아갑니다',
+          path: '/manager/engine/home'
         },
       {
           name: '업데이트',
