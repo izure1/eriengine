@@ -18,11 +18,11 @@
                   >
                     {{ text }}
                   </a>
-                  <router-link v-else
-                    :to="uri"
+                  <a href="javascript:void(0)" v-else
+                    @click="openComponent(uri)"
                   >
                     {{ text }}
-                  </router-link>
+                  </a>
                 </v-list-item-title>
                 <v-list-item-subtitle v-if="isExternal(uri)"
                   class="text-caption"
@@ -71,6 +71,10 @@ export default class EngineHomeLinkComponent extends Vue {
 
   private openExternal(uri: string): void {
     shell.openExternal(uri)
+  }
+
+  private openComponent(uri: string): void {
+    this.$router.replace(uri).catch(null)
   }
 }
 </script>
