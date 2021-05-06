@@ -1,52 +1,52 @@
 <template>
-    <v-app>
-        <v-app-bar
-            elevation="1"
-            color="blue-grey"
-            fixed
-            tile
+  <v-app>
+    <v-app-bar
+      elevation="1"
+      color="blue-grey"
+      fixed
+      tile
+    >
+      <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen" class="white--text"></v-app-bar-nav-icon>
+      <v-app-bar-title>
+        <v-btn
+          color="white"
+          class="subtitle-1"
+          text
+          @click="openPath(projectDirectory)"
         >
-            <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen" class="white--text"></v-app-bar-nav-icon>
-            <v-app-bar-title>
-                <v-btn
-                    color="white"
-                    class="subtitle-1"
-                    text
-                    @click="openPath(projectDirectory)"
-                >
-                    {{ projectName }}
-                </v-btn>
-            </v-app-bar-title>
-        </v-app-bar>
-        <v-navigation-drawer v-model="isDrawerOpen" fixed temporary class="py-3 px-1">
-            <v-list subheader>
-                <div
-                    v-for="{ title, menus } in contextmenuGroups"
-                    :key="`aside-contextmenu-${title}`"
-                >
-                    <v-subheader>{{ title }}</v-subheader>
-                    <v-list-item
-                        v-for="{ name, description, path } in menus"
-                        :key="`aside-contextmenu-${title}-${name}`"
-                        @click="showManager(path)"
-                    >
-                        <v-list-item-content class="ml-3">
-                            <v-list-item-title class="overline">{{ name }}</v-list-item-title>
-                            <v-list-item-subtitle class="caption">{{ description }}</v-list-item-subtitle>
-                        </v-list-item-content>
-                    </v-list-item>
-                </div>
-            </v-list>
-        </v-navigation-drawer>
-        <v-main>
-            <router-view class="main-view" />
-        </v-main>
-    </v-app>
+          {{ projectName }}
+        </v-btn>
+      </v-app-bar-title>
+    </v-app-bar>
+    <v-navigation-drawer v-model="isDrawerOpen" fixed temporary class="py-3 px-1">
+      <v-list subheader>
+        <div
+          v-for="{ title, menus } in contextmenuGroups"
+          :key="`aside-contextmenu-${title}`"
+        >
+          <v-subheader>{{ title }}</v-subheader>
+          <v-list-item
+            v-for="{ name, description, path } in menus"
+            :key="`aside-contextmenu-${title}-${name}`"
+            @click="showManager(path)"
+          >
+            <v-list-item-content class="ml-3">
+              <v-list-item-title class="overline">{{ name }}</v-list-item-title>
+              <v-list-item-subtitle class="caption">{{ description }}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </div>
+      </v-list>
+    </v-navigation-drawer>
+    <v-main>
+      <router-view class="main-view" />
+    </v-main>
+  </v-app>
 </template>
 
 <script lang="ts">
 import path from 'path'
-import { ipcRenderer, shell } from 'electron'
+import { ipcRenderer, shell, app } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
 import {

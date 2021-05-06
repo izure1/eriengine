@@ -96,7 +96,7 @@ function *generateIPC() {
 (() => {
   const generate = generateIPC()
   for (const { ipc } of generate) {
-      ipc()
+    ipc()
   }
 })();
 

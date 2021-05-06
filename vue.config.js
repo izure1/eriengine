@@ -1,4 +1,5 @@
 const path = require('path')
+const { version } = require('./package.json')
 
 module.exports = {
   "transpileDependencies": [
@@ -19,6 +20,12 @@ module.exports = {
       .use('raw-loader')
       .loader('raw-loader')
       .end()
+    config
+      .plugin('html')
+      .tap(args => {
+        args[0].title = `에리엔진 v${version}`
+        return args
+      })
   },
   pluginOptions: {
     electronBuilder: {
