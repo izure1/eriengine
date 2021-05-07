@@ -56,8 +56,11 @@
                 editable
               >벽의 높이는 몇 입니까?</v-stepper-step>
               <v-stepper-content step="3">
-                <p>
-                  단위는 px이며, 권장 크기는 {{ tileHeight }}입니다.
+                <p v-if="isWallLeft || isWallRight">
+                  단위는 px이며, 권장 크기는 {{ tileHeight * 2 }}입니다.
+                </p>
+                <p v-else>
+                  단위는 px입니다.
                 </p>
                 <v-text-field
                   type="number"
@@ -105,7 +108,7 @@ export default class IsometricalLayerComponent extends Vue {
   private step: number = 1
   private type: number = 0
   private side: number = 100
-  private height: number = this.tileHeight
+  private height: number = this.tileHeight * 2
 
   private get isObstacle(): boolean {
     return this.isWallLeft || this.isWallRight || this.isActor
@@ -128,22 +131,25 @@ export default class IsometricalLayerComponent extends Vue {
   }
 
   private get tileWidth(): number {
-    return ~~(Math.cos(this.isometricRadian) * this.side * 2)
+    return ~~(Math.cos(this.isometricRadian) * this.side)
   }
 
   private get tileHeight(): number {
-    return ~~(Math.sin(this.isometricRadian) * this.side * 2)
+    return ~~(Math.sin(this.isometricRadian) * this.side)
   }
 
   private get canvasWidth(): number {
-    return this.tileWidth
+    return this.tileWidth * 2
   }
 
   private get canvasHeight(): number {
-    if (this.isObstacle) {
+    if (this.isWallLeft || this.isWallRight) {
       return this.height + this.tileHeight
     }
-    return this.tileHeight
+    else if (this.isActor) {
+      return this.height + this.tileHeight * 2
+    }
+    return this.tileHeight * 2
   }
 
   private async drawCanvas(): Promise<void> {
@@ -181,9 +187,9 @@ export default class IsometricalLayerComponent extends Vue {
     
     ctx.moveTo(centerX, bottom)
 
-    ctx.lineTo(right, bottom - tileHeight / 2)
-    ctx.lineTo(centerX, bottom - tileHeight)
-    ctx.lineTo(left, bottom - tileHeight / 2)
+    ctx.lineTo(right, bottom - tileHeight)
+    ctx.lineTo(centerX, bottom - tileHeight * 2)
+    ctx.lineTo(left, bottom - tileHeight)
     ctx.lineTo(centerX, bottom)
 
     ctx.stroke()
@@ -199,26 +205,26 @@ export default class IsometricalLayerComponent extends Vue {
 
       if (this.isWallLeft) {
         ctx.lineTo(centerX, top + tileHeight)
-        ctx.lineTo(left, top + tileHeight / 2)
-        ctx.lineTo(left, bottom - tileHeight / 2)
+        ctx.lineTo(left, top)
+        ctx.lineTo(left, bottom - tileHeight)
       }
       else if (this.isWallRight) {
         ctx.lineTo(centerX, top + tileHeight)
-        ctx.lineTo(right, top + tileHeight / 2)
-        ctx.lineTo(right, bottom - tileHeight / 2)
+        ctx.lineTo(right, top)
+        ctx.lineTo(right, bottom - tileHeight)
       }
       else if (this.isActor) {
-        ctx.lineTo(centerX, top + tileHeight)
-        ctx.lineTo(left, top + tileHeight / 2)
-        ctx.lineTo(left, bottom - tileHeight / 2)
+        ctx.lineTo(centerX, top + tileHeight * 2)
+        ctx.lineTo(left, top + tileHeight)
+        ctx.lineTo(left, bottom - tileHeight)
 
-        ctx.moveTo(centerX, top + tileHeight)
-        ctx.lineTo(right, top + tileHeight / 2)
-        ctx.lineTo(right, bottom - tileHeight / 2)
+        ctx.moveTo(centerX, top + tileHeight * 2)
+        ctx.lineTo(right, top + tileHeight)
+        ctx.lineTo(right, bottom - tileHeight)
 
-        ctx.moveTo(left, top + tileHeight / 2)
+        ctx.moveTo(left, top + tileHeight)
         ctx.lineTo(centerX, top)
-        ctx.lineTo(right, top + tileHeight / 2)
+        ctx.lineTo(right, top + tileHeight)
       }
     }
 
