@@ -57,7 +57,7 @@
               >벽의 높이는 몇 입니까?</v-stepper-step>
               <v-stepper-content step="3">
                 <p>
-                  단위는 px이며, 권장 크기는 150입니다.
+                  단위는 px이며, 권장 크기는 {{ tileHeight }}입니다.
                 </p>
                 <v-text-field
                   type="number"
@@ -105,7 +105,7 @@ export default class IsometricalLayerComponent extends Vue {
   private step: number = 1
   private type: number = 0
   private side: number = 100
-  private height: number = 150
+  private height: number = this.tileHeight
 
   private get isObstacle(): boolean {
     return this.isWallLeft || this.isWallRight || this.isActor
@@ -128,11 +128,11 @@ export default class IsometricalLayerComponent extends Vue {
   }
 
   private get tileWidth(): number {
-    return Math.cos(this.isometricRadian) * this.side * 2
+    return ~~(Math.cos(this.isometricRadian) * this.side * 2)
   }
 
   private get tileHeight(): number {
-    return Math.sin(this.isometricRadian) * this.side * 2
+    return ~~(Math.sin(this.isometricRadian) * this.side * 2)
   }
 
   private get canvasWidth(): number {
@@ -252,7 +252,7 @@ export default class IsometricalLayerComponent extends Vue {
   private onChangeHeight() {
     this.height = Number(this.height)
     if (isNaN(this.height)) {
-      this.height = 150
+      this.height = 100
     }
     this.drawCanvas()
   }
