@@ -164,12 +164,12 @@ export default class ProjectFileListComponent extends Vue {
       {
           name: '업데이트',
           description: '엔진을 업데이트합니다',
-          path: '/manager/updater'
+          path: '/manager/engine/update'
         },
       ]
     },
     {
-      title: '아티스트 도구',
+      title: '도구',
       menus: [
         {
           name: '타일 레이어 생성기',

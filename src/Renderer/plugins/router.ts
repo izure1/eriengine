@@ -27,9 +27,9 @@ import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
 import ManagerToolMain from '@/Renderer/components/Manager/Tool/Main.vue'
 import ManagerToolIsometricalLayer from '@/Renderer/components/Manager/Tool/IsometricalLayer.vue'
-import Updater from '@/Renderer/components/Update/Main.vue'
 import ManagerEngineHome from '@/Renderer/components/Manager/Engine/Home/Main.vue'
 import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Main.vue'
+import ManagerEngineUpdate from '@/Renderer/components/Manager/Engine/Update/Main.vue'
 
 Vue.use(VueRouter)
 
@@ -179,16 +179,16 @@ const routes: Array<RouteConfig> = [
                 component: ManagerBuildRunner
             },
             {
-                path: 'updater',
-                component: Updater
-            },
-            {
               path: 'engine/home',
               component: ManagerEngineHome
             },
             {
                 path: 'engine/tutorial',
                 component: ManagerEngineTutorial
+            },
+            {
+              path: 'engine/update',
+              component: ManagerEngineUpdate
             },
             {
               path: 'tool',
