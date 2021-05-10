@@ -1,6 +1,6 @@
 import { Engine } from 'matter'
+import normalize from 'normalize-path'
 import Phaser from 'phaser'
-import * as Types from './Vars/Types'
 
 export class SceneMapManager implements Engine.GameProject.SceneMap {
   side!: number
@@ -81,6 +81,45 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     return { key: object.texture.key, x, y }
   }
 
+  changeAssetPath(before: string, after: string): this {
+    const changeAssetPath = (target: Engine.GameProject.SceneMapWall|Engine.GameProject.SceneMapFloor, before: string, after: string): void => {
+      if (target.key === before) {
+        target.key = after
+      }
+    }
+    for (const wall of this.walls) {
+      changeAssetPath(wall, before, after)
+    }
+    for (const floor of this.floors) {
+      changeAssetPath(floor, before, after)
+    }
+    return this
+  }
+
+  deleteAssetPath(assetPath: string): this {
+    let i = this.walls.length
+    let j = this.floors.length
+
+    const normalizeAssetPath = normalize(assetPath)
+    while (i--) {
+      const { key } = this.walls[i]
+      if (normalize(key) !== normalizeAssetPath) {
+        continue
+      }
+      this.walls.splice(i, 1)
+    }
+
+    while (j--) {
+      const { key } = this.floors[j]
+      if (normalize(key) !== normalizeAssetPath) {
+        continue
+      }
+      this.floors.splice(j, 1)
+    }
+
+    return this
+  }
+
   insertWallData(object: Phaser.Physics.Matter.Sprite): this {
     const has = !!this.getWall(object.x, object.y)
     if (has) {
@@ -132,24 +171,24 @@ export class SceneMapManager implements Engine.GameProject.SceneMap {
     return this
   }
 
-  dropWallData({ x, y }: Phaser.Physics.Matter.Sprite): this {
-    const wall = this.getWall(x, y)
-    if (!wall) {
+  dropWallData({ x, y }: Point2): this {
+    const key = this.getWall(x, y)
+    if (!key) {
       return this
     }
 
-    const index = this.walls.indexOf(wall)
+    const index = this.walls.indexOf(key)
     this.walls.splice(index, 1)
     return this
   }
 
-  dropFloorData({ x, y }: Phaser.GameObjects.Sprite): this {
-    const floor = this.getFloor(x, y)
-    if (!floor) {
+  dropFloorData({ x, y }: Point2): this {
+    const key = this.getFloor(x, y)
+    if (!key) {
       return this
     }
 
-    const index = this.floors.indexOf(floor)
+    const index = this.floors.indexOf(key)
     this.floors.splice(index, 1)
     return this
   }

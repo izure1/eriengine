@@ -14,8 +14,7 @@
       dense
     >
 
-      <v-btn
-        v-for="(button, i) in buttons"
+      <v-btn v-for="(button, i) in buttons"
         :key="`canvas-toolbar-btn-${i}`"
         icon
       >
@@ -107,27 +106,11 @@
             <v-list-item @click="changeBrushType(1)">
               <v-list-item-title>스프라이트</v-list-item-title>
             </v-list-item>
-            <!-- <v-list-item
-              v-for="(brush, i) in palettes"
-              :key="`canvas-brush-list-${i}`"
-              class="pa-0"
-            >
-              <v-btn
-                @click="setDisposeBrush(brush)"
-                width="100%"
-                class="text-sm-caption"
-                text
-              >
-                <div class="text-left">{{ getBrushKey(brush.key) }}</div>
-                <v-spacer />
-              </v-btn>
-            </v-list-item> -->
           </v-list>
         </v-menu>
       </v-btn>
 
-      <v-btn
-        v-if="isSaving"
+      <v-btn v-if="isSaving"
         :loading="isSaving"
         :disabled="isSaving"
         text
@@ -137,8 +120,7 @@
         
     </v-toolbar>
 
-    <v-card
-      v-if="isContextmenuOpen"
+    <v-card v-if="isContextmenuOpen"
       max-width="200"
       :style="{
           left: `${contextmenuOffset.x}px`,
@@ -161,8 +143,7 @@
       </v-list>
     </v-card>
 
-    <v-dialog
-      v-model="isPropertiesOpen"
+    <v-dialog v-model="isPropertiesOpen"
       :persistent="isPropertiesOpen"
       max-width="450"
     >
@@ -222,8 +203,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="isBuilding"
+    <v-dialog v-model="isBuilding"
       :persistent="isBuilding"
       max-width="500"
       scrollable
@@ -285,14 +265,13 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="isTooltipOpen"
+    <v-dialog v-model="isTooltipOpen"
       max-width="800"
     >
       <v-card>
         <v-card-title>기본 사용법</v-card-title>
         <v-card-subtitle>
-          씬 에디터를 이용하여 씬을 GUI 환경에서 디자인할 수 있습니다.
+          씬 파렛트를 이용하여 씬을 GUI 환경에서 디자인할 수 있습니다.
           <br>
           만들어둔 스프라이트나 이미지, 액터 데이터를 사용합니다.
         </v-card-subtitle>
@@ -336,8 +315,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="isMapResizerOpen"
+    <v-dialog v-model="isMapResizerOpen"
       max-width="500"
     >
       <v-card>
@@ -345,13 +323,97 @@
         <v-card-subtitle>맵의 한 변의 크기를 지정합니다. 큰 맵은 성능 저하를 유발합니다.</v-card-subtitle>
         <v-card-text>
           <v-text-field
-            v-model="mapSceneSide"
+            v-model="map.side"
             type="number"
             filled
             rounded
             suffix="px"
           />
         </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="isAssetMissingOpen"
+      fullscreen
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card
+        tile
+        flat
+      >
+        <v-card-title>씬 파렛트 에셋 누락</v-card-title>
+        <v-card-subtitle>
+          씬을 구성하는 데이터 중 {{ missingAssets.length }}개의 에셋이 누락되었으며, 다음과 같습니다.
+        </v-card-subtitle>
+        <v-card-text>
+          <v-list v-for="missingAsset in missingAssets"
+            :key="`preview-scene-missingasset-${missingAsset}`"
+          >
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-title>{{ missingAsset }}</v-list-item-title>
+                <v-list-item-subtitle class="text-caption">{{ getSimilarPath(missingAsset, allDatasPath) }} 아닌가요?</v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action class="flex-row">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      class="text-caption"
+                      v-on="on"
+                      @click="requestChangeAssetPath(missingAsset, getSimilarPath(missingAsset, allDatasPath))"
+                    >
+                      <v-icon>mdi-find-replace</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>바꾸기</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      class="text-caption"
+                      v-on="on"
+                      @click="requestDeleteMissingAsset(missingAsset)"
+                    >
+                      <v-icon>mdi-delete-forever</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>제거</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      class="text-caption"
+                      v-on="on"
+                      @click="deleteMissingAsset(missingAsset)"
+                    >
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>고쳤으므로 무시하겠습니다</span>
+                </v-tooltip>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+          <p>
+            해당 내용을 기반으로 에셋의 위치를 확인하고 고치십시오.
+          </p>
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions class="m-flex justify-center">
+          <v-btn
+            icon
+            @click="saveAndRestart"
+            :disabled="missingAssets.length > 0"
+          >
+            <v-icon>mdi-check</v-icon>
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
 
@@ -382,12 +444,15 @@
 
 <script lang="ts">
 import path from 'path'
+import fs from 'fs-extra'
 import { ipcRenderer } from 'electron'
 
+import glob from 'fast-glob'
 import normalize from 'normalize-path'
 import Phaser from 'phaser'
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import NonReactivity from 'vue-nonreactivity-decorator'
+import similarity from 'string-similarity'
 
 import PreviewScene from './Phaser/PreviewScene'
 import GuiScene from './Phaser/GuiScene'
@@ -436,11 +501,16 @@ export default class SceneMapEditor extends Vue {
   private isMapResizerOpen: boolean = false
   private isContextmenuOpen: boolean = false
   private isPropertiesOpen: boolean = false
+  private isAssetMissingOpen: boolean = false
+  private isWillBeRestartAfterSave: boolean = false
 
   private contextmenuOffset: Types.Point2 = { x: 0, y: 0 }
   private propertyAlias: string = ''
   private propertyIsSensor: boolean = false
   private propertyScale: number = 1
+
+  private missingAssets: string[] = []
+  private allDatasPath: string[] = []
 
   private propertyOnlyPositiveNumber: Rule = (v: string) => {
     const n: any = v
@@ -453,6 +523,7 @@ export default class SceneMapEditor extends Vue {
     return true
   }
 
+  private map: Engine.GameProject.SceneMap = { side: 2000, walls: [], floors: [] }
   private paletteImages: Types.PaletteImage[]   = []
   private paletteSprites: Types.PaletteSprite[] = []
   private paletteBrush: Types.PaletteImage|null = null
@@ -461,7 +532,6 @@ export default class SceneMapEditor extends Vue {
   private selectionType: number = 0
   private brushType: number = 0
   private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
-  private mapSceneSide: number = 2000
 
   private buttons: ActionButton[] = [
     {
@@ -477,7 +547,7 @@ export default class SceneMapEditor extends Vue {
         {
           text: '저장하기',
           click: (): void => {
-            this.save()
+            this.requestSave()
           }
         }
       ]
@@ -615,8 +685,13 @@ export default class SceneMapEditor extends Vue {
     .on('load-map-fail', (message: string): void => {
       this.goBack(message)
     })
-    .on('load-map-success', (map: Engine.GameProject.SceneMap): void => {
-      this.mapSceneSide = map.side
+    .on('load-map-success', (map: Engine.GameProject.SceneMap, missingAssets: string[]): void => {
+      this.map.side = map.side
+
+      if (missingAssets.length > 0) {
+        this.isAssetMissingOpen = true
+        this.missingAssets = missingAssets
+      }
     })
     .on('save-map-fail', (message: string): void => {
       this.isSaving = false
@@ -625,6 +700,10 @@ export default class SceneMapEditor extends Vue {
     .on('save-map-success', (): void => {
       this.isSaving = false
       this.$store.dispatch('snackbar', '저장되었습니다!')
+
+      if (this.isWillBeRestartAfterSave) {
+        this.restart()
+      }
     })
 
     this.resizeCanvas()
@@ -782,7 +861,7 @@ export default class SceneMapEditor extends Vue {
     this.setDisposeBrush(null)
   }
 
-  private save(): void {
+  private requestSave(): void {
     if (!this.scene) {
       return
     }
@@ -874,7 +953,7 @@ export default class SceneMapEditor extends Vue {
     if (!this.scene) {
       return
     }
-    this.scene.transfer.emit('receive-map-side', this.mapSceneSide)
+    this.scene.transfer.emit('receive-map-side', this.map.side)
   }
 
   private requestDeleteSelection(): void {
@@ -911,8 +990,14 @@ export default class SceneMapEditor extends Vue {
       const spriteModule = __non_webpack_require__(spriteModulePath)
       const imageModule = __non_webpack_require__(imageModulePath)
 
-      this.paletteSprites = Object.values(spriteModule) as Types.PaletteSprite[]
-      this.paletteImages = Object.values(imageModule) as Types.PaletteImage[]
+      const checkAssetExists = (rawModuledata: unknown) => {
+        const { key } = rawModuledata as Types.PaletteSprite|Types.PaletteImage
+        const filePath = path.resolve(this.$store.state.projectDirectory, key)
+        return fs.existsSync(filePath)
+      }
+
+      this.paletteSprites = Object.values(spriteModule).filter(checkAssetExists) as Types.PaletteSprite[]
+      this.paletteImages = Object.values(imageModule).filter(checkAssetExists) as Types.PaletteImage[]
     } catch (e) {
       this.isBuiltFail = true
       return
@@ -926,13 +1011,65 @@ export default class SceneMapEditor extends Vue {
     this.watchResizeWindow()
   }
 
-  @Watch('mapSceneSide')
-  private onChanageMapSceneSide(): void {
-    this.setMapSide(this.mapSceneSide)
+  private async restart(): Promise<void> {
+    const location = this.$route.fullPath
+    await this.$router.replace('/manager/engine/home')
+    await this.$router.replace(location)
   }
 
-  mounted(): void {
-    this.start()
+  private saveAndRestart(): void {
+    this.isWillBeRestartAfterSave = true
+    this.requestSave()
+  }
+
+  private async setAllDatasPath(): Promise<void> {
+    const root: string = this.$store.state.projectDirectory
+    const dataRoot = path.resolve(root, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME)
+    const imageDirectory = path.resolve(dataRoot, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME)
+    const animationDirectory = path.resolve(dataRoot, PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME)
+
+    const images = await glob('**/*.ts', { cwd: imageDirectory, onlyFiles: true, absolute: true })
+    const animations = await glob('**/*.ts', { cwd: animationDirectory, onlyFiles: true, absolute: true })
+    const changeToRelative = (assetPath: string): string => {
+      return path.relative(root, assetPath)
+    }
+
+    this.allDatasPath = [
+      ...images.map(changeToRelative),
+      ...animations.map(changeToRelative)
+    ]
+  }
+
+  private getSimilarPath(main: string, samples: string[]): string {
+    return similarity.findBestMatch(main, samples).bestMatch.target
+  }
+
+  private requestChangeAssetPath(before: string, after: string): void {
+    this.scene?.transfer.emit('receive-change-asset-path', before, after)
+    this.deleteMissingAsset(before)
+  }
+
+  private requestDeleteMissingAsset(assetPath: string): void {
+    // 정말로 이 에셋을 씬에서 제거하시겠습니까? 이 작업은 복구할 수 없습니다.
+    this.scene?.transfer.emit('receive-delete-asset', assetPath)
+    this.deleteMissingAsset(assetPath)
+  }
+
+  private deleteMissingAsset(assetPath: string): void {
+    const i = this.missingAssets.indexOf(assetPath)
+    if (i !== -1) {
+      this.missingAssets.splice(i, 1)
+    }
+  }
+
+  @Watch('map.side')
+  private onChanageMapSceneSide(): void {
+    this.setMapSide(this.map.side)
+  }
+
+  async mounted(): Promise<void> {
+    await this.setAllDatasPath()
+    await this.start()
   }
 
   beforeDestroy(): void {

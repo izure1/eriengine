@@ -25,7 +25,7 @@ export default class PreviewScene extends Phaser.Scene {
   private dialogue!: DialoguePlugin
 
   readonly transfer: SceneDataTransfer = new SceneDataTransfer
-  readonly mapData: SceneMapManager = new SceneMapManager({ side: 2000, walls: [], floors: [] })
+  readonly map: SceneMapManager = new SceneMapManager({ side: 2000, walls: [], floors: [] })
 
   private projectDirectory: string = ''
   private storageKey: string = ''
@@ -232,12 +232,12 @@ export default class PreviewScene extends Phaser.Scene {
 
   private deleteSelectionObjects(): void {
     this.selectionWalls.forEach((wall): void => {
-      this.mapData.dropWallData(wall)
+      this.map.dropWallData(wall)
       wall.destroy()
     })
 
     this.selectionFloors.forEach((floor): void => {
-      this.mapData.dropFloorData(floor)
+      this.map.dropFloorData(floor)
       floor.destroy()
     })
 
@@ -251,7 +251,7 @@ export default class PreviewScene extends Phaser.Scene {
 
     // 올바르지 않은 값이 넘어왔을 경우 객체를 삭제하고 데이터에서도 제거함
     if (isNaN(scale) || typeof scale !== 'number') {
-      this.mapData.dropWallData(wall)
+      this.map.dropWallData(wall)
       wall.destroy()
       return
     }
@@ -260,7 +260,7 @@ export default class PreviewScene extends Phaser.Scene {
     wall.setSensor(isSensor)
     wall.data.set('alias', alias)
 
-    this.mapData.modifyWallData(wall)
+    this.map.modifyWallData(wall)
   }
 
   private calcStraightDisposeOffset(x: number, y: number): Types.Point2 {
@@ -319,7 +319,7 @@ export default class PreviewScene extends Phaser.Scene {
         const wall = this.isometric.setWalltile(x, y, brushKey, undefined, animsKey)
         wall.setDataEnabled()
         if (insertData) {
-          this.mapData.insertWallData(wall)
+          this.map.insertWallData(wall)
         }
         return wall
       }
@@ -327,7 +327,7 @@ export default class PreviewScene extends Phaser.Scene {
       case 3: {
         const floor = this.isometric.setFloortile(x, y, brushKey, undefined, animsKey)
         if (insertData) {
-          this.mapData.insertFloorData(floor)
+          this.map.insertFloorData(floor)
         }
         return floor
       }
@@ -413,21 +413,36 @@ export default class PreviewScene extends Phaser.Scene {
       this.transfer.emit('load-map-fail', sceneMapRead.message)
       return false
     }
-    this.mapData.setData(sceneMapRead.content)
-    this.transfer.emit('load-map-success', this.mapData)
 
-    this.setWorldSize(this.mapData.side)
+    const { side, walls, floors } = sceneMapRead.content
 
-    for (const props of this.mapData.walls) {
-      const wall = this.dispose(props.x, props.y, 2, props.key, false)
+    this.setWorldSize(side)
+
+    const missingAssets: Set<string> = new Set
+
+    for (const prop of walls) {
+      const wall = this.dispose(prop.x, prop.y, 2, prop.key, false)
+      // 맵데이터 파일에는 기록되어있지만, 에셋이 삭제되었을 경우 에셋을 목록에서 제거합니다.
       if (!wall) {
+        missingAssets.add(prop.key)
         continue
       }
-      this.setWallProperties(wall as Phaser.Physics.Matter.Sprite, props)
+      // 벽의 정보를 설정합니다. 센서, 비율, 이름 등의 정보를 게임 오브젝트에 삽입합니다.
+      // 이후 씬에서 우클릭으로 오브젝트를 선택했을 때, 해당 오브젝트에서 이 정보를 읽어옵니다.
+      this.setWallProperties(wall as Phaser.Physics.Matter.Sprite, prop)
     }
-    for (const { key, x, y } of this.mapData.floors) {
-      this.dispose(x, y, 3, key, false)
+
+    for (const prop of floors) {
+      const floor = this.dispose(prop.x, prop.y, 3, prop.key, false)
+      // 맵데이터 파일에는 기록되어있지만, 에셋이 삭제되었을 경우 에셋을 목록에서 제거합니다.
+      if (!floor) {
+        missingAssets.add(prop.key)
+      }
     }
+
+    // 읽어들인 원본 맵 데이터를 기반으로 씬 파렛트 맵 데이터 인스턴스 생성
+    this.map.setData({ side, walls, floors })
+    this.transfer.emit('load-map-success', this.map, [...missingAssets.values()])
 
     return true
   }
@@ -497,25 +512,35 @@ export default class PreviewScene extends Phaser.Scene {
     .on('receive-save-request', (): void => {
       this.save()
     })
+    .on('receive-change-asset-path', (before: string, after: string): void => {
+      this.changeAssetPath(before, after)
+    })
+    .on('receive-delete-asset', (assetPath: string): void => {
+      this.deleteAssetPath(assetPath)
+    })
   }
 
   private setWorldSize(side: number): void {
-    this.mapData.modifySide(side)
+    this.map.modifySide(side)
     this.isometric.setWorldSize(side)
   }
 
   private async save(): Promise<void> {
-    if (!this.mapData) {
-      this.transfer.emit('save-map-fail', '데이터 인스턴스가 없습니다')
-      return
-    }
-    const mapData = this.mapData.data
+    const mapData = this.map.data
     const mapWrite: Engine.GameProject.WriteSceneMapSuccess|Engine.GameProject.WriteSceneMapFail = await ipcRenderer.invoke('write-scene-map', this.projectDirectory, this.storageKey, mapData)
     if (!mapWrite.success) {
       this.transfer.emit('save-map-fail', mapWrite.message)
       return
     }
     this.transfer.emit('save-map-success', mapData)
+  }
+
+  private async changeAssetPath(before: string, after: string): Promise<void> {
+    this.map.changeAssetPath(before, after)
+  }
+
+  private async deleteAssetPath(assetPath: string): Promise<void> {
+    this.map.deleteAssetPath(assetPath)
   }
 
   init(): void {
