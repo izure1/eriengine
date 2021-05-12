@@ -46,7 +46,7 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
     const projectDirName = parseProperty(PROJECT_DIRECTORY_NAME, config)
     const projectDirPath = path.resolve(directoryPath, projectDirName)
 
-    const projectEnsure = await ensureProject(projectDirPath, config)
+    const projectEnsure = await ensureProject(projectDirPath, config, false)
     if (!projectEnsure.success) {
         return projectEnsure as Engine.GameProject.CreateProjectFail
     }

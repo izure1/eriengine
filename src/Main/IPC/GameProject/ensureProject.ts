@@ -59,10 +59,11 @@ interface FileWriteQueue {
   content: string|((path?: string) => Promise<void>)
 }
 
-async function ensureRequireModules(projectDirPath: string): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
+async function ensureRequireModules(projectDirPath: string, forceUpdate: boolean = false): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {
   try {
+    const command = forceUpdate ? 'npm update' : 'npm i'
     const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
-    await spawner.spawn('npm i', { writeStream: writeToRenderer('ensure-require-modules') })
+    await spawner.spawn(command, { writeStream: writeToRenderer('ensure-require-modules') })
   } catch(reason) {
     return {
       success: false,
@@ -194,7 +195,7 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
   }
 }
 
-export async function handler(directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
+export async function handler(directoryPath: string, config: Engine.GameProject.Config, forceUpdate: boolean): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> {
   // 디렉토리 생성하기
   const dirs = [
     path.resolve(directoryPath, PROJECT_EXTEND_DIRECTORY_NAME),
@@ -230,7 +231,7 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
   }
 
   // 종속 모듈 설치
-  const moduleInstall = await ensureRequireModules(directoryPath)
+  const moduleInstall = await ensureRequireModules(directoryPath, forceUpdate)
   if (!moduleInstall.success) {
     return moduleInstall as Engine.GameProject.CreateProjectFail
   }
@@ -245,7 +246,7 @@ export async function handler(directoryPath: string, config: Engine.GameProject.
 }
 
 export function ipc(): void {
-  ipcMain.handle('ensure-project', async (e: IpcMainInvokeEvent, directoryPath: string, config: Engine.GameProject.Config): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> => {
-    return await handler(directoryPath, config)
+  ipcMain.handle('ensure-project', async (e: IpcMainInvokeEvent, directoryPath: string, config: Engine.GameProject.Config, forceUpdate: boolean): Promise<Engine.GameProject.CreateProjectSuccess|Engine.GameProject.CreateProjectFail> => {
+    return await handler(directoryPath, config, forceUpdate)
   })
 }
