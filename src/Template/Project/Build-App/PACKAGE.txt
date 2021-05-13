@@ -1,31 +1,31 @@
 {
-    "main": "main.js",
-    "build": {
-        "appId": "{{ applicationId }}",
-        "productName": "{{ name }}",
-        "win": {
-            "target": [{
-                "target": "nsis",
-                "arch": [ "x64", "ia32" ]
-            }],
-            "icon": "../../src/Build/favicon.png"
-        },
-        "nsis": {
-            "oneClick": false,
-            "perMachine": true,
-            "allowToChangeInstallationDirectory": true,
-            "language": 1042,
-            "shortcutName": "{{ name }}"
-        },
-        "directories": {
-            "output": "{{ OUTPUT }}"
-        }
+  "main": "main.js",
+  "build": {
+    "appId": "{{ applicationId }}",
+    "productName": "{{ name }}",
+    "win": {
+      "target": [{
+        "target": "nsis",
+        "arch": [ "x64", "ia32" ]
+      }],
+      "icon": "../../src/Build/favicon.png"
     },
-    "devDependencies": {
-        "electron": "^11.2.0",
-        "electron-builder": "^22.9.1"
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "language": 1042,
+      "shortcutName": "{{ name }}"
     },
-    "scripts": {
-        "electron:build": "npx electron-builder"
+    "directories": {
+      "output": "{{ OUTPUT }}"
     }
+  },
+  "devDependencies": {
+    "electron": "^11.2.0",
+    "electron-builder": "^22.9.1"
+  },
+  "scripts": {
+    "electron:build": "npx electron-builder"
+  }
 }

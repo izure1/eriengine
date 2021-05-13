@@ -1,22 +1,22 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>{{ TITLE }}</title>
-        <meta charset="utf-8">
-        <style>
-            html,
-            body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                background-color: black;
-            }
-        </style>
-        <script type="text/javascript" src="./js/main.js"></script>
-    </head>
-    <body>
-        <div id="canvas-wrapper"></div>
-    </body>
+  <head>
+    <title>{{ TITLE }}</title>
+    <meta charset="utf-8">
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: black;
+      }
+    </style>
+    <script type="text/javascript" src="./js/main.js"></script>
+  </head>
+  <body>
+    <div id="canvas-wrapper"></div>
+  </body>
 </html>

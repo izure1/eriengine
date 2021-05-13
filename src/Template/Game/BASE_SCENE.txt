@@ -116,7 +116,7 @@ export default class BaseScene extends Phaser.Scene {
     if (!callbacks)  {
       return
     }
-    callbacks.forEach((callback): void => callback.call(this, args))
+    callbacks.forEach((callback): void => callback.call(this, ...args))
   }
 
   private loadImage(): void {
@@ -338,9 +338,45 @@ export default class BaseScene extends Phaser.Scene {
     this.loadAssets()
   }
 
+  private usePointerEvent(): void {
+    this.input.on(Phaser.Input.Events.POINTER_DOWN, (e: Phaser.Input.Pointer): void => {
+      this.runScript(this.__scripts.get('onPointerDown'), e)
+    })
+    this.input.on(Phaser.Input.Events.POINTER_DOWN_OUTSIDE, (e: Phaser.Input.Pointer): void => {
+      this.runScript(this.__scripts.get('onPointerDown'), e)
+    })
+    this.input.on(Phaser.Input.Events.POINTER_UP, (e: Phaser.Input.Pointer): void => {
+      this.runScript(this.__scripts.get('onPointerUp'), e)
+    })
+    this.input.on(Phaser.Input.Events.POINTER_UP_OUTSIDE, (e: Phaser.Input.Pointer): void => {
+      this.runScript(this.__scripts.get('onPointerUp'), e)
+    })
+    this.input.on(Phaser.Input.Events.POINTER_MOVE, (e: Phaser.Input.Pointer): void => {
+      this.runScript(this.__scripts.get('onPointerMove'), e)
+    })
+    this.input.on(Phaser.Input.Events.POINTER_WHEEL, (e: Phaser.Input.Pointer): void => {
+      this.runScript(this.__scripts.get('onPointerWheel'), e)
+    })
+  }
+
+  private useKeyboardEvent(): void {
+    this.input.keyboard.on(Phaser.Input.Keyboard.Events.ANY_KEY_DOWN, (e: KeyboardEvent): void => {
+      this.runScript(this.__scripts.get('onKeyDown'), e)
+    })
+    this.input.keyboard.on(Phaser.Input.Keyboard.Events.ANY_KEY_UP, (e: KeyboardEvent): void => {
+      this.runScript(this.__scripts.get('onKeyUp'), e)
+    })
+  }
+
   create(): void {
     this.createAnimation()
     this.createMap()
+    this.usePointerEvent()
+    this.useKeyboardEvent()
+
+    // 마우스 우클릭으로 나오는 컨텍스트 메뉴를 비활성화합니다.
+    this.input.mouse.disableContextMenu()
+
     this.runScript(this.__scripts.get('onSceneCreate'))
   }
   
