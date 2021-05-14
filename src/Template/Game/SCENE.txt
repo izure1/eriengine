@@ -60,6 +60,9 @@ export default class NewScene extends BaseScene {
     super.create()
     // 이 아래에 작성하세요
 
+    // 필요하다면 전장의 안개를 활성화합니다. gui씬에서는 사용하지 마십시오.
+    // this.fow.enable()
+
   }
 
   update(time: number, delta: number): void {

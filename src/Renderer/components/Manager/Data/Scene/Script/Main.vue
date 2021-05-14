@@ -46,11 +46,15 @@ export default class ScriptMainComponent extends Vue {
     return getStorageKeyFromFilename(this.filePath)
   }
 
+  private get projectDirectory(): string {
+    return this.$store.state.projectDirectory
+  }
+
   private async add(filePath: string): Promise<void> {
     if (!this.storageKey) {
       return
     }
-    const scriptAdd: Engine.GameProject.AddSceneScriptSuccess|Engine.GameProject.AddSceneScriptFail = await ipcRenderer.invoke('add-scene-script', filePath, this.storageKey)
+    const scriptAdd: Engine.GameProject.AddSceneScriptSuccess|Engine.GameProject.AddSceneScriptFail = await ipcRenderer.invoke('add-scene-script', this.projectDirectory, filePath, this.storageKey)
     if (!scriptAdd.success) {
       this.$store.dispatch('snackbar', scriptAdd.message)
       return
