@@ -4,6 +4,7 @@ import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scen
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
 
 import BaseScene from '@/BaseScene'
 {{ DATA_LISTS }}
@@ -45,6 +46,9 @@ export default class NewScene extends BaseScene {
   }
 
   init(data: object = {}): void {
+    // 필요하다면 전장의 안개를 활성화합니다. gui씬에서는 사용하지 마십시오.
+    // this.fow.enable()
+    
     super.init(data)
     // 이 아래에 작성하세요
 
@@ -59,9 +63,6 @@ export default class NewScene extends BaseScene {
   create(): void {
     super.create()
     // 이 아래에 작성하세요
-
-    // 필요하다면 전장의 안개를 활성화합니다. gui씬에서는 사용하지 마십시오.
-    // this.fow.enable()
 
   }
 

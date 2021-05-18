@@ -40,7 +40,7 @@
               <v-stepper-step step="2" editable>변의 길이가 몇 입니까?</v-stepper-step>
               <v-stepper-content step="2">
                 <p>
-                  단위는 px이며, 권장 크기는 100입니다.
+                  단위는 px이며, 기본 크기는 50입니다.
                 </p>
                 <v-text-field
                   type="number"
@@ -107,7 +107,7 @@ export default class IsometricalLayerComponent extends Vue {
   private readonly isometricRadian: number = Phaser.Math.DegToRad(26.57)
   private step: number = 1
   private type: number = 0
-  private side: number = 100
+  private side: number = 50
   private height: number = this.tileHeight * 2
 
   private get isObstacle(): boolean {

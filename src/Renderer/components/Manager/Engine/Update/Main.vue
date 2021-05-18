@@ -3,6 +3,8 @@
         <v-card-title>업데이트 확인</v-card-title>
         <v-card-subtitle>
             에리엔진에 릴리즈된 업데이트가 있는지 확인합니다.
+            <br>
+            이 작업에는 인터넷 연결이 필요합니다.
         </v-card-subtitle>
         <v-card-text>
             <v-alert

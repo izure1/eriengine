@@ -1,7 +1,9 @@
 <template>
     <div class="lancher-main">
         <router-view />
-        <v-snackbar v-model="$store.state.snackbar.active">{{ $store.state.snackbar.message }}</v-snackbar>
+        <v-snackbar v-model="$store.state.snackbar.active">
+          <div class="snackbar-text">{{ $store.state.snackbar.message }}</div>
+        </v-snackbar>
     </div>
 </template>
 
@@ -24,6 +26,10 @@ body {
 .v-navigation-drawer {
     // Vuetify 네이게이션 글자가 흐릿하게 보이는 오류를 수정
     will-change: initial !important;
+}
+
+.snackbar-text {
+  text-align: center;
 }
 
 *:not(input):not(textarea) {
