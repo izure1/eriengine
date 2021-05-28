@@ -1,10 +1,10 @@
 <template>
-    <v-app id="project">
-        <v-main>
-            <router-view />
-            <particles-bg-component />
-        </v-main>
-    </v-app>
+  <v-app id="project">
+    <v-main>
+      <router-view />
+      <particles-bg-component />
+    </v-main>
+  </v-app>
 </template>
 
 <script lang="ts">

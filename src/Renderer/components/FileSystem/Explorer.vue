@@ -9,28 +9,29 @@
 
       <v-card-subtitle class="overline pb-0">{{ cwdOffset }}</v-card-subtitle>
       <v-card-actions>
-        <v-tooltip
-          v-for="({ icon, description, action }, index) in actions"
+        <v-tooltip v-for="({ icon, description, action }, index) in actions"
           :key="`file-list-actions-${index}`"
           bottom
         >
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on" @click="action(currentPath)">
-              <v-icon color="blue-grey">{{ icon }}</v-icon>
+            <v-btn
+              icon
+              v-on="on"
+              @click="action(currentPath)"
+            >
+              <v-icon color="eribrown">{{ icon }}</v-icon>
             </v-btn>
           </template>
           <span>{{ description }}</span>
         </v-tooltip>
       </v-card-actions>
       
-      <v-list
-        v-if="loadedFiles.length"
+      <v-list v-if="loadedFiles.length"
         :two-line="isTwoLine"
         dense
       >
         <transition-group name="fade" >
-          <v-list-item
-            v-for="file in loadedFiles"
+          <v-list-item v-for="file in loadedFiles"
             :key="`file-list-${file}`"
             @click="open(file)"
           >
@@ -51,27 +52,36 @@
               </v-list-item-subtitle>
             </v-list-item-content>
 
-            <v-list-item-action class="flex-row" v-if="!isUpperDirectory(file) && contextmenus.length">
+            <v-list-item-action v-if="!isUpperDirectory(file) && contextmenus.length"
+              class="flex-row" 
+            >
               <v-menu
                 open-on-hover
                 close-delay="250"
                 offset-y
               >
                 <template v-slot:activator="{ on }">
-                  <v-btn icon v-on="on" @click.stop="">
+                  <v-btn
+                    icon
+                    v-on="on"
+                    @click.stop=""
+                  >
                     <v-icon>mdi-dots-vertical</v-icon>
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item
-                    v-for="({ icon, description, action }, i) in contextmenus"
+                  <v-list-item v-for="({ icon, description, action }, i) in contextmenus"
                     :key="`file-list-contextmenu-${file}-${i}`"
                   >
                     <v-tooltip left>
                       <template v-slot:activator="{ on }">
                         <v-list-item-title>
-                          <v-btn icon v-on="on" @click.stop="action(getAbsolutePath(file))">
-                            <v-icon color="blue-grey">{{ icon }}</v-icon>
+                          <v-btn
+                            icon
+                            v-on="on"
+                            @click.stop="action(getAbsolutePath(file))"
+                          >
+                            <v-icon color="eribrown">{{ icon }}</v-icon>
                           </v-btn>
                         </v-list-item-title>
                       </template>
@@ -85,17 +95,22 @@
           </v-list-item>
         </transition-group>
       </v-list>
-      <div v-else class="grey--text body-2 lighten-5 text-center py-10">
+      <div v-else
+        class="grey--text body-2 lighten-5 text-center py-10"
+      >
         {{ isSearching ? '탐색 중입니다' : '디렉토리가 비어있습니다' }}
       </div>
-      <div
-        v-if="!isAllLoaded"
+      <div v-if="!isAllLoaded"
         class="text-center pa-2"
       >
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-btn text @click="loadMore" v-on="on">
-              <v-icon class="blue-grey--text">mdi-dots-horizontal</v-icon>
+            <v-btn
+              text
+              v-on="on"
+              @click="loadMore"
+            >
+              <v-icon color="eribrown">mdi-dots-horizontal</v-icon>
             </v-btn>
           </template>
           <span>더 불러오기</span>

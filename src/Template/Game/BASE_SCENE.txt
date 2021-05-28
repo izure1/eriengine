@@ -19,8 +19,9 @@ interface Point2 {
 
 interface SceneMap {
   side: number
-  walls:  { key: string, alias: string, x: number, y: number, scale: number, isSensor: boolean }[]
+  walls:  { key: string, x: number, y: number, alias: string, scale: number, isSensor: boolean }[]
   floors: { key: string, x: number, y: number }[]
+  audios: { key: string, x: number, y: number, alias: string, isListenerOnCamera: boolean, thresholdRadius: number, volume: number, loop: boolean }[]
 }
 
 interface SceneStorage {
@@ -78,7 +79,7 @@ export default class BaseScene extends Phaser.Scene {
   spatial!: SpatialAudioPlugin
 
   protected __scripts: Map<string, ScriptCallback[]> = new Map
-  protected __map: SceneMap = { side: 2000, walls: [], floors: [] }
+  protected __map: SceneMap = { side: 2000, walls: [], floors: [], audios: [] }
 
   /** 게임데이터를 저장하는데 사용된 키 목록입니다 */
   protected async saveKeys(): Promise<string[]> {
@@ -204,6 +205,13 @@ export default class BaseScene extends Phaser.Scene {
         animsKey = key
       }
       this.isometric.setFloortile(x, y, key, undefined, animsKey)
+    }
+    for (const { key, x, y, thresholdRadius, volume, loop, isListenerOnCamera } of this.__map.audios) {
+      this.spatial
+        .addSpatialAudio(key, { x, y }, { loop, volume })
+        .setThresholdRadius(thresholdRadius)
+        .attachListenerOnCamera(isListenerOnCamera)
+        .play()
     }
   }
 

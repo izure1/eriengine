@@ -1,10 +1,10 @@
 <template>
-    <div class="lancher-main">
-        <router-view />
-        <v-snackbar v-model="$store.state.snackbar.active">
-          <div class="snackbar-text">{{ $store.state.snackbar.message }}</div>
-        </v-snackbar>
-    </div>
+  <div class="lancher-main">
+    <router-view />
+    <v-snackbar v-model="$store.state.snackbar.active">
+      <div class="snackbar-text">{{ $store.state.snackbar.message }}</div>
+    </v-snackbar>
+  </div>
 </template>
 
 <script lang="ts">
@@ -17,15 +17,15 @@ export default class AppComponent extends Vue {}
 <style lang="scss">
 html,
 body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    overflow-y: auto !important;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overflow-y: auto !important;
 }
 
 .v-navigation-drawer {
-    // Vuetify 네이게이션 글자가 흐릿하게 보이는 오류를 수정
-    will-change: initial !important;
+  // Vuetify 네이게이션 글자가 흐릿하게 보이는 오류를 수정
+  will-change: initial !important;
 }
 
 .snackbar-text {
@@ -33,22 +33,22 @@ body {
 }
 
 *:not(input):not(textarea) {
-    user-select: none;
+  user-select: none;
 }
 
 *::-webkit-scrollbar {
-    width: 7px;
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-    }
+  width: 7px;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.15);
-    border-radius: 7px;
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.3);
-    }
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 7px;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
 }
 
 #app {

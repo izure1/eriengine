@@ -2,9 +2,9 @@ import Phaser from 'phaser'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin, SelectPlugin } from '@eriengine/plugin-isometric-cursor'
 
-import PreviewScene from './PreviewScene'
+import { PreviewScene } from './PreviewScene'
 
-export default class GuiScene extends Phaser.Scene {
+export class GuiScene extends Phaser.Scene {
   private isometric!: IsometricScenePlugin
   private cursor!: PointerPlugin
   private select!: SelectPlugin
@@ -12,7 +12,7 @@ export default class GuiScene extends Phaser.Scene {
   private preview: PreviewScene|null = null
 
   constructor() {
-    super({ key: '__gui-scene__', active: false })
+    super({ key: '__gui-scene__', active: true })
   }
 
   private generateCursor(): void {
@@ -23,7 +23,7 @@ export default class GuiScene extends Phaser.Scene {
   }
 
   private updateCursor(): void {
-    if (!this.preview) {
+    if (!this.preview || !this.preview.input) {
       return
     }
     if (!this.pointer) {

@@ -1,17 +1,17 @@
 <template>
   <v-app>
     <v-app-bar
-      elevation="1"
-      color="blue-grey"
       fixed
       tile
+      elevation="0"
+      color="eribrown"
     >
       <v-app-bar-nav-icon @click="isDrawerOpen = !isDrawerOpen" class="white--text"></v-app-bar-nav-icon>
       <v-app-bar-title>
         <v-btn
+          text
           color="white"
           class="subtitle-1"
-          text
           @click="openPath(projectDirectory)"
         >
           {{ projectName }}

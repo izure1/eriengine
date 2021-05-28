@@ -1,195 +1,216 @@
-import { Engine } from 'matter'
 import normalize from 'normalize-path'
-import Phaser from 'phaser'
+import { TypedEmitter } from 'tiny-typed-emitter'
 
-export class SceneMapManager implements Engine.GameProject.SceneMap {
-  side!: number
-  walls!: Engine.GameProject.SceneMapWall[]
-  floors!: Engine.GameProject.SceneMapFloor[]
+interface TypedEvents {
+  'change-wall':  (wall: Engine.GameProject.SceneMapWall) => void
+  'change-floor': (floor: Engine.GameProject.SceneMapFloor) => void
+  'change-audio': (audio: Engine.GameProject.SceneMapAudio) => void
+}
 
-  constructor(sceneMap: Engine.GameProject.SceneMap) {
-    this.setData(sceneMap)
+export class SceneMapManager extends TypedEmitter<TypedEvents> {
+  protected side: number
+  protected readonly walls: Map<string, Engine.GameProject.SceneMapWall>
+  protected readonly floors: Map<string, Engine.GameProject.SceneMapFloor>
+  protected readonly audios: Map<string, Engine.GameProject.SceneMapAudio>
+
+  constructor(mapData: Engine.GameProject.SceneMap) {
+    super()
+    const { side, walls, floors, audios } = mapData
+
+    this.side = side
+    
+    this.walls = new Map(
+      walls.map((wall) => [this.createKey(wall.x, wall.y), wall])
+    )
+    this.floors = new Map(
+      floors.map((floor) => [this.createKey(floor.x, floor.y), floor])
+    )
+    this.audios = new Map(
+      audios.map((audio) => [this.createKey(audio.x, audio.y), audio])
+    )
   }
 
   get data(): Engine.GameProject.SceneMap {
-    const { side, walls, floors } = this
+    const { side, walls, floors, audios } = this
+
     return {
       side,
-      walls,
-      floors
+      walls: Array.from(walls.values()),
+      floors: Array.from(floors.values()),
+      audios: Array.from(audios.values())
     }
   }
-
-  private getItemKey(x: number, y: number): string {
-    return `${x}:${y}`
+  
+  createKey(x: number, y: number): string {
+    return `${x},${y}`
   }
 
-  setData(sceneMap: Engine.GameProject.SceneMap): this {
-    this.side = sceneMap.side
-    this.walls = sceneMap.walls
-    this.floors = sceneMap.floors
-    return this
-  }
-
-  private getItem(x: number, y: number, items: Engine.GameProject.SceneMapWall[]|Engine.GameProject.SceneMapFloor[]): Engine.GameProject.SceneMapWall|Engine.GameProject.SceneMapFloor|null {
-    const key = this.getItemKey(x, y)
-    const item = items.find(({ x, y }): boolean => {
-      const itemKey = this.getItemKey(x, y)
-      return itemKey === key
-    })
-
-    if (!item) {
-      return null
-    }
-    return item
-  }
-
-  getWall(x: number, y: number): Engine.GameProject.SceneMapWall|null {
-    const wall = this.getItem(x, y, this.walls)
-    if (!wall) {
-      return null
-    }
-    return wall as Engine.GameProject.SceneMapWall
-  }
-
-  getFloor(x: number, y: number): Engine.GameProject.SceneMapFloor|null {
-    const floor = this.getItem(x, y, this.floors)
-    if (!floor) {
-      return null
-    }
-    return floor as Engine.GameProject.SceneMapFloor
-  }
-
-  private hasWall(x: number, y: number): boolean {
-    const key: string = this.getItemKey(x, y)
-    const wall: Engine.GameProject.SceneMapWall|undefined = this.walls.find((wall: Engine.GameProject.SceneMapWall): boolean => {
-      return key === this.getItemKey(wall.x, wall.y)
-    })
-    return !!wall
-  }
-
-  private createWallData(object: Phaser.Physics.Matter.Sprite): Engine.GameProject.SceneMapWall {
-    const { x, y, scale } = object
-    const alias = object.data.get('alias') || ''
-    const isSensor = object.isSensor()
-
-    return { key: object.texture.key, alias, x, y, scale, isSensor }
-  }
-
-  private createFloorData(object: Phaser.GameObjects.Sprite): Engine.GameProject.SceneMapFloor {
-    const { x, y } = object
-    return { key: object.texture.key, x, y }
-  }
-
-  changeAssetPath(before: string, after: string): this {
-    const changeAssetPath = (target: Engine.GameProject.SceneMapWall|Engine.GameProject.SceneMapFloor, before: string, after: string): void => {
-      if (target.key === before) {
-        target.key = after
-      }
-    }
-    for (const wall of this.walls) {
-      changeAssetPath(wall, before, after)
-    }
-    for (const floor of this.floors) {
-      changeAssetPath(floor, before, after)
-    }
-    return this
-  }
-
-  deleteAssetPath(assetPath: string): this {
-    let i = this.walls.length
-    let j = this.floors.length
-
-    const normalizeAssetPath = normalize(assetPath)
-    while (i--) {
-      const { key } = this.walls[i]
-      if (normalize(key) !== normalizeAssetPath) {
-        continue
-      }
-      this.walls.splice(i, 1)
-    }
-
-    while (j--) {
-      const { key } = this.floors[j]
-      if (normalize(key) !== normalizeAssetPath) {
-        continue
-      }
-      this.floors.splice(j, 1)
-    }
-
-    return this
-  }
-
-  insertWallData(object: Phaser.Physics.Matter.Sprite): this {
-    const has = !!this.getWall(object.x, object.y)
-    if (has) {
-      this.dropWallData(object)
-    }
-    const data = this.createWallData(object)
-    this.walls.push(data)
-    return this
-  }
-
-  insertFloorData(object: Phaser.GameObjects.Sprite): this {
-    const has = !!this.getFloor(object.x, object.y)
-    if (has) {
-      this.dropFloorData(object)
-    }
-    const data = this.createFloorData(object)
-    this.floors.push(data)
-    return this
-  }
-
-  modifySide(side: number): this {
+  setSide(side: number): this {
     this.side = side
-    return this
-  }
-
-  modifyWallData(object: Phaser.Physics.Matter.Sprite): this {
-    const key = this.getItemKey(object.x, object.y)
-
-    this.walls = this.walls.map((wall: Engine.GameProject.SceneMapWall): Engine.GameProject.SceneMapWall => {
-      if (key !== this.getItemKey(wall.x, wall.y)) {
-        return wall
-      }
-      return this.createWallData(object)
-    })
 
     return this
   }
 
-  modifyFloorData(object: Phaser.GameObjects.Sprite): this {
-    const key = this.getItemKey(object.x, object.y)
+  setWall(wall: Engine.GameProject.SceneMapWall): this {
+    const { x, y } = wall
+    const key = this.createKey(x, y)
 
-    this.floors = this.floors.map((floor: Engine.GameProject.SceneMapFloor): Engine.GameProject.SceneMapFloor => {
-      if (key !== this.getItemKey(floor.x, floor.y)) {
-        return floor
-      }
-      return this.createFloorData(object)
-    })
+    this.walls.set(key, wall)
+    this.emit('change-wall', wall)
 
     return this
   }
 
-  dropWallData({ x, y }: Point2): this {
-    const key = this.getWall(x, y)
-    if (!key) {
-      return this
+  setFloor(floor: Engine.GameProject.SceneMapFloor): this {
+    const { x, y } = floor
+    const key = this.createKey(x, y)
+    
+    this.floors.set(key, floor)
+    this.emit('change-floor', floor)
+
+    return this
+  }
+
+  setAudio(audio: Engine.GameProject.SceneMapAudio): this {
+    const { x, y } = audio
+    const key = this.createKey(x, y)
+
+    this.audios.set(key, audio)
+    this.emit('change-audio', audio)
+
+    return this 
+  }
+
+  getSide(): number {
+    return this.side
+  }
+
+  getWallFromPosition(x: number, y: number): Engine.GameProject.SceneMapWall|null {
+    const key = this.createKey(x, y)
+    
+    return this.walls.get(key) ?? null
+  }
+
+  getFloorFromPosition(x: number, y: number): Engine.GameProject.SceneMapFloor|null {
+    const key = this.createKey(x, y)
+
+    return this.floors.get(key) ?? null
+  }
+
+  getAudioFromPosition(x: number, y: number): Engine.GameProject.SceneMapAudio|null {
+    const key = this.createKey(x, y)
+
+    return this.audios.get(key) ?? null
+  }
+
+  deleteWallFromPosition(x: number, y: number): boolean {
+    const key = this.createKey(x, y)
+    
+    return this.walls.delete(key)
+  }
+
+  deleteFloorFromPosition(x: number, y: number): boolean {
+    const key = this.createKey(x, y)
+    
+    return this.floors.delete(key)
+  }
+
+  deleteAudioFromPosition(x: number, y: number): boolean {
+    const key = this.createKey(x, y)
+    
+    return this.audios.delete(key)
+  }
+
+  getWallFromPaintKey(paintKey: string): Engine.GameProject.SceneMapWall|null {
+    const normalizedPaintKey = normalize(paintKey)
+    const walls = Array.from(this.walls.values())
+
+    return walls.find((wall) => normalize(wall.key) === normalizedPaintKey) ?? null
+  }
+
+  getFloorFromPaintKey(paintKey: string): Engine.GameProject.SceneMapFloor|null {
+    const normalizedPaintKey = normalize(paintKey)
+    const floors = Array.from(this.floors.values())
+
+    return floors.find((floor) => normalize(floor.key) === normalizedPaintKey) ?? null
+  }
+
+  getAudioFromPaintKey(paintKey: string): Engine.GameProject.SceneMapAudio|null {
+    const normalizedPaintKey = normalize(paintKey)
+    const audios = Array.from(this.audios.values())
+
+    return audios.find((audio) => normalize(audio.key) === normalizedPaintKey) ?? null
+  }
+  
+  deleteWallFromPaintKey(paintKey: string): boolean {
+    const wall = this.getWallFromPaintKey(paintKey)
+    
+    if (!wall) {
+      return false
     }
 
-    const index = this.walls.indexOf(key)
-    this.walls.splice(index, 1)
-    return this
-  }
-
-  dropFloorData({ x, y }: Point2): this {
-    const key = this.getFloor(x, y)
-    if (!key) {
-      return this
+    if (normalize(wall.key) !== normalize(paintKey)) {
+      return false
     }
 
-    const index = this.floors.indexOf(key)
-    this.floors.splice(index, 1)
-    return this
+    return this.deleteWallFromPosition(wall.x, wall.y)
+  }
+
+  deleteFloorFromPaintKey(paintKey: string): boolean {
+    const floor = this.getFloorFromPaintKey(paintKey)
+    
+    if (!floor) {
+      return false
+    }
+
+    if (normalize(floor.key) !== normalize(paintKey)) {
+      return false
+    }
+
+    return this.deleteFloorFromPosition(floor.x, floor.y)
+  }
+
+  deleteAudioFromPaintKey(paintKey: string): boolean {
+    const audio = this.getAudioFromPaintKey(paintKey)
+    
+    if (!audio) {
+      return false
+    }
+
+    if (normalize(audio.key) !== normalize(paintKey)) {
+      return false
+    }
+
+    return this.deleteAudioFromPosition(audio.x, audio.y)
+  }
+
+  changeWallPaintKey(beforeKey: string, afterKey: string): boolean {
+    const wall = this.getWallFromPaintKey(beforeKey)
+
+    if (!wall) {
+      return false
+    }
+    wall.key = afterKey
+    return true
+  }
+
+  changeFloorPaintKey(beforeKey: string, afterKey: string): boolean {
+    const floor = this.getFloorFromPaintKey(beforeKey)
+
+    if (!floor) {
+      return false
+    }
+    floor.key = afterKey
+    return true
+  }
+
+  changeAudioPaintKey(beforeKey: string, afterKey: string): boolean {
+    const audio = this.getAudioFromPaintKey(beforeKey)
+
+    if (!audio) {
+      return false
+    }
+    audio.key = afterKey
+    return true
   }
 }

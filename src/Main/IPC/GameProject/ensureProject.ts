@@ -41,7 +41,8 @@ import {
   PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
   PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME,
   PROJECT_SRC_IMAGELIST_NAME,
-  PROJECT_SRC_ANIMSLIST_NAME
+  PROJECT_SRC_ANIMSLIST_NAME,
+  PROJECT_SRC_AUDIOLIST_NAME
 } from '@/Const'
 import RAW_PROJECT_TSCONFIG from 'raw-loader!@/Template/Project/TSCONFIG.txt'
 import RAW_PROJECT_WEBPACK from 'raw-loader!@/Template/Project/WEBPACK.CONFIG.txt'
@@ -100,7 +101,8 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
       path: path.resolve(projectDirPath, PROJECT_WEBPACKGEN_NAME),
       content: parseProperty(RAW_PROJECT_WEBPACKGEN, {
         IMAGE_LIST: PROJECT_SRC_IMAGELIST_NAME,
-        ANIMS_LIST: PROJECT_SRC_ANIMSLIST_NAME
+        ANIMS_LIST: PROJECT_SRC_ANIMSLIST_NAME,
+        AUDIO_LIST: PROJECT_SRC_AUDIOLIST_NAME
       })
     },
     // README.txt

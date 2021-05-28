@@ -9,7 +9,8 @@ module.exports = {
   },
   entry: {
     sprite: path.resolve(__dirname, 'src', '{{ ANIMS_LIST }}'),
-    image: path.resolve(__dirname, 'src', '{{ IMAGE_LIST }}')
+    image: path.resolve(__dirname, 'src', '{{ IMAGE_LIST }}'),
+    audio: path.resolve(__dirname, 'src', '{{ AUDIO_LIST }}')
   },
   output: {
     path: path.resolve(__dirname, 'cache', 'scene-palette'),

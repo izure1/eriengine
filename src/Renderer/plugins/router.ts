@@ -34,176 +34,176 @@ import ManagerEngineUpdate from '@/Renderer/components/Manager/Engine/Update/Mai
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
-    {
-        path: '/',
-        redirect: '/dependencies'
-    },
-    {
-        path: '/dependencies',
-        component: DependenciesMain,
-        children: [
-            {
-                path: '',
-                redirect: 'check'
-            },
-            {
-                path: 'check',
-                component: DependenciesCheck
-            },
-            {
-                path: 'install',
-                redirect: 'check'
-            },
-            {
-                path: 'install/:missings',
-                component: DependenciesInstall
-            }
-        ]
-    },
-    {
-        path: '/project',
-        component: ProjectMain,
-        children: [
-            {
-                path: '',
-                redirect: 'job'
-            },
-            {
-                path: 'job',
-                component: ProjectJob
-            },
-            {
-                path: 'new',
-                component: ProjectNew
-            },
-            {
-                path: 'open',
-                component: ProjectOpen
-            },
-            {
-                path: 'close',
-                component: ProjectClose
-            },
-        ]
-    },
-    {
-        path: '/project/new',
+  {
+    path: '/',
+    redirect: '/dependencies'
+  },
+  {
+    path: '/dependencies',
+    component: DependenciesMain,
+    children: [
+      {
+        path: '',
+        redirect: 'check'
+      },
+      {
+        path: 'check',
+        component: DependenciesCheck
+      },
+      {
+        path: 'install',
+        redirect: 'check'
+      },
+      {
+        path: 'install/:missings',
+        component: DependenciesInstall
+      }
+    ]
+  },
+  {
+    path: '/project',
+    component: ProjectMain,
+    children: [
+      {
+        path: '',
+        redirect: 'job'
+      },
+      {
+        path: 'job',
+        component: ProjectJob
+      },
+      {
+        path: 'new',
         component: ProjectNew
-    },
-    {
-        path: '/project/open',
+      },
+      {
+        path: 'open',
         component: ProjectOpen
-    },
-    {
-        path: '/project/close',
+      },
+      {
+        path: 'close',
         component: ProjectClose
-    },
-    {
-        path: '/manager',
-        component: Manager,
-        children: [
-            {
-                path: '',
-                redirect: 'engine/home'
-            },
-            {
-                path: 'scene',
-                component: ManagerScene
-            },
-            {
-                path: 'scene/script',
-                component: ManagerSceneScript
-            },
-            {
-                path: 'scene/script/:filePath',
-                component: ManagerSceneScript
-            },
-            {
-                path: 'scene/map',
-                component: ManagerSceneMap
-            },
-            {
-                path: 'scene/map/:filePath',
-                component: ManagerSceneMap
-            },
-            {
-                path: 'actor',
-                component: ManagerActor
-            },
-            {
-                path: 'actor/script',
-                component: ManagerActorScript
-            },
-            {
-                path: 'actor/script/:filePath',
-                component: ManagerActorScript
-            },
-            {
-                path: 'asset',
-                component: ManagerAsset
-            },
-            {
-                path: 'animation',
-                component: ManagerAnimation
-            },
-            {
-                path: 'skill',
-                component: ManagerSkill
-            },
-            {
-                path: 'image',
-                component: ManagerImage
-            },
-            {
-                path: 'audio',
-                component: ManagerAudio
-            },
-            {
-                path: 'video',
-                component: ManagerVideo
-            },
-            {
-                path: 'config',
-                component: ManagerConfig
-            },
-            {
-                path: 'restructure/:cwd',
-                component: ManagerRestructure
-            },
-            {
-                path: 'build',
-                component: ManagerBuild
-            },
-            {
-                path: 'build/runner/:buildData',
-                component: ManagerBuildRunner
-            },
-            {
-              path: 'engine/home',
-              component: ManagerEngineHome
-            },
-            {
-                path: 'engine/tutorial',
-                component: ManagerEngineTutorial
-            },
-            {
-              path: 'engine/update',
-              component: ManagerEngineUpdate
-            },
-            {
-              path: 'tool',
-              component: ManagerToolMain
-            },
-            {
-              path: 'tool/isometrical-layer',
-              component: ManagerToolIsometricalLayer
-            }
-        ]
-    },
-    {
-        path: '*',
-        component: Error404
-    }
+      }
+    ]
+  },
+  {
+    path: '/project/new',
+    component: ProjectNew
+  },
+  {
+    path: '/project/open',
+    component: ProjectOpen
+  },
+  {
+    path: '/project/close',
+    component: ProjectClose
+  },
+  {
+    path: '/manager',
+    component: Manager,
+    children: [
+      {
+        path: '',
+        redirect: 'engine/home'
+      },
+      {
+        path: 'scene',
+        component: ManagerScene
+      },
+      {
+        path: 'scene/script',
+        component: ManagerSceneScript
+      },
+      {
+        path: 'scene/script/:filePath',
+        component: ManagerSceneScript
+      },
+      {
+        path: 'scene/map',
+        component: ManagerSceneMap
+      },
+      {
+        path: 'scene/map/:filePath',
+        component: ManagerSceneMap
+      },
+      {
+        path: 'actor',
+        component: ManagerActor
+      },
+      {
+        path: 'actor/script',
+        component: ManagerActorScript
+      },
+      {
+        path: 'actor/script/:filePath',
+        component: ManagerActorScript
+      },
+      {
+        path: 'asset',
+        component: ManagerAsset
+      },
+      {
+        path: 'animation',
+        component: ManagerAnimation
+      },
+      {
+        path: 'skill',
+        component: ManagerSkill
+      },
+      {
+        path: 'image',
+        component: ManagerImage
+      },
+      {
+        path: 'audio',
+        component: ManagerAudio
+      },
+      {
+        path: 'video',
+        component: ManagerVideo
+      },
+      {
+        path: 'config',
+        component: ManagerConfig
+      },
+      {
+        path: 'restructure/:cwd',
+        component: ManagerRestructure
+      },
+      {
+        path: 'build',
+        component: ManagerBuild
+      },
+      {
+        path: 'build/runner/:buildData',
+        component: ManagerBuildRunner
+      },
+      {
+      path: 'engine/home',
+      component: ManagerEngineHome
+      },
+      {
+        path: 'engine/tutorial',
+        component: ManagerEngineTutorial
+      },
+      {
+        path: 'engine/update',
+        component: ManagerEngineUpdate
+      },
+      {
+        path: 'tool',
+        component: ManagerToolMain
+      },
+      {
+        path: 'tool/isometrical-layer',
+        component: ManagerToolIsometricalLayer
+      }
+    ]
+  },
+  {
+    path: '*',
+    component: Error404
+  }
 ]
 
 const router = new VueRouter({

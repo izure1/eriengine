@@ -1,275 +1,353 @@
 import path from 'path'
-import Phaser from 'phaser'
-import { ipcRenderer } from 'electron'
-import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
+
+import normalize from 'normalize-path'
+import { Scene } from 'phaser'
+import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
 import { DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
+import { PointerPlugin, SelectPlugin } from '@eriengine/plugin-isometric-cursor'
 
-import * as Types from './Vars/Types'
-import { SceneDataTransfer } from './SceneDataTransfer'
+import { PreviewAudioVisualizer } from './PreviewAudioVisualizer'
 import { SceneMapManager } from './SceneMapManager'
-
+import { Palette, PaletteImageAsset, PalettePaintAsset, PaletteSpriteAsset } from './Vars/Types'
 import {
   PROJECT_SRC_DIRECTORY_NAME,
   PROJECT_SRC_ASSET_DIRECTORY_NAME
 } from '@/Const'
 
-export default class PreviewScene extends Phaser.Scene {
-  private isometric!: IsometricScenePlugin
-  private cursor!: IsometricCursorPlugin
-  private select!: IsometricSelectPlugin
-  private actor!: ActorPlugin
-  private fow!: FogOfWarPlugin
-  private dialogue!: DialoguePlugin
+import IcoPaletteAudio from '@/Renderer/assets/ico-palette-audio.png'
 
-  readonly transfer: SceneDataTransfer = new SceneDataTransfer
-  readonly map: SceneMapManager = new SceneMapManager({ side: 2000, walls: [], floors: [] })
+type FillableObject = Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Tint
 
-  private projectDirectory: string = ''
-  private storageKey: string = ''
+export class PreviewScene extends Scene {
+  protected actor!: ActorPlugin
+  protected dialogue!: DialoguePlugin
+  protected fow!: FogOfWarPlugin
+  protected map!: IsometricScenePlugin
+  protected cursor!: PointerPlugin
+  protected select!: SelectPlugin
+
+  protected readonly assetDirectory: string
+  
+  protected readonly palette: Palette
+  protected readonly projectDirectory: string
+  protected readonly mapDataState: Engine.GameProject.SceneMap
+  readonly mapDataManager: SceneMapManager
+  protected selectedPaint: PalettePaintAsset|null
+  protected disposeType: number
+  
+  private dragStartOffset: Point2 = { x: 0, y: 0 }
+  
   private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
 
-  private requireImages:  Types.PaletteImage[] = []
-  private requireSprites: Types.PaletteSprite[] = []
-  private disposeBrush: Types.PaletteImage|Types.PaletteSprite|null = null
+  private waitCreatedPromise: Promise<void>
+  private waitCreatedResolver: ((value: void|PromiseLike<void>) => void)|null = null
 
-  private shiftKey: Phaser.Input.Keyboard.Key|null = null
+  constructor(palette: Palette, mapDataState: Engine.GameProject.SceneMap, projectDirectory: string, config: string|Phaser.Types.Scenes.SettingsConfig) {
+    super(config)
 
-  private dragStartOffset: Types.Point2 = { x: 0, y: 0 }
-  private selectionType: number = 0
-  readonly selectionWalls: Set<Phaser.Physics.Matter.Sprite> = new Set
-  readonly selectionFloors: Set<Phaser.GameObjects.Sprite> = new Set
-
-  constructor(projectDirectory: string, storageKey: string) {
-    super({ key: '__preview-scene__', active: false })
-
+    this.palette = palette
     this.projectDirectory = projectDirectory
-    this.storageKey = storageKey
+    this.assetDirectory = normalize(
+      path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
+    )
 
-    this.transfer
-    .on('receive-image-list', (list): void => {
-      this.requireImages = list
-    })
-    .on('receive-sprite-list', (list): void => {
-      this.requireSprites = list
-    })
-  }
+    this.selectedPaint = null
+    this.disposeType = 0
 
-  private get assetDirectory(): string {
-    return path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME)
-  }
+    this.mapDataState = this.copy(mapDataState)
+    this.mapDataManager = new SceneMapManager(this.mapDataState)
 
-  private get isDisposeEnable(): boolean {
-    if (!this.selectionType) {
-      return false
-    }
-    if (!this.disposeBrush) {
-      return false
-    }
-    if (!this.textures.exists(this.disposeBrush.key)) {
-      return false
-    }
-    return true
-  }
-
-  private get cursorSide(): number {
-    if (!this.isDisposeEnable) {
-      return 0
-    }
-
-    let width: number
-    let height: number
-
-    if (this.isAnimationPalette(this.disposeBrush!.key)) {
-      const brush: Types.PaletteSprite = this.disposeBrush as Types.PaletteSprite
-      width   = brush.frameWidth
-      height  = brush.frameHeight
-    }
-    else {
-      const texture = this.textures.get(this.disposeBrush!.key)
-      if (!texture) {
-        return 0
+    // 벽의 속성이 수정되었을 경우, 벽의 비주얼을 수정합니다.
+    this.mapDataManager.on('change-wall', ({ x, y, scale, isSensor }) => {
+      const object = this.wallObjects.find((wall) => wall.x === x && wall.y === y) ?? null
+      if (object !== null) {
+        object.setScale(scale).setSensor(isSensor)
       }
-      width = texture.source[0].width
-      height = texture.source[0].height
+    })
+    // 오디오의 속성이 수정되었을 경우, 오디오의 비주얼을 수정합니다.
+    this.mapDataManager.on('change-audio', ({ x, y, thresholdRadius }) => {
+      const object = this.audioObjects.find((audio) => audio.x === x && audio.y === y) ?? null
+      if (object !== null) {
+        object.changeThresholdRadius(thresholdRadius)
+      }
+    })
 
-      if (!width || !height) {
-        return 0
+    // 씬이 preload 단계를 넘어 create 되었을 때 해결될 프로미스입니다. 이는 `waitCreated` 메서드에서 이용됩니다.
+    this.waitCreatedPromise = new Promise((resolve) => {
+      this.waitCreatedResolver = resolve
+    })
+  }
+
+  /** 벽 타일의 기본 데이터를 반환합니다. */
+  get defaultWallData(): Engine.GameProject.SceneMapWall {
+    return {
+      key: '',
+      x: 0,
+      y: 0,
+      alias: '',
+      scale: 1,
+      isSensor: false
+    }
+  }
+
+  /** 바닥 타일의 기본 데이터를 반환합니다. */
+  get defaultFloorData(): Engine.GameProject.SceneMapFloor {
+    return {
+      key: '',
+      x: 0,
+      y: 0
+    }
+  }
+
+  /** 오디오 타일의 기본 데이터를 반환합니다. */
+  get defaultAudioData(): Engine.GameProject.SceneMapAudio {
+    return {
+      key: '',
+      x: 0,
+      y: 0,
+      isListenerOnCamera: false,
+      loop: true,
+      thresholdRadius: 1000,
+      volume: 1
+    }
+  }
+
+  /** 씬에 설치된 벽의 게임 오브젝트 목록을 배열로 반환합니다. */
+  get wallObjects() {
+    return this.map.walls
+  }
+  
+  /** 씬에 설치된 바닥 타일의 게임 오브젝트 목록을 배열로 반환합니다. */
+  get floorObjects() {
+    return this.map.floors
+  }
+  
+  /** 씬에 설치된 오디오의 게임 오브젝트 목록을 배열로 반환합니다. */
+  get audioObjects(): PreviewAudioVisualizer[] {
+    return this.children.list.filter((object) => object instanceof PreviewAudioVisualizer) as PreviewAudioVisualizer[]
+  }
+
+  /**
+   * 드래그로 선택된 맵 오브젝트 정보를 반환합니다.
+   */
+  get selectedMapObjects() {
+    const selected: {
+      walls: Engine.GameProject.SceneMapWall[],
+      floors: Engine.GameProject.SceneMapFloor[],
+      audios: Engine.GameProject.SceneMapAudio[]
+    } = {
+      walls: [],
+      floors: [],
+      audios: []
+    }
+
+    for (const object of this.select.selects) {
+      const { x, y } = object as unknown as Point2
+
+      switch (this.disposeType) {
+        case 1: {
+          const wall = this.mapDataManager.getWallFromPosition(x, y)
+          if (wall) selected.walls.push(wall)
+          break
+        }
+        case 2: {
+          const floor = this.mapDataManager.getFloorFromPosition(x, y)
+          if (floor) selected.floors.push(floor)
+          break
+        }
+        case 3: {
+          const audio = this.mapDataManager.getAudioFromPosition(x, y)
+          if (audio) selected.audios.push(audio)
+          break
+        }
       }
     }
 
-    return this.getIsometricSideFromWidth(width / 2)
+    return selected
   }
 
-  private getPaletteFromKey(key: string): Types.PaletteImage|Types.PaletteSprite|null {
-    const map: Map<string, Types.PaletteImage|Types.PaletteSprite> = new Map
+  /** 씬 맵에서 오브젝트를 선택 중인지 여부를 반환합니다. 1개 이상의 오브젝트를 선택 중이라면 참을 반환합니다. */
+  get isSelectedMapObject(): boolean {
+    return this.select.selects.length > 0
+  }
 
-    for (const image of this.requireImages) {
-      map.set(image.key, image)
-    }
-    for (const sprite of this.requireSprites) {
-      map.set(sprite.key, sprite)
-    }
+  private copy<T extends object>(jsonData: T): T {
+    return JSON.parse(JSON.stringify(jsonData))
+  }
 
-    if (!map.has(key)) {
-      return null
+  preload(): void {
+    // this.load.image('ico-palette-audio', IcoPaletteAudio)
+    this.textures.addBase64('ico-palette-audio', IcoPaletteAudio)
+
+    for (const { key, asset } of this.palette.images) {
+      const assetPath = path.join(this.assetDirectory, asset)
+      this.load.image(key, assetPath)
     }
     
-    return map.get(key)!
-  }
-
-  private isAnimationPalette(key: string): boolean {
-    const palette: Types.PaletteImage|Types.PaletteSprite|null = this.getPaletteFromKey(key)
-    if (!palette) {
-      return false
+    for (const { key, asset, frameWidth, frameHeight } of this.palette.sprites) {
+      const assetPath = path.join(this.assetDirectory, asset)
+      this.load.spritesheet(key, assetPath, { frameWidth, frameHeight })
     }
-    return Object.prototype.hasOwnProperty.call(this.getPaletteFromKey(key)!, 'frameWidth')
-  }
-
-  private setCameraMoving(): void {
-    const camera = this.cameras.main
-    const acceleration = 0.05
-    const drag = 0.0005
-    const maxSpeed = 1
-
-    this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl({
-      camera,
-      left:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false),
-      right:      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false),
-      up:         this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, false),
-      down:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false),
-      zoomIn:     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q, false),
-      zoomOut:    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E, false),
-      acceleration,
-      drag,
-      maxSpeed
-    })
-
-    camera.pan(0, 0, 0)
-  }
-
-  private setSelectionType(type: number): void {
-    this.selectionType = type
-    this.unselectObjects()
-  }
-
-  private setDisposeBrush(brush: Types.PaletteImage|Types.PaletteSprite|null): void {
-    this.disposeBrush = brush
-
-    if (!this.selectionType) {
-      this.select.enable(false)
-    }
-    else {
-      this.select.enable(!brush)
+    
+    for (const { key, asset } of this.palette.audios) {
+      const assetPath = path.join(this.assetDirectory, asset)
+      this.load.audio(key, assetPath)
     }
   }
 
-  private updateDisposeCursor(): void {
-    this.cursor.enable(false)
-    if (!this.isDisposeEnable) {
-      return
-    }
-    this.cursor.enable(true)
-    this.cursor.setGridSide(this.cursorSide)
-  }
+  create(): void {
+    this.resolveWait()
 
-  private getDiagonal(width: number, height: number): number {
-    return Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
-  }
+    this.generateAnimation()
+    this.setCameraControl()
 
-  private getIsometricSideFromWidth(width: number): number {
-    const rad = Phaser.Math.DegToRad(26.57)
-    return width / Math.cos(rad)
-  }
+    this.setMapSize(this.mapDataState.side)
+    this.deploy()
 
-  private unselectObjects(): void {
-    this.select.unselect()
+    // 맵 배치 기능을 위해 이벤트를 할당합니다.
+    this.input.on(Phaser.Input.Events.POINTER_DOWN, (e: Phaser.Input.Pointer) => {
+      this.dragStartOffset = { x: e.worldX, y: e.worldY }
 
-    for (const wall of this.selectionWalls) {
-      wall.clearTint()
-    }
-    for (const floor of this.selectionFloors) {
-      floor.clearTint()
-    }
+      switch (e.buttons) {
+        // 좌클릭 했다면 현재 selectedPaint, disposeType를 기준으로 맵에 오브젝트 배치를 시도합니다.
+        case 1: {
+          const { x, y } = this.cursor.pointer
+          this.disposeSelectedPaint(x, y)
 
-    this.selectionWalls.clear()
-    this.selectionFloors.clear()
-  }
-
-  private selectObjects(e: Phaser.Input.Pointer, selection: Types.Rect): void {
-    if (!this.selectionType) {
-      return
-    }
-    if (this.disposeBrush) {
-      return
-    }
-
-    const fillColor = Phaser.Display.Color.GetColor(255, 0, 0)
-
-    switch (this.selectionType) {
-      case 1:
-        break
-      case 2: {
-        const walls: Phaser.Physics.Matter.Sprite[] = this.select.select(selection, this.isometric.walls) as Phaser.Physics.Matter.Sprite[]
-        for (const wall of walls) {
-          wall.setTint(fillColor)
-          this.selectionWalls.add(wall)
+          // shift키를 누르지 않았다면, 이전에 선택되었던 리스트를 제거합니다.
+          if (!e.event.shiftKey) {
+            this.unselectObjects()
+          }
+          break
         }
-        break
       }
-      case 3: {
-        const floors: Phaser.GameObjects.Sprite[] = this.select.select(selection, this.isometric.floors) as Phaser.GameObjects.Sprite[]
-        for (const floor of floors) {
-          floor.setTint(fillColor)
-          this.selectionFloors.add(floor)
+    })
+
+    this.input.on(Phaser.Input.Events.POINTER_MOVE, (e: Phaser.Input.Pointer) => {
+      switch (e.buttons) {
+        // 좌클릭 상태로 드래그할 경우, 현재 배치모드라면 맵에 오브젝트를 배치합니다.
+        case 1: {
+          if (this.selectedPaint !== null) {
+            let { x, y } = this.cursor.calcCursorOffset({ x: e.worldX, y: e.worldY })
+
+            // 쉬프트키와 함께 사용하고 있다면, 맵에 오브젝트를 대각선으로 배치합니다.
+            if (e.event.shiftKey) {
+              const startOffset = this.dragStartOffset
+              const currentOffset = { x, y }
+
+              const offset = this.calcStraightDisposeOffset(startOffset, currentOffset)
+              x = offset.x
+              y = offset.y
+            }
+
+            const { key } = this.selectedPaint
+            switch (this.disposeType) {
+              case 1: {
+                this.disposeWall({ ...this.defaultWallData, key, x, y })
+                break
+              }
+              case 2: {
+                this.disposeFloor({ ...this.defaultFloorData, key, x, y })
+                break
+              }
+              case 3: {
+                this.disposeAudio({ ...this.defaultAudioData, key, x, y })
+                break
+              }
+            }
+          }
+          break
         }
-        break
       }
-    }
-  }
-
-  private deleteSelectionObjects(): void {
-    this.selectionWalls.forEach((wall): void => {
-      this.map.dropWallData(wall)
-      wall.destroy()
     })
 
-    this.selectionFloors.forEach((floor): void => {
-      this.map.dropFloorData(floor)
-      floor.destroy()
-    })
+    // 맵 배치 삭제 및 선택 기능을 위해 이벤트를 할당합니다.
+    this.select.events.on('drag-end', (_e, selection) => {
+      switch (this.disposeType) {
+        case 1: {
+          this.select.select(selection, this.map.walls)
+          break
+        }
+        case 2: {
+          this.select.select(selection, this.map.floors)
+          break
+        }
+        case 3: {
+          this.select.select(selection, this.children.list.filter((object) => object instanceof PreviewAudioVisualizer))
+          break
+        }
+      }
+      
+      const color = Phaser.Display.Color.GetColor(255, 0, 0)
 
-    this.selectionWalls.clear()
-    this.selectionFloors.clear()
+      for (const object of this.select.selects) {
+        const item: FillableObject = object as FillableObject
+        item.setTint(color)
+      }
+    })
   }
 
-  private setWallProperties(wall: Phaser.Physics.Matter.Sprite, { alias, scale, isSensor }: Types.PaletteProperties): void {
-    scale = Number(scale)
-    isSensor = Boolean(isSensor)
+  update(_time: number, delta: number): void {
+    this.updateCamera(delta)
+  }
 
-    // 올바르지 않은 값이 넘어왔을 경우 객체를 삭제하고 데이터에서도 제거함
-    if (isNaN(scale) || typeof scale !== 'number') {
-      this.map.dropWallData(wall)
-      wall.destroy()
+  /**
+   * 씬이 에셋 로드를 포함한 모든 작업(preload)가 끝나고, 실행 가능(create) 상태가 될 때 까지 대기합니다.
+   * @returns 실행 가능 상태가 될 때 해결될 프로미스 인스턴스입니다.
+   */
+  waitCreated(): Promise<void> {
+    return this.waitCreatedPromise
+  }
+
+  private resolveWait(): void {
+    if (!this.waitCreatedResolver) {
       return
     }
-
-    wall.setScale(scale)
-    wall.setSensor(isSensor)
-    wall.data.set('alias', alias)
-
-    this.map.modifyWallData(wall)
+    this.waitCreatedResolver()
   }
 
-  private calcStraightDisposeOffset(x: number, y: number): Types.Point2 {
-    const startOffset = this.cursor.calcCursorOffset(this.dragStartOffset)
-    const distanceX = x - startOffset.x
-    const distanceY = y - startOffset.y
+  private generateAnimation(): void {
+    for (const anims of this.palette.sprites) {
+      const { key, frameRate, start, end } = anims
+      if (this.anims.exists(key)) {
+        continue
+      }
+      this.anims.create({
+        key,
+        frameRate,
+        frames: this.anims.generateFrameNumbers(key, { start, end }),
+        repeat: -1
+      })
+    }
+  }
+
+  /**
+   * Map.json으로부터 저장된 모든 오브젝트 데이터를 기반으로 맵을 초기화합니다.
+   */
+  private deploy(): void {
+    const { walls, floors, audios } = this.mapDataState
+
+    walls.forEach((wall) => this.disposeWall(wall))
+    floors.forEach((floor) => this.disposeFloor(floor))
+    audios.forEach((audio) => this.disposeAudio(audio))
+  }
+
+  /**
+   * 쉬프트를 누른 상태에서 드래그하면 대각선으로 블록을 배치할 수 있습니다.
+   * 이는 드래그를 시작한 위치에서, 현재 마우스의 위치를 고려하여 블록이 어느 좌표에 배치되어야하는지 계산하는 메서드입니다.
+   * @param dragStartOffset 드래그를 시작헀던 커서의 좌표입니다.
+   * @param currentCursorOffset 현재 커서의 좌표입니다.
+   * @returns 계산 결과, 블록이 배치될 씬의 월드 좌표입니다.
+   */
+  private calcStraightDisposeOffset(dragStartOffset: Point2, currentCursorOffset: Point2): Point2 {
+    const startOffset = this.cursor.calcCursorOffset(dragStartOffset)
+    const distanceX = currentCursorOffset.x - startOffset.x
+    const distanceY = currentCursorOffset.y - startOffset.y
     
     let deg: number
-    const distance = this.getDiagonal(distanceX, distanceY)
+    const distance = Phaser.Math.Distance.Between(0, 0, distanceX, distanceY)
 
     // ↗
     if (distanceX > 0 && distanceY < 0) {
@@ -294,46 +372,275 @@ export default class PreviewScene extends Phaser.Scene {
       y: Math.sin(rad) * distance
     })
 
-    x = startOffset.x + offset.x
-    y = startOffset.y + offset.y
+    const x = startOffset.x + offset.x
+    const y = startOffset.y + offset.y
 
     return { x, y }
   }
 
-  private dispose(x: number, y: number, type: number, brushKey: string, insertData: boolean = true): Phaser.GameObjects.GameObject|null {
-    if (!this.getPaletteFromKey(brushKey)) {
-      return null
+  /**
+   * 해당 에셋이 어떤 파렛트 타입인지를 반환합니다.
+   * 이미지 에셋일 경우 1, 스프라이트 에셋일 경우 2, 오디오 에셋일 경우 3을 반환하며, 어느 곳에도 속하지 않는다면 -1을 반환합니다.
+   * @param key 에셋의 키입니다.
+   */
+  private getPaletteType(key: string): number {
+    const { images, sprites, audios } = this.palette
+
+    if (images.find((image) => image.key === key)) {
+      return 1
     }
 
-    let animsKey: string|undefined = undefined
-
-    if (this.isAnimationPalette(brushKey)) {
-      animsKey = brushKey
+    if (sprites.find((sprite) => sprite.key === key)) {
+      return 2
     }
 
-    switch (type) {
-      case 1:
+    if (audios.find((audio) => audio.key === key)) {
+      return 3
+    }
+
+    return -1
+  }
+  
+  /**
+   * 사용된 에셋 키를 기반으로 파렛트에서 정보를 반환합니다.
+   * 해당 에셋이 없거나 누락되었다면, `null`을 반환합니다.
+   * @param key 에셋의 키입니다.
+   */
+  private getPaint(key: string): PalettePaintAsset|null {
+    const { images, sprites, audios } = this.palette
+
+    return images.find((image) => image.key === key) ??
+      sprites.find((sprite) => sprite.key === key) ??
+      audios.find((audio) => audio.key === key) ?? null
+  }
+
+  /**
+   * 씬 맵 오브젝트 정보로부터 맵에 벽 오브젝트를 배치합니다.
+   * @param data Map.json에 저장된 씬 벽 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
+   */
+  private disposeWall(data: Engine.GameProject.SceneMapWall): void {
+    const { key, x, y } = data
+    const paletteType = this.getPaletteType(key)
+
+    // 없는 에셋이거나 누락되었다면 무시합니다
+    if (paletteType === -1) {
+      return
+    }
+
+    const animationKey: string|undefined = paletteType === 2 ? key : undefined
+
+    this.map.setWalltile(x, y, key, undefined, animationKey)
+    this.mapDataManager.setWall(data)
+  }
+
+  /**
+   * 씬 맵 오브젝트 정보로부터 맵에 바닥타일 오브젝트를 배치합니다.
+   * @param data Map.json에 저장된 씬 바닥타일 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
+   */
+  private disposeFloor(data: Engine.GameProject.SceneMapFloor): void {
+    const { key, x, y } = data
+    const paletteType = this.getPaletteType(key)
+
+    // 없는 에셋이거나 누락되었다면 무시합니다
+    if (paletteType === -1) {
+      return
+    }
+
+    const animationKey: string|undefined = paletteType === 2 ? key : undefined
+
+    this.map.setFloortile(x, y, key, undefined, animationKey)
+    this.mapDataManager.setFloor(data)
+  }
+
+  /**
+   * 씬 맵 오브젝트 정보로부터 맵에 오디오 오브젝트를 배치합니다.
+   * @param data Map.json에 저장된 씬 오디오 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
+   */
+  private disposeAudio(data: Engine.GameProject.SceneMapAudio): void {
+    const { key, x, y } = data
+    const paletteType = this.getPaletteType(key)
+
+    // 없는 에셋이거나 누락되었다면 무시합니다
+    if (paletteType === -1) {
+      return
+    }
+
+    // 오디오 이미지 배치해야 함
+    // this.add.image(x, y, 'ico-palette-audio').setDepth(Phaser.Math.MAX_SAFE_INTEGER - 1)
+    const visualizer = new PreviewAudioVisualizer(this, x, y, { key, thresholdRadius: 1000 })
+    this.add.existing(visualizer)
+
+    this.mapDataManager.setAudio(data)
+  }
+
+  /**
+   * 현재 선택된 페인트(selectedPaint)와 배치 타입(disposeType)을 기준으로 좌표에 오브젝트를 배치합니다.
+   * @param x 배치할 x좌표입니다
+   * @param y 배치할 y좌표입니다.
+   */
+  private disposeSelectedPaint(x: number, y: number): void {
+    if (!this.selectedPaint) {
+      return
+    }
+
+    const { key } = this.selectedPaint
+
+    switch (this.disposeType) {
+      case 1: {
+        const alias = ''
+        const isSensor = false
+        const scale = 1
+        this.disposeWall({ key, x, y, alias, isSensor, scale })
         break
-      
-      case 2: {
-        const wall = this.isometric.setWalltile(x, y, brushKey, undefined, animsKey)
-        wall.setDataEnabled()
-        if (insertData) {
-          this.map.insertWallData(wall)
-        }
-        return wall
       }
-
+      case 2: {
+        this.disposeFloor({ key, x, y })
+        break
+      }
       case 3: {
-        const floor = this.isometric.setFloortile(x, y, brushKey, undefined, animsKey)
-        if (insertData) {
-          this.map.insertFloorData(floor)
+        const isListenerOnCamera = false
+        const loop = true
+        const volume = 1
+        const thresholdRadius = 1000
+        this.disposeAudio({ key, x, y, isListenerOnCamera, loop, volume, thresholdRadius })
+        break
+      }
+    }
+  }
+
+  /**
+   * 설치된 벽을 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
+   * @param position 제거하고자 하는 벽이 설치된 씬의 좌표입니다.
+   */
+  deleteWall(position: Point2): void {
+    const { x, y } = position
+    this.mapDataManager.deleteWallFromPosition(x, y)
+    this.map.removeWalltile(x, y)
+  }
+
+  /**
+   * 설치된 바닥 타일을 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
+   * @param position 제거하고자 하는 바닥 타일이 설치된 씬의 좌표입니다.
+   */
+  deleteFloor(position: Point2): void {
+    const { x, y } = position
+    this.mapDataManager.deleteFloorFromPosition(x, y)
+    this.map.removeFloortile(x, y)
+  }
+
+  /**
+   * 설치된 오디오를 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
+   * @param position 제거하고자 하는 오디오가 설치된 씬의 좌표입니다.
+   */
+  deleteAudio(position: Point2): void {
+    const { x, y } = position
+    this.mapDataManager.deleteAudioFromPosition(x, y)
+    this.children.list.filter((object) => object instanceof PreviewAudioVisualizer).forEach((audio) => {
+      const { x, y } = audio as unknown as Point2
+      if (x === position.x && y === position.y) {
+        audio.destroy()
+      }
+    })
+  }
+
+  /**
+   * 선택된 맵 오브젝트를 선택 취소합니다.
+   * 선택된 틴트 색이 제거됩니다.
+   */
+  private unselectObjects(): void {
+    for (const object of this.select.selects) {
+      const item = object as FillableObject
+      item.clearTint()
+    }
+    this.select.unselect()
+  }
+
+  /**
+   * 현재 배치모드라면, 선택된 페인트의 크기에 맞는 커서 크기를 반환합니다.
+   * 그렇지 않다면 0을 반환합니다.
+   */
+  private get cursorSize(): number {
+    if (this.disposeType === 0) {
+      return 0
+    }
+
+    if (!this.selectedPaint) {
+      return 0
+    }
+
+    let width: number
+    let height: number
+
+    switch (this.getPaletteType(this.selectedPaint.key)) {
+      // 이미지 파렛트일 경우
+      case 1: {
+        const image = this.selectedPaint as PaletteImageAsset
+        const texture = this.textures.get(image.key)
+        
+        // 만일 일치하는 텍스쳐가 오류를 포함해 로드되지 않았거나, 누락되었을 경우 0을 반환합니다.
+        if (!texture) {
+          return 0
         }
-        return floor
+
+        width = texture.source[0].width
+        height = texture.source[0].height
+
+        // 가로, 세로 너비 중 하나라도 0일 경우, 오류로 판단합니다. 이미지의 크기는 0이 될 수 없기 때문입니다.
+        if (!width || !height) {
+          return 0
+        }
+        break
+      }
+      // 스프라이트 파렛트일 경우
+      case 2: {
+        const sprite = this.selectedPaint as PaletteSpriteAsset
+        width = sprite.frameWidth
+        height = sprite.frameHeight
+        break
+      }
+      // 오디오 파렛트일 경우
+      case 3: {
+        width = 30
+        height = 30
+        break
+      }
+      // 그 외 오류일 경우
+      default: {
+        width = 0
+        height = 0
       }
     }
 
-    return null
+    const halfWidth = width / 2
+
+    const rad = Phaser.Math.DegToRad(26.57)
+    const cosSide = Math.cos(rad)
+
+    const cursorSide = halfWidth / cosSide
+    return cursorSide
+  }
+
+  private setCameraControl(): void {
+    // 카메라 설정
+    const camera = this.cameras.main
+    const acceleration = 0.05
+    const drag = 0.0005
+    const maxSpeed = 1
+
+    this.cameraControl = new Phaser.Cameras.Controls.SmoothedKeyControl({
+      camera,
+      left:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, false),
+      right:      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, false),
+      up:         this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, false),
+      down:       this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, false),
+      zoomIn:     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q, false),
+      zoomOut:    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E, false),
+      acceleration,
+      drag,
+      maxSpeed
+    })
+
+    camera.pan(0, 0, 0)
   }
 
   private updateCamera(delta: number): void {
@@ -344,260 +651,62 @@ export default class PreviewScene extends Phaser.Scene {
     if (this.cameras.main.zoom > 1)     this.cameras.main.zoom = 1
   }
 
-  private destroyCamera(): void {
-    this.cameraControl?.destroy()
+  /**
+   * 월드의 맵 크기를 설정합니다. 이는 한 변의 길이를 의미합니다.
+   * @param side 한 변의 길이입니다. 단위는 `px`입니다.
+   */
+  setMapSize(side: number): void {
+    this.map.setWorldSize(side)
+    this.mapDataManager.setSide(side)
   }
 
-  private generateAnimation(): void {
-    for (const anims of this.requireSprites) {
-      const { key, frameRate, start, end } = anims
-      if (this.anims.exists(key)) {
-        continue
-      }
-      this.anims.create({
-        key,
-        frameRate,
-        frames: this.anims.generateFrameNumbers(key, { start, end }),
-        repeat: -1
-      })
-    }
-  }
+  /**
+   * 월드에 배치할 페인트를 지정합니다. 그리고 이후 마우스를 클릭하여 월드에 해당 페인트를 배치할 수 있습니다.
+   * @param paint 페인트 정보입니다.
+   */
+  setDisposePaint(paint: PalettePaintAsset|null): void {
+    this.unselectObjects()
+    
+    this.selectedPaint = paint
+    this.select.enable(false)
 
-  private updateDragStartOffset({ worldX, worldY }: Phaser.Input.Pointer): void {
-    this.dragStartOffset = { x: worldX, y: worldY }
-  }
-
-  private onMouseLeftDown(e: Phaser.Input.Pointer): void {
-    this.updateDragStartOffset(e)
-
-    // dispose brush
-    if (this.disposeBrush) {
-      let { x, y } = this.cursor.calcCursorOffset({ x: e.worldX, y: e.worldY })
-      if (e.event.shiftKey) {
-        const offset = this.calcStraightDisposeOffset(x, y)
-        x = offset.x
-        y = offset.y
-      }
-      this.dispose(x, y, this.selectionType, this.disposeBrush.key)
-    }
-    if (!e.event.shiftKey) {
-      this.unselectObjects()
-    }
-  }
-
-  private onMouseLeftDrag(e: Phaser.Input.Pointer): void {
-    // dispose brush
-    if (this.disposeBrush) {
-      let { x, y } = this.cursor.calcCursorOffset({ x: e.worldX, y: e.worldY })
-      if (e.event.shiftKey) {
-        const offset = this.calcStraightDisposeOffset(x, y)
-        x = offset.x
-        y = offset.y
-      }
-      this.dispose(x, y, this.selectionType, this.disposeBrush.key)
-    }
-  }
-
-  private onMouseLeftUp(e: Phaser.Input.Pointer): void {
-  }
-  
-  private onMouseRightDown(e: Phaser.Input.Pointer): void {
-  }
-
-  private onMouseRightUp(e: Phaser.Input.Pointer): void {
-  }
-
-  private async generateMapData(): Promise<boolean> {
-    const sceneMapRead: Engine.GameProject.ReadSceneMapSuccess|Engine.GameProject.ReadSceneMapFail = await ipcRenderer.invoke('read-scene-map', this.projectDirectory, this.storageKey)
-    if (!sceneMapRead.success) {
-      this.transfer.emit('load-map-fail', sceneMapRead.message)
-      return false
-    }
-
-    const { side, walls, floors } = sceneMapRead.content
-
-    this.setWorldSize(side)
-
-    const missingAssets: Set<string> = new Set
-
-    for (const prop of walls) {
-      const wall = this.dispose(prop.x, prop.y, 2, prop.key, false)
-      // 맵데이터 파일에는 기록되어있지만, 에셋이 삭제되었을 경우 에셋을 목록에서 제거합니다.
-      if (!wall) {
-        missingAssets.add(prop.key)
-        continue
-      }
-      // 벽의 정보를 설정합니다. 센서, 비율, 이름 등의 정보를 게임 오브젝트에 삽입합니다.
-      // 이후 씬에서 우클릭으로 오브젝트를 선택했을 때, 해당 오브젝트에서 이 정보를 읽어옵니다.
-      this.setWallProperties(wall as Phaser.Physics.Matter.Sprite, prop)
-    }
-
-    for (const prop of floors) {
-      const floor = this.dispose(prop.x, prop.y, 3, prop.key, false)
-      // 맵데이터 파일에는 기록되어있지만, 에셋이 삭제되었을 경우 에셋을 목록에서 제거합니다.
-      if (!floor) {
-        missingAssets.add(prop.key)
-      }
-    }
-
-    // 읽어들인 원본 맵 데이터를 기반으로 씬 파렛트 맵 데이터 인스턴스 생성
-    this.map.setData({ side, walls, floors })
-    this.transfer.emit('load-map-success', this.map, [...missingAssets.values()])
-
-    return true
-  }
-
-  private attachMouseEvent(): void {
-    this.input.on(Phaser.Input.Events.POINTER_DOWN, (e: Phaser.Input.Pointer): void => {
-      switch (e.button) {
-        case 0:
-          this.onMouseLeftDown(e)
-          break
-        case 2:
-          this.onMouseRightDown(e)
-          break
-      }
-    })
-
-    this.input.on(Phaser.Input.Events.POINTER_UP, (e: Phaser.Input.Pointer): void => {
-      switch (e.button) {
-        case 0:
-          this.onMouseLeftUp(e)
-          break
-        case 2:
-          this.onMouseRightUp(e)
-          break
-      }
-    })
-
-    this.input.on(Phaser.Input.Events.POINTER_MOVE, (e: Phaser.Input.Pointer): void => {
-      switch (e.buttons) {
-        case 1:
-          this.onMouseLeftDrag(e)
-          break
-      }
-    })
-  }
-
-  private attachKeyboardEvent(): void {
-    if (this.shiftKey) {
-      this.shiftKey.destroy()
-    }
-    this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
-  }
-
-  private attachTransferEvent(): void {
-    // 데이터 송수신 인스턴스 이벤트 할당
-    this.transfer
-    .on('receive-map-side', (side: number): void => {
-      this.setWorldSize(side)
-    })
-    .on('receive-selection-type', (type: number): void => {
-      this.setSelectionType(type)
-      this.setDisposeBrush(this.disposeBrush)
-      this.updateDisposeCursor()
-    })
-    .on('receive-dispose-brush', (brush: Types.PaletteImage|Types.PaletteSprite|null): void => {
-      this.setDisposeBrush(brush)
-      this.updateDisposeCursor()
-    })
-    .on('receive-delete-selection', (): void => {
-      this.deleteSelectionObjects()
-    })
-    .on('receive-wall-properties', (properties: Types.PaletteProperties): void => {
-      for (const wall of this.selectionWalls) {
-        this.setWallProperties(wall, properties)
-      }
-    })
-    .on('receive-save-request', (): void => {
-      this.save()
-    })
-    .on('receive-change-asset-path', (before: string, after: string): void => {
-      this.changeAssetPath(before, after)
-    })
-    .on('receive-delete-asset', (assetPath: string): void => {
-      this.deleteAssetPath(assetPath)
-    })
-  }
-
-  private setWorldSize(side: number): void {
-    this.map.modifySide(side)
-    this.isometric.setWorldSize(side)
-  }
-
-  private async save(): Promise<void> {
-    const mapData = this.map.data
-    const mapWrite: Engine.GameProject.WriteSceneMapSuccess|Engine.GameProject.WriteSceneMapFail = await ipcRenderer.invoke('write-scene-map', this.projectDirectory, this.storageKey, mapData)
-    if (!mapWrite.success) {
-      this.transfer.emit('save-map-fail', mapWrite.message)
+    if (this.disposeType === 0) {
+      this.cursor.enable(false)
+      this.select.enable(false)
       return
     }
-    this.transfer.emit('save-map-success', mapData)
-  }
 
-  private async changeAssetPath(before: string, after: string): Promise<void> {
-    this.map.changeAssetPath(before, after)
-  }
-
-  private async deleteAssetPath(assetPath: string): Promise<void> {
-    this.map.deleteAssetPath(assetPath)
-  }
-
-  init(): void {
-    this.plugins.installScenePlugin('ActorPlugin', ActorPlugin, 'actor', this)
-    this.plugins.installScenePlugin('IsometricScenePlugin', IsometricScenePlugin, 'isometric', this)
-    this.plugins.installScenePlugin('IsometricCursorPlugin', IsometricCursorPlugin, 'cursor', this)
-    this.plugins.installScenePlugin('IsometricSelectPlugin', IsometricSelectPlugin, 'select', this)
-    this.plugins.installScenePlugin('FogOfWarPlugin', FogOfWarPlugin, 'fow', this)
-  }
-
-  preload(): void {
-    this.load.setBaseURL(this.assetDirectory)
-    for (const { key, asset } of this.requireImages) {
-      this.load.image(key, asset)
+    if (paint === null) {
+      this.cursor.enable(false)
+      this.select.enable(true)
+      return
     }
-    for (const { key, asset, frameWidth, frameHeight } of this.requireSprites) {
-      this.load.spritesheet(key, asset, { frameWidth, frameHeight })
-    }
+
+    this.cursor.enable(true)
+    this.cursor.setGridSide(this.cursorSize)
   }
 
-  create(): void {
-    this.generateMapData().then((success: boolean): void => {
-      if (!success) {
-        return
-      }
+  /**
+   * 월드에 배치할 페인트의 타입입니다. 벽, 바닥타일, 오디오 등을 의미합니다. `selectedPaint`로 지정된 페인트가 어떤 타입으로 배치될 것인지를 지정하기 위함입니다.
+   * @param type 페인트의 타입입니다.
+   */
+  setDisposeType(type: number): void {
+    this.disposeType = type
 
-      // 맵 파일 감지 시작
-      this.generateAnimation()
-      
-      // 씬 기능 시작
-      this.setCameraMoving()
-      this.setSelectionType(0)
-      this.setDisposeBrush(null)
+    // 배치 타입을 변경하면 이전에 선택했던 리스트를 전부 복구합니다.
+    this.unselectObjects()
 
-      // 이벤트 할당
-      this.attachMouseEvent()
-      this.attachKeyboardEvent()
-      this.attachTransferEvent()
-
-      // 플러그인 설정
-      this.cursor.enableCoordinate(true)
+    if (this.disposeType === 0) {
+      this.cursor.enable(false)
       this.select.enable(false)
-
-      this.select.events.on('drag-end', this.selectObjects.bind(this))
-
-      // gui 씬 생성
-      this.scene.launch('__gui-scene__', this)
-    })
-
-    this.events.once(Phaser.Scenes.Events.DESTROY, this.onDestroy.bind(this))
-  }
-
-  update(time: number, delta: number): void {
-    this.updateCamera(delta)
-  }
-
-  private onDestroy(): void {
-    this.destroyCamera()
+    }
+    else {
+      if (!this.selectedPaint) {
+        this.select.enable(true)
+      }
+      else {
+        this.select.enable(false)
+      }
+    }
   }
 }
