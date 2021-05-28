@@ -67,16 +67,19 @@ interface SaveData {
  */
 export default class BaseScene extends Phaser.Scene {
 
-  private static ApplicationId: string = '{{ APPLICATION_ID }}'
+  private static readonly ApplicationId: string = '{{ APPLICATION_ID }}'
 
-  actor!: ActorPlugin
-  isometric!: IsometricScenePlugin
-  cursor!: IsometricCursorPlugin
-  select!: IsometricSelectPlugin
-  dialogue!: DialoguePlugin
-  modal!: ModalPlugin
-  fow!: FogOfWarPlugin
-  spatial!: SpatialAudioPlugin
+  readonly actor!: ActorPlugin
+  readonly isometric!: IsometricScenePlugin
+  readonly cursor!: IsometricCursorPlugin
+  readonly select!: IsometricSelectPlugin
+  readonly dialogue!: DialoguePlugin
+  readonly modal!: ModalPlugin
+  readonly fow!: FogOfWarPlugin
+  readonly spatial!: SpatialAudioPlugin
+
+  /** 씬에서 재생되는 bgm 사운드 인스턴스입니다. */
+  protected bgm: Phaser.Sound.WebAudioSound|null = null
 
   protected __scripts: Map<string, ScriptCallback[]> = new Map
   protected __map: SceneMap = { side: 2000, walls: [], floors: [], audios: [] }
@@ -212,6 +215,19 @@ export default class BaseScene extends Phaser.Scene {
         .setThresholdRadius(thresholdRadius)
         .attachListenerOnCamera(isListenerOnCamera)
         .play()
+    }
+  }
+
+  protected createAudio(): void {
+    const BGM = (this.constructor as any).BGM
+    if (BGM) {
+      const { key } = BGM
+      const bgm = this.sound.add(key, { loop: true })
+      this.bgm = bgm as Phaser.Sound.WebAudioSound
+      this.bgm.play()
+    }
+    else {
+      this.bgm = null
     }
   }
 
@@ -381,6 +397,7 @@ export default class BaseScene extends Phaser.Scene {
   create(): void {
     this.createAnimation()
     this.createMap()
+    this.createAudio()
     this.usePointerEvent()
     this.useKeyboardEvent()
 

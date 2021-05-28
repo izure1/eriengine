@@ -10,6 +10,8 @@ import BaseScene from '@/BaseScene'
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
 
+type Audios = (typeof Audios[keyof typeof Audios])
+
 /*
  *  주의!
  *  씬 파일 이름의 뒷 부분은 절대 변경하지 마십시오.
@@ -30,14 +32,23 @@ import BaseScene from '@/BaseScene'
  */
 export default class NewScene extends BaseScene {
     
-  /** 씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다. 절대 건드리지 마십시오. */
-  static Key: string = __filename
+  /**
+   *  씬의 고유값입니다. 이 값은 다른 씬과 절대로 중복되어선 안됩니다. 절대 건드리지 마십시오.
+   */
+  static readonly Key: string = __filename
 
   /**
-    *  씬의 우선순위입니다. 이 값이 클수록, 작은 값을 가진 씬보다 위에 보여집니다.  
-    *  가령 씬A의 Depth가 0이고, 씬B의 Depth가 1일 경우, 씬B가 씬A보다 위에 보여집니다.
-    */
-  static Depth: number = {{ DEPTH }}
+   *  씬의 우선순위입니다. 이 값이 클수록, 작은 값을 가진 씬보다 위에 보여집니다.  
+   *  가령 씬A의 Depth가 0이고, 씬B의 Depth가 1일 경우, 씬B가 씬A보다 위에 보여집니다.
+   */
+  static readonly Depth: number = {{ DEPTH }}
+
+  /**
+   *  씬에서 재생될 배경음악입니다.
+   *  배경음악 기능을 사용하고 싶지 않다면 null로 지정하십시오.
+   *  사용하고 싶다면 Audios['사용할 배경음악'] 을 선택해주십시오.
+   */
+  static readonly BGM: Audios|null = null
 
   constructor() {
     super({ key: NewScene.Key, active: false })

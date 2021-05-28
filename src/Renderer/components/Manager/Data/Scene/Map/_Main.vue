@@ -509,7 +509,7 @@ import NonReactivity from 'vue-nonreactivity-decorator'
 import similarity from 'string-similarity'
 
 import PreviewScene from './Phaser/_PreviewScene'
-import GuiScene from './Phaser/GuiScene'
+import { GuiScene } from './Phaser/GuiScene'
 import createConfig from './Phaser/createConfig'
 import { getStorageKeyFromFilename } from '@/Utils/getStorageKeyFromFilename'
 
