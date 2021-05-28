@@ -1,13 +1,15 @@
 <template>
-  <v-card flat>
+  <v-card
+    flat
+    tile
+  >
     <v-card-title>타일 레이어 생성기</v-card-title>
     <v-card-subtitle>아티스트가 타일이나 벽을 그릴 때 필요한 사이즈의 견본 레이어 이미지를 생성해줍니다.</v-card-subtitle>
     <v-card-text>
       <v-container>
         <v-row>
           <v-col>
-            <v-stepper
-              v-model="step"
+            <v-stepper v-model="step"
               vertical
               class="elevation-0"
             >
@@ -15,9 +17,7 @@
               <v-stepper-step step="1" editable>무엇을 만들고 싶나요?</v-stepper-step>
               <v-stepper-content step="1">
                 
-                <v-radio-group
-                  v-model="type"
-                >
+                <v-radio-group v-model="type">
                   <v-radio
                     label="바닥"
                     :value="0"
@@ -42,19 +42,20 @@
                 <p>
                   단위는 px이며, 기본 크기는 50입니다.
                 </p>
-                <v-text-field
+                <v-text-field v-model="side"
                   type="number"
-                  v-model="side"
                   rounded
                   filled
                 />
               </v-stepper-content>
 
-              <v-stepper-step
-                v-if="isObstacle"
+              <v-stepper-step v-if="isObstacle"
                 step="3"
                 editable
-              >벽의 높이는 몇 입니까?</v-stepper-step>
+              >
+                벽의 높이는 몇 입니까?
+              </v-stepper-step>
+
               <v-stepper-content step="3">
                 <p v-if="isWallLeft || isWallRight">
                   단위는 px이며, 권장 크기는 {{ tileHeight * 2 }}입니다.
@@ -62,9 +63,8 @@
                 <p v-else>
                   단위는 px입니다.
                 </p>
-                <v-text-field
+                <v-text-field v-model="height"
                   type="number"
-                  v-model="height"
                   rounded
                   filled
                 />
@@ -78,7 +78,10 @@
               <br>
               다운로드하면 프로젝트 디렉토리에 파일이 생성됩니다.
             </p>
-            <canvas ref="preview-canvas" :width="canvasWidth" :height="canvasHeight" />
+            <canvas ref="preview-canvas"
+              :width="canvasWidth"
+              :height="canvasHeight"
+            />
             
             <div>
               <v-btn

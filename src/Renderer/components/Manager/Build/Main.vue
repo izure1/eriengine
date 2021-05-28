@@ -1,5 +1,8 @@
 <template>
-  <v-card flat> 
+  <v-card
+    flat
+    tile
+  > 
     <v-card-title>테스트 및 빌드하기  (｢• ω •)｢	</v-card-title>
     <v-card-subtitle>
       게임을 테스트하거나, 실제 작동하는 애플리케이션으로 빌드할 수 있습니다. 하지만 순서를 지켜주세요.
@@ -102,59 +105,59 @@ import { BuildData } from './Runner.vue'
 
 @Component
 export default class BuildComponent extends Vue {
-    private isDevMode: boolean = false
-    private buttons: BuildData[] = []
+  private isDevMode: boolean = false
+  private buttons: BuildData[] = []
 
-    private get cwd(): string {
-        return this.$store.state.projectDirectory
-    }
+  private get cwd(): string {
+    return this.$store.state.projectDirectory
+  }
 
-    private get buildMode(): string {
-        return this.isDevMode ? 'dev' : 'prod'
-    }
+  private get buildMode(): string {
+    return this.isDevMode ? 'dev' : 'prod'
+  }
 
-    @Watch('buildMode', { immediate: true })
-    private onBuildModeChange(): void {
-        this.buttons = [
-            {
-                title: 'Test',
-                description: '브라우저에서 게임을 테스트합니다.<br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
-                jobChannel: 'build-serve',
-                jobParameters: [ this.cwd ],
-                streamChannel: 'build'
-            },
-            {
-                title: 'Web',
-                description: '소스코드를 게임이 작동하는 웹페이지로 추출합니다.',
-                jobChannel: 'build-to-web',
-                jobParameters: [ this.cwd, this.buildMode ],
-                streamChannel: 'build'
-            },
-            {
-                title: 'Windows',
-                description: '소스코드를 게임이 작동하는 Windows 전용 애플리케이션으로 추출합니다.',
-                jobChannel: 'build-to-app',
-                jobParameters: [ this.cwd, this.buildMode ],
-                streamChannel: 'build'
-            },
-            {
-                title: 'PWA',
-                description: '모바일에서 동작하는 애플리케이션으로 추출합니다.',
-                jobChannel: 'build-to-app',
-                jobParameters: [ this.cwd, this.buildMode ],
-                streamChannel: 'build'
-            }
-        ]
-    }
+  @Watch('buildMode', { immediate: true })
+  private onBuildModeChange(): void {
+    this.buttons = [
+      {
+        title: 'Test',
+        description: '브라우저에서 게임을 테스트합니다.<br>빌드가 빠르며, 소스코드를 수정하면 즉시 반영됩니다.',
+        jobChannel: 'build-serve',
+        jobParameters: [ this.cwd ],
+        streamChannel: 'build'
+      },
+      {
+        title: 'Web',
+        description: '소스코드를 게임이 작동하는 웹페이지로 추출합니다.',
+        jobChannel: 'build-to-web',
+        jobParameters: [ this.cwd, this.buildMode ],
+        streamChannel: 'build'
+      },
+      {
+        title: 'Windows',
+        description: '소스코드를 게임이 작동하는 Windows 전용 애플리케이션으로 추출합니다.',
+        jobChannel: 'build-to-app',
+        jobParameters: [ this.cwd, this.buildMode ],
+        streamChannel: 'build'
+      },
+      {
+        title: 'PWA',
+        description: '모바일에서 동작하는 애플리케이션으로 추출합니다.',
+        jobChannel: 'build-to-app',
+        jobParameters: [ this.cwd, this.buildMode ],
+        streamChannel: 'build'
+      }
+    ]
+  }
 
-    private createBuildDataToken(buildData: BuildData): string {
-        const stringify = JSON.stringify(buildData)
-        return Base64.encode(stringify)
-    }
+  private createBuildDataToken(buildData: BuildData): string {
+    const stringify = JSON.stringify(buildData)
+    return Base64.encode(stringify)
+  }
 
-    private runBuilder(button: BuildData): void {
-        const buildDataToken = this.createBuildDataToken(button)
-        this.$router.replace(`/manager/build/runner/${buildDataToken}`).catch(() => null)
-    }
+  private runBuilder(button: BuildData): void {
+    const buildDataToken = this.createBuildDataToken(button)
+    this.$router.replace(`/manager/build/runner/${buildDataToken}`).catch(() => null)
+  }
 }
 </script>

@@ -1,9 +1,10 @@
 <template>
   <v-card
+    flat
+    tile
     :loading="isCreating"
     :disabled="isCreating"
     elevation="0"
-    tile
   >
     <v-stepper v-model="step" class="elevation-0">
       <v-stepper-header>
@@ -93,7 +94,9 @@
                 숫자와 영소문자만 입력할 수 있습니다.
               </p>
               <div>
-                <v-text-field v-model="projectName" :rules="[projectNameRule, projectNameRequiredRule]" />
+                <v-text-field v-model="projectName"
+                  :rules="[projectNameRule, projectNameRequiredRule]"
+                />
               </div>
             </v-card-text>
             <v-card-actions>
@@ -218,7 +221,10 @@
                     <v-card-subtitle class="text-center">GUI의 글자 색상을 선택합니다</v-card-subtitle>
                     <v-card-actions>
                       <v-spacer />
-                      <v-color-picker hide-canvas show-swatches v-model="gameThemeTextColor" />
+                      <v-color-picker v-model="gameThemeTextColor"
+                        hide-canvas
+                        show-swatches
+                      />
                       <v-spacer />
                     </v-card-actions>
                   </v-card>
@@ -229,7 +235,10 @@
                     <v-card-subtitle class="text-center">GUI의 배경 색상을 선택합니다</v-card-subtitle>
                     <v-card-actions>
                       <v-spacer />
-                      <v-color-picker hide-canvas show-swatches v-model="gameThemeBackgroundColor" />
+                      <v-color-picker v-model="gameThemeBackgroundColor"
+                        hide-canvas
+                        show-swatches
+                      />
                       <v-spacer />
                     </v-card-actions>
                   </v-card>

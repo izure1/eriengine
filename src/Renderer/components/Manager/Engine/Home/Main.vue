@@ -1,5 +1,8 @@
 <template>
-  <v-card flat>
+  <v-card
+    flat
+    tile
+  >
     <v-card-title>위키</v-card-title>
     <v-card-subtitle>엔진을 이해하는데 도움이 될 수 있는 강좌입니다</v-card-subtitle>
     <engine-home-link-component :links="wikiLists" />

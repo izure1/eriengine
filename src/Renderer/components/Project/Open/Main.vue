@@ -1,41 +1,56 @@
 <template>
-    <v-card
-        :loading="isLoading"
-        :disabled="isLoading"
-        class="open"
-        flat
-    >
-        <v-card-title>프로젝트 열기  ☆ﾐ(o*･ω･)ﾉ</v-card-title>
-        <v-card-text>
-            <div v-if="isLoading">
-                <p>
-                    프로젝트를 재구축하는 중입니다.
-                    <br>
-                    필요한 모듈을 다운로드받고 있으며, 이 작업에는 인터넷 연결이 필요합니다.
-                    <br>
-                    잠시만 기다려주세요.
-                </p>
-                <shell-channel-component channel="ensure-require-modules" />
-            </div>
-            <span v-else>프로젝트 디렉토리를 선택하세요.</span>
-        </v-card-text>
-        <v-card-actions>
-            <v-spacer />
-            <v-container class="text-center">
-                <v-row>
-                    <v-col>
-                        <v-btn min-width="150" text @click="selectDirectory">디렉토리 선택</v-btn>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-btn min-width="150" text @click="goBack">돌아가기</v-btn>
-                    </v-col>
-                </v-row>
-            </v-container>
-            <v-spacer />
-        </v-card-actions>
-    </v-card>
+  <v-card class="open"
+    flat
+    tile
+    :loading="isLoading"
+    :disabled="isLoading"
+  >
+    <v-card-title>프로젝트 열기  ☆ﾐ(o*･ω･)ﾉ</v-card-title>
+    <v-card-text>
+      <div v-if="isLoading">
+        <p>
+          프로젝트를 재구축하는 중입니다.
+          <br>
+          필요한 모듈을 다운로드받고 있으며, 이 작업에는 인터넷 연결이 필요합니다.
+          <br>
+          잠시만 기다려주세요.
+        </p>
+        <shell-channel-component channel="ensure-require-modules" />
+      </div>
+      <span v-else>프로젝트 디렉토리를 선택하세요.</span>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer />
+
+      <v-container class="text-center">
+        <v-row>
+          <v-col>
+            <v-btn
+              text
+              min-width="150"
+              @click="selectDirectory"
+            >
+              디렉토리 선택
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <v-btn
+              text
+              min-width="150"
+              @click="goBack"
+            >
+              돌아가기
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <v-spacer />
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">

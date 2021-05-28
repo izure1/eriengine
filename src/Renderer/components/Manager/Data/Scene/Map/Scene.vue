@@ -26,6 +26,7 @@
 
     <v-card v-if="isContextmenuOpen"
       dark
+      tile
       width="230"
       class="contextmenu"
       :style="{ left: `${contextmenuX}px`, top: `${contextmenuY}px` }"

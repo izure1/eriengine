@@ -1,42 +1,53 @@
 <template>
-    <v-card flat>
-        <v-card-title>업데이트 확인</v-card-title>
-        <v-card-subtitle>
-            에리엔진에 릴리즈된 업데이트가 있는지 확인합니다.
-            <br>
-            이 작업에는 인터넷 연결이 필요합니다.
-        </v-card-subtitle>
-        <v-card-text>
-            <v-alert
-                v-if="error"
-                type="error"
-            >{{ error }}</v-alert>
-            <v-progress-linear
-                v-if="downloadProgress"
-                :value="downloadProgress"
-                :buffer-value="bufferProgress"
-                :color="progressColor"
-                height="10"
-                stream
-            ></v-progress-linear>
-        </v-card-text>
-        <v-card-actions>
-            <v-spacer />
-            <v-btn
-                v-if="!downloaded"
-                :disabled="downloading || downloaded || error"
-                @click="download"
-                text
-            >업데이트 확인</v-btn>
-            <v-btn
-                v-if="downloaded"
-                :disabled="downloading || !downloaded || error"
-                @click="install"
-                text
-            >업데이트 설치를 위해 다시 시작</v-btn>
-            <v-spacer />
-        </v-card-actions>
-    </v-card>
+    <v-card
+      flat
+      tile
+    >
+      <v-card-title>업데이트 확인</v-card-title>
+
+      <v-card-subtitle>
+        에리엔진에 릴리즈된 업데이트가 있는지 확인합니다.
+        <br>
+        이 작업에는 인터넷 연결이 필요합니다.
+      </v-card-subtitle>
+
+      <v-card-text>
+        <v-alert v-if="error"
+          type="error"
+        >
+          {{ error }}
+        </v-alert>
+        <v-progress-linear v-if="downloadProgress"
+          :value="downloadProgress"
+          :buffer-value="bufferProgress"
+          :color="progressColor"
+          height="10"
+          stream
+        />
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+        
+        <v-btn v-if="!downloaded"
+          :disabled="downloading || downloaded || error"
+          @click="download"
+          text
+        >
+          업데이트 확인
+        </v-btn>
+
+        <v-btn v-if="downloaded"
+          :disabled="downloading || !downloaded || error"
+          @click="install"
+          text
+        >
+          업데이트 설치를 위해 다시 시작
+        </v-btn>
+
+        <v-spacer />
+      </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">

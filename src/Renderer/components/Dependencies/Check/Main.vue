@@ -1,8 +1,12 @@
 <template>
-    <v-card tile flat :loading="isChecking">
-        <v-card-title>종속성 검사 중...</v-card-title>
-        <v-card-text>잠시만 기다려주세요...</v-card-text>
-    </v-card>
+  <v-card
+    flat
+    tile
+    :loading="isChecking"
+  >
+    <v-card-title>종속성 검사 중...</v-card-title>
+    <v-card-text>잠시만 기다려주세요...</v-card-text>
+  </v-card>
 </template>
 
 <script lang="ts">

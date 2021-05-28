@@ -1,10 +1,10 @@
 <template>
   <section>
     <v-card
-      :loading="isLoading"
-      :disabled="isLoading"
       flat
       tile
+      :loading="isLoading"
+      :disabled="isLoading"
     >
 
       <v-card-subtitle class="overline pb-0">{{ cwdOffset }}</v-card-subtitle>

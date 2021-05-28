@@ -1,40 +1,42 @@
 <template>
   <v-container>
-      <v-row>
-        <v-col v-for="col in links"
-          :key="`enginehome-${col.subheader}`"
-        >
-          <v-list>
-            <v-subheader>{{ col.subheader }}</v-subheader>
-            <v-list-item v-for="({ text, uri }, i) in col.lists"
-              :key="`enginehome-${col.subheader}-${i}`"
-              two-line
-              dense
-            >
-              <v-list-item-content>
-                <v-list-item-title class="primary--text">
-                  <a href="javascript:void(0)" v-if="isExternal(uri)"
-                    @click="openExternal(uri)"
-                  >
-                    {{ text }}
-                  </a>
-                  <a href="javascript:void(0)" v-else
-                    @click="openComponent(uri)"
-                  >
-                    {{ text }}
-                  </a>
-                </v-list-item-title>
-                <v-list-item-subtitle v-if="isExternal(uri)"
-                  class="text-caption"
+    <v-row>
+      <v-col v-for="col in links"
+        :key="`enginehome-${col.subheader}`"
+      >
+        <v-list>
+          <v-subheader>{{ col.subheader }}</v-subheader>
+          <v-list-item v-for="({ text, uri }, i) in col.lists"
+            :key="`enginehome-${col.subheader}-${i}`"
+            two-line
+            dense
+          >
+            <v-list-item-content>
+              <v-list-item-title class="primary--text">
+                <a v-if="isExternal(uri)"
+                  href="javascript:void(0)" 
+                  @click="openExternal(uri)"
                 >
-                  {{ uri }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-col>
-      </v-row>
-    </v-container>
+                  {{ text }}
+                </a>
+                <a v-else
+                  href="javascript:void(0)" 
+                  @click="openComponent(uri)"
+                >
+                  {{ text }}
+                </a>
+              </v-list-item-title>
+              <v-list-item-subtitle v-if="isExternal(uri)"
+                class="text-caption"
+              >
+                {{ uri }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">

@@ -6,8 +6,8 @@
     transition="dialog-bottom-transition"
   >
     <v-card
-      tile
       flat
+      tile
     >
       <v-card-title>씬 파렛트 에셋 누락</v-card-title>
       <v-card-subtitle>{{ missingAssets.length }}개의 에셋 누락 문제를 해결하십시오.</v-card-subtitle>

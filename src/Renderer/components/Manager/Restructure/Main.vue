@@ -1,5 +1,9 @@
 <template>
-  <v-card flat :loading="true"> 
+  <v-card
+    flat
+    tile
+    :loading="true"
+  > 
     <v-card-title>프로젝트 재구성 중  ( ╯°□°)╯ ┻━━┻</v-card-title>
     <v-card-subtitle>게임 엔진 버전에 맞지 않거나 일부 파일이 누락된 오류를 바로 잡습니다.</v-card-subtitle>
     <v-card-text> 

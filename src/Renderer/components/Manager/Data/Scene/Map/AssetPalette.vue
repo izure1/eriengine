@@ -5,8 +5,8 @@
     @click:outside="showPaintExplorer(false)"
   >
     <v-card class="preview-paint-explorer"
-      tile
       flat
+      tile
       elevation="1"
     >
       <v-card-title>브러쉬 선택</v-card-title>

@@ -1,13 +1,13 @@
 <template>
-    <explorer-component
-        :cwd="cwd"
-        :actions="actions"
-        :contextmenus="contextmenus"
-        :options="{ extensions }"
-        :preload="10"
-        :openFile="openPath"
-        :loading="isLoading"
-    />
+  <explorer-component
+    :cwd="cwd"
+    :actions="actions"
+    :contextmenus="contextmenus"
+    :options="{ extensions }"
+    :preload="10"
+    :openFile="openPath"
+    :loading="isLoading"
+  />
 </template>
 
 <script lang="ts">

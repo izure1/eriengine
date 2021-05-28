@@ -1,6 +1,9 @@
 <template>
   <section>
-    <v-card flat>
+    <v-card
+      flat
+      tile
+    >
       <v-card-text>
         <p v-for="(text, index) in description"
           v-html="text"
