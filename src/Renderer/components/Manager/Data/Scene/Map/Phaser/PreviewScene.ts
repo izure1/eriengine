@@ -109,7 +109,8 @@ export class PreviewScene extends Scene {
       y: 0,
       loop: true,
       thresholdRadius: 1000,
-      volume: 1
+      volume: 1,
+      delay: 0
     }
   }
 
@@ -486,21 +487,15 @@ export class PreviewScene extends Scene {
 
     switch (this.disposeType) {
       case 1: {
-        const alias = ''
-        const isSensor = false
-        const scale = 1
-        this.disposeWall({ key, x, y, alias, isSensor, scale })
+        this.disposeWall({ ...this.defaultWallData, key, x, y })
         break
       }
       case 2: {
-        this.disposeFloor({ key, x, y })
+        this.disposeFloor({ ...this.defaultFloorData, key, x, y })
         break
       }
       case 3: {
-        const loop = true
-        const volume = 1
-        const thresholdRadius = 1000
-        this.disposeAudio({ key, x, y, loop, volume, thresholdRadius })
+        this.disposeAudio({ ...this.defaultAudioData, key, x, y })
         break
       }
     }

@@ -193,11 +193,12 @@ export default class SceneInputComponent extends Vue {
         const {
           thresholdRadius,
           volume,
-          loop
+          loop,
+          delay
         } = this.getStandardPropertiesValue(
           audios,
           this.scene.defaultAudioData,
-          ['thresholdRadius', 'volume', 'loop']
+          ['thresholdRadius', 'volume', 'loop', 'delay']
         )
 
         this.component<ModalFormComponent<Engine.GameProject.SceneMapAudio>>('modal-properties')
@@ -224,14 +225,21 @@ export default class SceneInputComponent extends Vue {
               text: '반복',
               description: '음악이 반복 재생될지 여부를 지정합니다.',
               defaultValue: loop
+            },
+            {
+              key: 'delay',
+              type: 'number',
+              text: '지연',
+              description: '음악이 반복 재생될 때, 지연될 시간을 지정합니다. 이는 주기적으로 들리는 소리를 만들 때 유용합니다.',
+              defaultValue: delay
             }
           ]).setButtons([
             {
               text: '완료',
               click: (result) => {
-                const { thresholdRadius, volume, loop } = result
+                const { thresholdRadius, volume, loop, delay } = result
                 for (const audio of audios) {
-                  this.scene.mapDataManager.setAudio({ ...audio, thresholdRadius, volume, loop })
+                  this.scene.mapDataManager.setAudio({ ...audio, thresholdRadius, volume, loop, delay })
                 }
                 this.closePropertiesConfig()
               }

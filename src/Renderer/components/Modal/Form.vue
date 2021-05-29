@@ -13,28 +13,36 @@
             :key="`modal-form-input-${i}`"
           >
             <v-subheader>{{ input.text }}</v-subheader>
-            <v-text-field v-if="input.type === 'string'"
-              v-model="inputData[input.key]"
-              type="text"
-              :label="input.description"
-              dense
-              filled
-              rounded
-            />
-            <v-text-field v-else-if="input.type === 'number'"
-              v-model="inputData[input.key]"
-              type="number"
-              :label="input.description"
-              dense
-              filled
-              rounded
-            />
-            <v-switch v-else-if="input.type === 'boolean'"
-              v-model="inputData[input.key]"
-              :label="input.description"
-              dense
-              inset
-            />
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-text-field v-if="input.type === 'string'"
+                  v-model="inputData[input.key]"
+                  v-on="on"
+                  type="text"
+                  :label="input.description"
+                  dense
+                  filled
+                  rounded
+                />
+                <v-text-field v-else-if="input.type === 'number'"
+                  v-model="inputData[input.key]"
+                  v-on="on"
+                  type="number"
+                  :label="input.description"
+                  dense
+                  filled
+                  rounded
+                />
+                <v-switch v-else-if="input.type === 'boolean'"
+                  v-model="inputData[input.key]"
+                  v-on="on"
+                  :label="input.description"
+                  dense
+                  inset
+                />
+              </template>
+              <span class="text-caption">{{ input.description }}</span>
+            </v-tooltip>
           </div>
         </v-form>
       </v-card-text>

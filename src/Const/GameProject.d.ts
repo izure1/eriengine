@@ -40,6 +40,7 @@ declare namespace Engine {
       volume: number
       thresholdRadius: number
       loop: boolean
+      delay: number
     }
 
     interface SceneMapFloor extends SceneMapObject {}

@@ -21,7 +21,7 @@ interface SceneMap {
   side: number
   walls:  { key: string, x: number, y: number, alias: string, scale: number, isSensor: boolean }[]
   floors: { key: string, x: number, y: number }[]
-  audios: { key: string, x: number, y: number, alias: string, thresholdRadius: number, volume: number, loop: boolean }[]
+  audios: { key: string, x: number, y: number, alias: string, thresholdRadius: number, volume: number, delay: number, loop: boolean }[]
 }
 
 interface SceneStorage {
@@ -209,12 +209,19 @@ export default class BaseScene extends Phaser.Scene {
       }
       this.isometric.setFloortile(x, y, key, undefined, animsKey)
     }
-    for (const { key, x, y, thresholdRadius, volume, loop } of this.__map.audios) {
-      this.spatial
-        .addSpatialAudio(key, { x, y }, { loop, volume })
+    for (const { key, x, y, thresholdRadius, volume, delay, loop } of this.__map.audios) {
+      const audio = this.spatial.addSpatialAudio(key, { x, y }, { volume })
+
+      audio
         .setThresholdRadius(thresholdRadius)
         .attachListenerOnCamera(true)
-        .play()
+        .on(Phaser.Sound.Events.COMPLETE, () => {
+          if (loop) {
+            audio.play({ delay })
+          }
+        })
+
+      audio.play()
     }
   }
 
