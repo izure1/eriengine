@@ -16,7 +16,7 @@
     "@eriengine/plugin-fog-of-war": "^1.1.0",
     "@eriengine/plugin-isometric-cursor": "^1.2.0",
     "@eriengine/plugin-isometric-scene": "^1.2.2",
-    "@eriengine/plugin-spatial-audio": "^1.0.0",
+    "@eriengine/plugin-spatial-audio": "^1.0.1",
     "@vue/composition-api": "^1.0.0-rc.9",
     "add-filename-increment": "^1.0.0",
     "an-array-of-english-words": "2.0.0",
