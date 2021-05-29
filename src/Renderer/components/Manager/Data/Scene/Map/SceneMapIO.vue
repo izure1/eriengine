@@ -5,6 +5,7 @@
     >
       <v-card :loading="isLoading">
         <v-card-title>데이터를 불러오는 중...</v-card-title>
+        <v-card-text>잠시 기다려 주세요.</v-card-text>
       </v-card>
     </v-dialog>
     
@@ -13,6 +14,7 @@
     >
       <v-card :loading="isSaving">
         <v-card-title>데이터를 기록하는 중...</v-card-title>
+        <v-card-text>잠시 기다려 주세요.</v-card-text>
       </v-card>
     </v-dialog>
   </section>

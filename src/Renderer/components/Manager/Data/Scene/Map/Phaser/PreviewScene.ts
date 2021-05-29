@@ -107,7 +107,6 @@ export class PreviewScene extends Scene {
       key: '',
       x: 0,
       y: 0,
-      isListenerOnCamera: false,
       loop: true,
       thresholdRadius: 1000,
       volume: 1
@@ -498,11 +497,10 @@ export class PreviewScene extends Scene {
         break
       }
       case 3: {
-        const isListenerOnCamera = false
         const loop = true
         const volume = 1
         const thresholdRadius = 1000
-        this.disposeAudio({ key, x, y, isListenerOnCamera, loop, volume, thresholdRadius })
+        this.disposeAudio({ key, x, y, loop, volume, thresholdRadius })
         break
       }
     }

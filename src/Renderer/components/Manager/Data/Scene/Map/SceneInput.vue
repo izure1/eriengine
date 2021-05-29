@@ -193,12 +193,11 @@ export default class SceneInputComponent extends Vue {
         const {
           thresholdRadius,
           volume,
-          loop,
-          isListenerOnCamera
+          loop
         } = this.getStandardPropertiesValue(
           audios,
           this.scene.defaultAudioData,
-          ['thresholdRadius', 'volume', 'loop', 'isListenerOnCamera']
+          ['thresholdRadius', 'volume', 'loop']
         )
 
         this.component<ModalFormComponent<Engine.GameProject.SceneMapAudio>>('modal-properties')
@@ -225,21 +224,14 @@ export default class SceneInputComponent extends Vue {
               text: '반복',
               description: '음악이 반복 재생될지 여부를 지정합니다.',
               defaultValue: loop
-            },
-            {
-              key: 'isListenerOnCamera',
-              type: 'boolean',
-              text: '카메라 청취',
-              description: '플레이어가 보고 있는 화면의 위치를 기준으로 소리를 들을 것인지 여부를 지정합니다.',
-              defaultValue: isListenerOnCamera
             }
           ]).setButtons([
             {
               text: '완료',
               click: (result) => {
-                const { thresholdRadius, volume, loop, isListenerOnCamera } = result
+                const { thresholdRadius, volume, loop } = result
                 for (const audio of audios) {
-                  this.scene.mapDataManager.setAudio({ ...audio, thresholdRadius, volume, loop, isListenerOnCamera })
+                  this.scene.mapDataManager.setAudio({ ...audio, thresholdRadius, volume, loop })
                 }
                 this.closePropertiesConfig()
               }

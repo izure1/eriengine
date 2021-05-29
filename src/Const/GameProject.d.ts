@@ -37,7 +37,6 @@ declare namespace Engine {
     }
 
     interface SceneMapAudio extends SceneMapObject {
-      isListenerOnCamera: boolean
       volume: number
       thresholdRadius: number
       loop: boolean
