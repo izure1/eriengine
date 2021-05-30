@@ -79,10 +79,10 @@ export default class BaseScene extends Phaser.Scene {
   readonly spatial!: SpatialAudioPlugin
 
   /** 씬에서 재생되는 bgm 사운드 인스턴스입니다. */
-  protected bgm: Phaser.Sound.WebAudioSound|null = null
+  protected readonly bgm: Phaser.Sound.WebAudioSound|null = null
 
-  protected __scripts: Map<string, ScriptCallback[]> = new Map
-  protected __map: SceneMap = { side: 2000, walls: [], floors: [], audios: [] }
+  protected readonly __scripts: Map<string, ScriptCallback[]> = new Map
+  protected readonly __map: SceneMap = { side: 2000, walls: [], floors: [], audios: [] }
 
   /** 게임데이터를 저장하는데 사용된 키 목록입니다 */
   protected async saveKeys(): Promise<string[]> {
@@ -97,7 +97,7 @@ export default class BaseScene extends Phaser.Scene {
     if (!storage) {
       throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`
     }
-    this.__map = Object.values(storage.Map)[0].default
+    ;(this.__map as any) = Object.values(storage.Map)[0].default
   }
 
   protected generateScript(storages: typeof Storages, key: keyof typeof storages): void {
@@ -230,11 +230,11 @@ export default class BaseScene extends Phaser.Scene {
     if (BGM) {
       const { key } = BGM
       const bgm = this.sound.add(key, { loop: true })
-      this.bgm = bgm as Phaser.Sound.WebAudioSound
-      this.bgm.play()
+      ;(this.bgm as Phaser.Sound.WebAudioSound) = bgm as Phaser.Sound.WebAudioSound
+      this.bgm?.play()
     }
     else {
-      this.bgm = null
+      ;(this.bgm as null) = null
     }
   }
 

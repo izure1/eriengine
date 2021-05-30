@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import * as Key from 'keycode-js'
-import { Actor } from '@eriengine/plugin-actor'
+import BaseActor from '@/BaseActor'
 
 {{ DATA_LISTS }}
 
