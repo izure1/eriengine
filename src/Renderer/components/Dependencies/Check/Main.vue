@@ -71,9 +71,7 @@ export default class DependenciesCheckComponent extends Vue {
     for (const dependency of this.dependencies) {
       const commandExists: Engine.Process.CheckCommandExistsSuccess|Engine.Process.CheckCommandExistsFail = await ipcRenderer.invoke('check-command-exists', dependency.command)
       if (!commandExists.success) {
-        this.$store.dispatch('snackbar', commandExists.message)
         missings.add(dependency)
-        return
       }
     }
 
