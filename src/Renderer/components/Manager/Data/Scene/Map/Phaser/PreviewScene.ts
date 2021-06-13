@@ -59,6 +59,9 @@ export class PreviewScene extends Scene {
     this.mapDataState = this.copy(mapDataState)
     this.mapDataManager = new SceneMapManager(this.mapDataState)
 
+    // Map Data Manager에서 setWall, setFloor, setAudio, deleteWall, deleteFloor, deleteAudio 등과의 메서드로 데이터가 변경되었을 때
+    // 실제 씬에서 이 데이터를 기반으로 다시 그리기 (re-rendering) 해야 합니다.
+
     // 벽이 추가/수정/제거되었을 경우, 벽의 비주얼을 수정합니다.
     this.mapDataManager
       .on('set-wall', (wall) => {

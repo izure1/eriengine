@@ -8,7 +8,7 @@ import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scen
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 
 import * as Types from './Vars/Types'
-import { SceneDataTransfer } from './SceneDataTransfer'
+import { SceneDataTransfer } from './_SceneDataTransfer'
 import { SceneMapManager } from './_SceneMapManager'
 
 import {

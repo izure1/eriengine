@@ -297,14 +297,6 @@ export default class SceneInputComponent extends Vue {
           click: (result) => {
             const radius = result.radius as number
             const repeat = result.repeat as number
-            
-            interface Obstacle {
-              side: number
-              x: number
-              y: number
-            }
-
-            const side = this.scene.mapDataManager.getSide()
 
             const getRandomSpotOffset = (center: Point2, radius: number): Point2 => {
               const addX = Phaser.Math.Between(-radius, radius)

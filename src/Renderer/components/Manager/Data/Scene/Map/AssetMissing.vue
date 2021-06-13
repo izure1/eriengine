@@ -220,9 +220,9 @@ export default class AssetMissingComponent extends Vue {
   private changeAssetPath(before: string, after: string): void {
     const map = new SceneMapManager(this.savedMap)
 
-    map.changeWallPaintKey(before, after)
-    map.changeFloorPaintKey(before, after)
-    map.changeAudioPaintKey(before, after)
+    map.changeWallsPaintKey(before, after)
+    map.changeFloorsPaintKey(before, after)
+    map.changeAudiosPaintKey(before, after)
 
     this.$emit('send-data', 'savedMap', map.data)
   }
@@ -230,7 +230,9 @@ export default class AssetMissingComponent extends Vue {
   private deleteMissingAsset(assetPath: string): void {
     const map = new SceneMapManager(this.savedMap)
 
-    map.deleteWallFromPaintKey(assetPath)
+    map.deleteWallsFromPaintKey(assetPath)
+    map.deleteFloorsFromPaintKey(assetPath)
+    map.deleteAudiosFromPaintKey(assetPath)
     
     this.$emit('send-data', 'savedMap', map.data)
   }
