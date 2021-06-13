@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import { PaletteAudioAsset } from './Vars/Types'
 
 export class PreviewAudioVisualizer extends Phaser.GameObjects.Text {
   private thresholdRadius: number

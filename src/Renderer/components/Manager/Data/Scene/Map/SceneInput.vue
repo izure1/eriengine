@@ -2,6 +2,7 @@
   <div>
     <modal-form-component ref="modal-config" :value="isSceneConfigOpen" />
     <modal-form-component ref="modal-properties" :value="isPropertiesConfigOpen" />
+    <modal-form-component ref="modal-spread" :value="isSpreadConfigOpen" />
   </div>
 </template>
 
@@ -24,6 +25,10 @@ import ModalFormComponent, { ModalInputResult } from '@/Renderer/components/Moda
       type: Boolean,
       required: true
     },
+    isSpreadConfigOpen: {
+      type: Boolean,
+      required: true
+    },
     disposeType: {
       type: Number,
       required: true
@@ -37,6 +42,7 @@ import ModalFormComponent, { ModalInputResult } from '@/Renderer/components/Moda
 export default class SceneInputComponent extends Vue {
   protected isSceneConfigOpen!: boolean
   protected isPropertiesConfigOpen!: boolean
+  protected isSpreadConfigOpen!: boolean
   protected disposeType!: number
   protected scene!: PreviewScene
 
@@ -58,6 +64,10 @@ export default class SceneInputComponent extends Vue {
 
   private closePropertiesConfig(): void {
     this.$emit('send-data', 'isPropertiesConfigOpen', false)
+  }
+
+  private closeSpreadConfig(): void {
+    this.$emit('send-data', 'isSpreadConfigOpen', false)
   }
 
   /**
@@ -254,6 +264,89 @@ export default class SceneInputComponent extends Vue {
         break
       }
     }
+  }
+
+  @Watch('isSpreadConfigOpen', { immediate: true })
+  private onChangeIsSpreadConfigOpen(): void {
+    if (!this.isSpreadConfigOpen) {
+      return
+    }
+  
+    this.component<ModalFormComponent>('modal-spread')
+      .setTitle('흩뿌리기')
+      .setSubtitle('현재 선택한 오브젝트를 씬에 주변에 산개시켜 흩뿌립니다. 이는 풀, 나무 등을 배치하는데 좋습니다.')
+      .setInputs([
+        {
+          key: 'radius',
+          type: 'number',
+          text: '반지름',
+          description: '흩뿌릴 범위의 반지름을 설정합니다. 현재 오브젝트의 좌표를 중심으로 해당 반지름 안에 페인트가 랜덤하게 배치됩니다.',
+          defaultValue: 1000
+        },
+        {
+          key: 'repeat',
+          type: 'number',
+          text: '반복',
+          description: '선택한 오브젝트를 몇 회 산개할 것인지 지정합니다.',
+          defaultValue: 5
+        }
+      ])
+      .setButtons([
+        {
+          text: '완료',
+          click: (result) => {
+            const radius = result.radius as number
+            const repeat = result.repeat as number
+            
+            interface Obstacle {
+              side: number
+              x: number
+              y: number
+            }
+
+            const side = this.scene.mapDataManager.getSide()
+
+            const getRandomSpotOffset = (center: Point2, radius: number): Point2 => {
+              const addX = Phaser.Math.Between(-radius, radius)
+              const addY = Phaser.Math.Between(-radius, radius)
+
+              const x = center.x + addX
+              const y = center.y + addY
+              
+              return { x, y }
+            }
+
+            const getSpreadedObject = <T extends Engine.GameProject.SceneMapObject>(object: T, radius: number): T => {
+              const { x, y } = getRandomSpotOffset(object, radius)
+              const clone = JSON.parse(JSON.stringify(object)) as T
+
+              return { ...clone, x, y }
+            }
+
+            for (let i = 0; i < repeat; i++) {
+              const { walls, floors, audios } = this.scene.selectedMapObjects
+
+              for (const wall of walls) {
+                const clone = getSpreadedObject(wall, radius)
+                this.scene.mapDataManager.setWall(clone)
+              }
+              for (const floor of floors) {
+                const clone = getSpreadedObject(floor, radius)
+                this.scene.mapDataManager.setFloor(clone)
+              }
+              for (const audio of audios) {
+                const clone = getSpreadedObject(audio, radius)
+                this.scene.mapDataManager.setAudio(clone)
+              }
+            }
+
+            // TODO: 세이브해야함
+            // 이후 다시 렌더링해야함
+
+            this.closeSpreadConfig()
+          }
+        }
+      ])
   }
 }
 </script>

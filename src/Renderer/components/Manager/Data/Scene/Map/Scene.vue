@@ -35,8 +35,15 @@
       <v-list>
         <v-list-item-group>
           <v-list-item>
+            <v-list-item-content @click="showSpreadConfig">흩뿌리기</v-list-item-content>
+          </v-list-item>
+
+          <v-divider />
+
+          <v-list-item>
             <v-list-item-content @click="showSelectedObjectsProperties">속성</v-list-item-content>
           </v-list-item>
+
           <v-list-item>
             <v-list-item-content @click="deleteSelectedObject">삭제</v-list-item-content>
           </v-list-item>
@@ -201,13 +208,13 @@ export default class SceneComponent extends Vue {
       }
       const { walls, floors, audios } = this.mainScene.selectedMapObjects
       for (const wall of walls) {
-        this.mainScene.deleteWall(wall)
+        this.mainScene.eraseWall(wall)
       }
       for (const floor of floors) {
-        this.mainScene.deleteFloor(floor)
+        this.mainScene.eraseFloor(floor)
       }
       for (const audio of audios) {
-        this.mainScene.deleteAudio(audio)
+        this.mainScene.eraseAudio(audio)
       }
     })
   }
@@ -215,6 +222,20 @@ export default class SceneComponent extends Vue {
   /** 씬에서 선택한 오브젝트의 속성 수정창을 엽니다. */
   private showSelectedObjectsProperties(): void {
     this.$emit('send-data', 'isPropertiesConfigOpen', true)
+  }
+
+  /** 씬에서 선택한 오브젝트를 원하는 구역에 스프레드로 흩뿌리는 기능의 설정창을 엽니다. */
+  private showSpreadConfig(): void {
+    this.mainScene?.waitCreated().then(() => {
+      if (!this.mainScene) {
+        return
+      }
+      if (!this.mainScene.isSelectedMapObject) {
+        this.$store.dispatch('snackbar', '선택된 오브젝트가 없습니다.')
+        return
+      }
+      this.$emit('send-data', 'isSpreadConfigOpen', true)
+    })
   }
 
   @Watch('selectedPaint')

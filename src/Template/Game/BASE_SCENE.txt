@@ -6,6 +6,7 @@ import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelect
 import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
+import { Plugin as EnvironmentPlugin } from '@eriengine/plugin-environment'
 
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
@@ -77,6 +78,7 @@ export default class BaseScene extends Phaser.Scene {
   readonly modal!: ModalPlugin
   readonly fow!: FogOfWarPlugin
   readonly spatial!: SpatialAudioPlugin
+  readonly environment!: EnvironmentPlugin
 
   /** 씬에서 재생되는 bgm 사운드 인스턴스입니다. */
   protected readonly bgm: Phaser.Sound.WebAudioSound|null = null

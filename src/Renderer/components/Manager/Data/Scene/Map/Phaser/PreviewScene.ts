@@ -21,12 +21,12 @@ import IcoPaletteAudio from '@/Renderer/assets/ico-palette-audio.png'
 type FillableObject = Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Tint
 
 export class PreviewScene extends Scene {
-  protected actor!: ActorPlugin
-  protected dialogue!: DialoguePlugin
-  protected fow!: FogOfWarPlugin
-  protected map!: IsometricScenePlugin
-  protected cursor!: PointerPlugin
-  protected select!: SelectPlugin
+  readonly actor!: ActorPlugin
+  readonly dialogue!: DialoguePlugin
+  readonly fow!: FogOfWarPlugin
+  readonly map!: IsometricScenePlugin
+  readonly cursor!: PointerPlugin
+  readonly select!: SelectPlugin
 
   protected readonly assetDirectory: string
   
@@ -59,20 +59,30 @@ export class PreviewScene extends Scene {
     this.mapDataState = this.copy(mapDataState)
     this.mapDataManager = new SceneMapManager(this.mapDataState)
 
-    // 벽의 속성이 수정되었을 경우, 벽의 비주얼을 수정합니다.
-    this.mapDataManager.on('change-wall', ({ x, y, scale, isSensor }) => {
-      const object = this.wallObjects.find((wall) => wall.x === x && wall.y === y) ?? null
-      if (object !== null) {
-        object.setScale(scale).setSensor(isSensor)
-      }
-    })
-    // 오디오의 속성이 수정되었을 경우, 오디오의 비주얼을 수정합니다.
-    this.mapDataManager.on('change-audio', ({ x, y, thresholdRadius }) => {
-      const object = this.audioObjects.find((audio) => audio.x === x && audio.y === y) ?? null
-      if (object !== null) {
-        object.changeThresholdRadius(thresholdRadius)
-      }
-    })
+    // 벽이 추가/수정/제거되었을 경우, 벽의 비주얼을 수정합니다.
+    this.mapDataManager
+      .on('set-wall', (wall) => {
+        this.drawWall(wall)
+      })
+      .on('delete-wall', (wall) => {
+        this.eraseWall(wall)
+      })
+    // 바닥이 추가/수정/제거되었을 경우, 바닥의 비주얼을 수정합니다.
+    this.mapDataManager
+      .on('set-floor', (floor) => {
+        this.drawFloor(floor)
+      })
+      .on('delete-floor', (floor) => {
+        this.eraseFloor(floor)
+      })
+    // 오디오가 추가/수정/제거되었을 경우, 오디오의 비주얼을 수정합니다.
+    this.mapDataManager
+      .on('set-audio', (audio) => {
+        this.drawAudio(audio)
+      })
+      .on('delete-audio', (audio) => {
+        this.eraseAudio(audio)
+      })
 
     // 씬이 preload 단계를 넘어 create 되었을 때 해결될 프로미스입니다. 이는 `waitCreated` 메서드에서 이용됩니다.
     this.waitCreatedPromise = new Promise((resolve) => {
@@ -214,7 +224,7 @@ export class PreviewScene extends Scene {
         // 좌클릭 했다면 현재 selectedPaint, disposeType를 기준으로 맵에 오브젝트 배치를 시도합니다.
         case 1: {
           const { x, y } = this.cursor.pointer
-          this.disposeSelectedPaint(x, y)
+          this.drawSelectedPaint(x, y)
 
           // shift키를 누르지 않았다면, 이전에 선택되었던 리스트를 제거합니다.
           if (!e.event.shiftKey) {
@@ -245,15 +255,15 @@ export class PreviewScene extends Scene {
             const { key } = this.selectedPaint
             switch (this.disposeType) {
               case 1: {
-                this.disposeWall({ ...this.defaultWallData, key, x, y })
+                this.drawWall({ ...this.defaultWallData, key, x, y })
                 break
               }
               case 2: {
-                this.disposeFloor({ ...this.defaultFloorData, key, x, y })
+                this.drawFloor({ ...this.defaultFloorData, key, x, y })
                 break
               }
               case 3: {
-                this.disposeAudio({ ...this.defaultAudioData, key, x, y })
+                this.drawAudio({ ...this.defaultAudioData, key, x, y })
                 break
               }
             }
@@ -329,9 +339,9 @@ export class PreviewScene extends Scene {
   private deploy(): void {
     const { walls, floors, audios } = this.mapDataState
 
-    walls.forEach((wall) => this.disposeWall(wall))
-    floors.forEach((floor) => this.disposeFloor(floor))
-    audios.forEach((audio) => this.disposeAudio(audio))
+    walls.forEach((wall) => this.drawWall(wall))
+    floors.forEach((floor) => this.drawFloor(floor))
+    audios.forEach((audio) => this.drawAudio(audio))
   }
 
   /**
@@ -418,8 +428,8 @@ export class PreviewScene extends Scene {
    * 씬 맵 오브젝트 정보로부터 맵에 벽 오브젝트를 배치합니다.
    * @param data Map.json에 저장된 씬 벽 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
    */
-  private disposeWall(data: Engine.GameProject.SceneMapWall): void {
-    const { key, x, y } = data
+  private drawWall(data: Engine.GameProject.SceneMapWall): void {
+    const { key, x, y, scale, isSensor } = data
     const paletteType = this.getPaletteType(key)
 
     // 없는 에셋이거나 누락되었다면 무시합니다
@@ -429,15 +439,17 @@ export class PreviewScene extends Scene {
 
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
-    this.map.setWalltile(x, y, key, undefined, animationKey)
-    this.mapDataManager.setWall(data)
+    this.map
+      .setWalltile(x, y, key, undefined, animationKey)
+      .setScale(data.scale)
+      .setSensor(isSensor)
   }
 
   /**
    * 씬 맵 오브젝트 정보로부터 맵에 바닥타일 오브젝트를 배치합니다.
    * @param data Map.json에 저장된 씬 바닥타일 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
    */
-  private disposeFloor(data: Engine.GameProject.SceneMapFloor): void {
+  private drawFloor(data: Engine.GameProject.SceneMapFloor): void {
     const { key, x, y } = data
     const paletteType = this.getPaletteType(key)
 
@@ -449,15 +461,14 @@ export class PreviewScene extends Scene {
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
     this.map.setFloortile(x, y, key, undefined, animationKey)
-    this.mapDataManager.setFloor(data)
   }
 
   /**
    * 씬 맵 오브젝트 정보로부터 맵에 오디오 오브젝트를 배치합니다.
    * @param data Map.json에 저장된 씬 오디오 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
    */
-  private disposeAudio(data: Engine.GameProject.SceneMapAudio): void {
-    const { key, x, y } = data
+  private drawAudio(data: Engine.GameProject.SceneMapAudio): void {
+    const { key, x, y, thresholdRadius } = data
     const paletteType = this.getPaletteType(key)
 
     // 없는 에셋이거나 누락되었다면 무시합니다
@@ -465,12 +476,13 @@ export class PreviewScene extends Scene {
       return
     }
 
+    // 기존에 존재하는 오디오를 제거합니다
+    this.eraseAudio(data)
+
     // 오디오 이미지 배치해야 함
     // this.add.image(x, y, 'ico-palette-audio').setDepth(Phaser.Math.MAX_SAFE_INTEGER - 1)
-    const visualizer = new PreviewAudioVisualizer(this, x, y, { key, thresholdRadius: 1000 })
+    const visualizer = new PreviewAudioVisualizer(this, x, y, { key, thresholdRadius })
     this.add.existing(visualizer)
-
-    this.mapDataManager.setAudio(data)
   }
 
   /**
@@ -478,7 +490,7 @@ export class PreviewScene extends Scene {
    * @param x 배치할 x좌표입니다
    * @param y 배치할 y좌표입니다.
    */
-  private disposeSelectedPaint(x: number, y: number): void {
+  private drawSelectedPaint(x: number, y: number): void {
     if (!this.selectedPaint) {
       return
     }
@@ -487,15 +499,15 @@ export class PreviewScene extends Scene {
 
     switch (this.disposeType) {
       case 1: {
-        this.disposeWall({ ...this.defaultWallData, key, x, y })
+        this.mapDataManager.setWall({ ...this.defaultWallData, key, x, y })
         break
       }
       case 2: {
-        this.disposeFloor({ ...this.defaultFloorData, key, x, y })
+        this.mapDataManager.setFloor({ ...this.defaultFloorData, key, x, y })
         break
       }
       case 3: {
-        this.disposeAudio({ ...this.defaultAudioData, key, x, y })
+        this.mapDataManager.setAudio({ ...this.defaultAudioData, key, x, y })
         break
       }
     }
@@ -505,9 +517,9 @@ export class PreviewScene extends Scene {
    * 설치된 벽을 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
    * @param position 제거하고자 하는 벽이 설치된 씬의 좌표입니다.
    */
-  deleteWall(position: Point2): void {
+  eraseWall(position: Point2): void {
     const { x, y } = position
-    this.mapDataManager.deleteWallFromPosition(x, y)
+
     this.map.removeWalltile(x, y)
   }
 
@@ -515,9 +527,9 @@ export class PreviewScene extends Scene {
    * 설치된 바닥 타일을 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
    * @param position 제거하고자 하는 바닥 타일이 설치된 씬의 좌표입니다.
    */
-  deleteFloor(position: Point2): void {
+  eraseFloor(position: Point2): void {
     const { x, y } = position
-    this.mapDataManager.deleteFloorFromPosition(x, y)
+
     this.map.removeFloortile(x, y)
   }
 
@@ -525,14 +537,23 @@ export class PreviewScene extends Scene {
    * 설치된 오디오를 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
    * @param position 제거하고자 하는 오디오가 설치된 씬의 좌표입니다.
    */
-  deleteAudio(position: Point2): void {
+  eraseAudio(position: Point2): void {
     const { x, y } = position
-    this.mapDataManager.deleteAudioFromPosition(x, y)
-    this.children.list.filter((object) => object instanceof PreviewAudioVisualizer).forEach((audio) => {
-      const { x, y } = audio as unknown as Point2
-      if (x === position.x && y === position.y) {
-        audio.destroy()
+    
+    this.children.list.filter((gameObject) => {
+
+      // 오디오 객체가 아닌 게임 오브젝트 제외
+      if ( !(gameObject instanceof PreviewAudioVisualizer) ) {
+        return false
       }
+      // 삭제하고자 하는 사운드가 배치된 위치가 다른 오디오 제외
+      if (x !== gameObject.x || y !== gameObject.y) {
+        return false 
+      }
+      return true
+
+    }).forEach((audio) => {
+      audio.destroy()
     })
   }
 

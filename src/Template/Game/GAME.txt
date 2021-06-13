@@ -5,6 +5,7 @@ import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelect
 import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
+import { Plugin as EnvironmentPlugin } from '@eriengine/plugin-environment'
 
 import Scenes from './{{ PROJECT_SRC_SCENELIST_NAME }}'
 import config from '../extend/package.json'
@@ -81,6 +82,11 @@ new Phaser.Game({
         key: 'SpatialAudioPlugin',
         mapping: 'spatial',
         plugin: SpatialAudioPlugin
+      },
+      {
+        key: 'EnvironmentPlugin',
+        mapping: 'environment',
+        plugin: EnvironmentPlugin
       }
     ]
   },

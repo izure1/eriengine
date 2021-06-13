@@ -40,6 +40,7 @@
     <scene-input-component ref="scene-input"
       :isSceneConfigOpen="isSceneConfigOpen"
       :isPropertiesConfigOpen="isPropertiesConfigOpen"
+      :isSpreadConfigOpen="isSpreadConfigOpen"
       :disposeType="disposeType"
       :scene="scene"
       @send-data="receiveData"
@@ -109,6 +110,7 @@ export default class ScenePaletteComponent extends Vue {
   }
   protected isSceneConfigOpen: boolean = false
   protected isPropertiesConfigOpen: boolean = false
+  protected isSpreadConfigOpen: boolean = false
   protected isPaintExplorerOpen: boolean = false
   protected selectedPaint: PalettePaintAsset|null = null
 

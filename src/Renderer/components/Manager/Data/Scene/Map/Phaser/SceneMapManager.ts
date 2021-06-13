@@ -2,9 +2,12 @@ import normalize from 'normalize-path'
 import { TypedEmitter } from 'tiny-typed-emitter'
 
 interface TypedEvents {
-  'change-wall':  (wall: Engine.GameProject.SceneMapWall) => void
-  'change-floor': (floor: Engine.GameProject.SceneMapFloor) => void
-  'change-audio': (audio: Engine.GameProject.SceneMapAudio) => void
+  'set-wall':  (wall: Engine.GameProject.SceneMapWall) => void
+  'set-floor': (floor: Engine.GameProject.SceneMapFloor) => void
+  'set-audio': (audio: Engine.GameProject.SceneMapAudio) => void
+  'delete-wall': (wall: Engine.GameProject.SceneMapWall) => void
+  'delete-floor': (floor: Engine.GameProject.SceneMapFloor) => void
+  'delete-audio': (audio: Engine.GameProject.SceneMapAudio) => void
 }
 
 export class SceneMapManager extends TypedEmitter<TypedEvents> {
@@ -56,7 +59,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     const key = this.createKey(x, y)
 
     this.walls.set(key, wall)
-    this.emit('change-wall', wall)
+    this.emit('set-wall', wall)
 
     return this
   }
@@ -66,7 +69,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     const key = this.createKey(x, y)
     
     this.floors.set(key, floor)
-    this.emit('change-floor', floor)
+    this.emit('set-floor', floor)
 
     return this
   }
@@ -76,7 +79,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     const key = this.createKey(x, y)
 
     this.audios.set(key, audio)
-    this.emit('change-audio', audio)
+    this.emit('set-audio', audio)
 
     return this 
   }
@@ -105,20 +108,35 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
 
   deleteWallFromPosition(x: number, y: number): boolean {
     const key = this.createKey(x, y)
+    const wall = this.walls.get(key) ?? null
+
+    if (wall !== null) {
+      this.emit('delete-wall', wall)
+    }
     
-    return this.walls.delete(key)
+    return !!wall
   }
 
   deleteFloorFromPosition(x: number, y: number): boolean {
     const key = this.createKey(x, y)
+    const floor = this.floors.get(key) ?? null
+
+    if (floor !== null) {
+      this.emit('delete-floor', floor)
+    }
     
-    return this.floors.delete(key)
+    return !!floor
   }
 
   deleteAudioFromPosition(x: number, y: number): boolean {
     const key = this.createKey(x, y)
+    const audio = this.audios.get(key) ?? null
+
+    if (audio !== null) {
+      this.emit('delete-audio', audio)
+    }
     
-    return this.audios.delete(key)
+    return !!audio
   }
 
   getWallFromPaintKey(paintKey: string): Engine.GameProject.SceneMapWall|null {
@@ -191,6 +209,8 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       return false
     }
     wall.key = afterKey
+
+    this.emit('set-wall', wall)
     return true
   }
 
@@ -201,6 +221,8 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       return false
     }
     floor.key = afterKey
+
+    this.emit('set-floor', floor)
     return true
   }
 
@@ -211,6 +233,8 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       return false
     }
     audio.key = afterKey
+
+    this.emit('set-audio', audio)
     return true
   }
 }
