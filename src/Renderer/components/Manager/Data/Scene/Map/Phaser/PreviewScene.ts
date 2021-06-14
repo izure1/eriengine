@@ -62,6 +62,10 @@ export class PreviewScene extends Scene {
     // Map Data Manager에서 setWall, setFloor, setAudio, deleteWall, deleteFloor, deleteAudio 등과의 메서드로 데이터가 변경되었을 때
     // 실제 씬에서 이 데이터를 기반으로 다시 그리기 (re-rendering) 해야 합니다.
 
+    this.mapDataManager.on('set-side', (side) => {
+      this.setMapSize(side)
+    })
+
     // 벽이 추가/수정/제거되었을 경우, 벽의 비주얼을 수정합니다.
     this.mapDataManager
       .on('set-wall', (wall) => {
@@ -226,6 +230,11 @@ export class PreviewScene extends Scene {
       switch (e.buttons) {
         // 좌클릭 했다면 현재 selectedPaint, disposeType를 기준으로 맵에 오브젝트 배치를 시도합니다.
         case 1: {
+          // 선택된 페인트가 있는 상태에서 좌클릭은 그리기를 의미하므로, 그리기를 시작했을 때 데이터를 저장합니다.
+          if (this.selectedPaint !== null) {
+            this.mapDataManager.saveState()
+          }
+
           const { x, y } = this.cursor.pointer
           this.drawSelectedPaint(x, y)
 
@@ -255,25 +264,26 @@ export class PreviewScene extends Scene {
               y = offset.y
             }
 
-            const { key } = this.selectedPaint
-            switch (this.disposeType) {
-              case 1: {
-                this.drawWall({ ...this.defaultWallData, key, x, y })
-                break
-              }
-              case 2: {
-                this.drawFloor({ ...this.defaultFloorData, key, x, y })
-                break
-              }
-              case 3: {
-                this.drawAudio({ ...this.defaultAudioData, key, x, y })
-                break
-              }
-            }
+            this.drawSelectedPaint(x, y)
           }
           break
         }
       }
+    })
+
+    // 좌클릭 마우스를 때었을 경우, 배치가 끝났음을 알려줍니다.
+    this.input.on(Phaser.Input.Events.POINTER_UP, (e: Phaser.Input.Pointer) => {
+      // PointerUP 이벤트의 경우, e.buttons 속성값이 무조건 0이 되므로 우클릭을 때었을 경우에도 상태가 저장되는 오류가 있음.
+      // e.buttons가 무조건 0으로 나오는 것이 Phaser 오류인지 확실하지 않움.
+      // 이것에 대한 대응으로 leftButtonReleased 메서드를 사용.
+      // if (this.input.mousePointer.leftButtonReleased()) {
+      //   // 선택된 페인트가 있었을 경우, 이는 그리기를 하고 있었음을 알 수 있습니다.
+      //     // 따라서 그리기가 끝났고, 상태를 저장합니다.
+      //     if (this.selectedPaint !== null) {
+      //       console.log('저장됨!', this.mapDataManager)
+      //       this.mapDataManager.saveState()
+      //     }
+      // }
     })
 
     // 맵 배치 삭제 및 선택 기능을 위해 이벤트를 할당합니다.
@@ -444,7 +454,7 @@ export class PreviewScene extends Scene {
 
     this.map
       .setWalltile(x, y, key, undefined, animationKey)
-      .setScale(data.scale)
+      .setScale(scale)
       .setSensor(isSensor)
   }
 
@@ -479,11 +489,9 @@ export class PreviewScene extends Scene {
       return
     }
 
-    // 기존에 존재하는 오디오를 제거합니다
+    // 기존에 해당 위치에 존재하는 오디오를 제거합니다. 없다면 무시됩니다.
     this.eraseAudio(data)
 
-    // 오디오 이미지 배치해야 함
-    // this.add.image(x, y, 'ico-palette-audio').setDepth(Phaser.Math.MAX_SAFE_INTEGER - 1)
     const visualizer = new PreviewAudioVisualizer(this, x, y, { key, thresholdRadius })
     this.add.existing(visualizer)
   }
@@ -674,7 +682,6 @@ export class PreviewScene extends Scene {
    */
   setMapSize(side: number): void {
     this.map.setWorldSize(side)
-    this.mapDataManager.setSide(side)
   }
 
   /**

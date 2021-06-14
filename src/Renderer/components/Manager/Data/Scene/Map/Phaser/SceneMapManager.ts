@@ -2,6 +2,7 @@ import normalize from 'normalize-path'
 import { TypedEmitter } from 'tiny-typed-emitter'
 
 interface TypedEvents {
+  'set-side': (side: number) => void
   'set-wall':  (wall: Engine.GameProject.SceneMapWall) => void
   'set-floor': (floor: Engine.GameProject.SceneMapFloor) => void
   'set-audio': (audio: Engine.GameProject.SceneMapAudio) => void
@@ -11,37 +12,58 @@ interface TypedEvents {
 }
 
 export class SceneMapManager extends TypedEmitter<TypedEvents> {
-  protected side: number
-  protected readonly walls: Map<string, Engine.GameProject.SceneMapWall>
-  protected readonly floors: Map<string, Engine.GameProject.SceneMapFloor>
-  protected readonly audios: Map<string, Engine.GameProject.SceneMapAudio>
+  protected side: number = 0
+  protected readonly walls: Map<string, Engine.GameProject.SceneMapWall> = new Map
+  protected readonly floors: Map<string, Engine.GameProject.SceneMapFloor> = new Map
+  protected readonly audios: Map<string, Engine.GameProject.SceneMapAudio> = new Map
+  
+  protected cacheStates: Engine.GameProject.SceneMap[] = []
 
   constructor(mapData: Engine.GameProject.SceneMap) {
     super()
-    const { side, walls, floors, audios } = mapData
-
-    this.side = side
     
-    this.walls = new Map(
-      walls.map((wall) => [this.createKey(wall.x, wall.y), wall])
-    )
-    this.floors = new Map(
-      floors.map((floor) => [this.createKey(floor.x, floor.y), floor])
-    )
-    this.audios = new Map(
-      audios.map((audio) => [this.createKey(audio.x, audio.y), audio])
-    )
+    this.setDataState(mapData)
+    this.saveState()
   }
 
-  /** 맵 데이터를 반환합니다. 이 반환된 데이터를 직접 수정하지 마십시오. */
+  /**
+   * 맵 데이터를 반환합니다.
+   * 이 데이터는 깊은 복사가 이루어진 데이터이므로, 직접 수정하여도 영향을 미치지 않습니다.
+   */
   get data(): Engine.GameProject.SceneMap {
     const { side, walls, floors, audios } = this
 
-    return {
+    return this.copy<Engine.GameProject.SceneMap>({
       side,
       walls: Array.from(walls.values()),
       floors: Array.from(floors.values()),
       audios: Array.from(audios.values())
+    })
+  }
+
+  private copy<T>(data: T): T {
+    return JSON.parse(JSON.stringify(data))
+  }
+
+  /**
+   * 데이터를 기반으로 인스턴스를 초기화합니다.
+   * @param data 초기화하고자 하는 데이터입니다.
+   */
+   protected setDataState(data: Engine.GameProject.SceneMap): void {
+    const { side, walls, floors, audios } = data
+
+    this.side = side
+
+    for (const wall of walls) {
+      this.walls.set(this.createKey(wall.x, wall.y), wall)
+    }
+
+    for (const floor of floors) {
+      this.floors.set(this.createKey(floor.x, floor.y), floor)
+    }
+
+    for (const audio of audios) {
+      this.audios.set(this.createKey(audio.x, audio.y), audio)
     }
   }
   
@@ -62,6 +84,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   setSide(side: number): this {
     this.side = side
 
+    this.emit('set-side', side)
     return this
   }
 
@@ -162,6 +185,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     const wall = this.walls.get(key) ?? null
 
     if (wall !== null) {
+      this.walls.delete(key)
       this.emit('delete-wall', wall)
     }
     
@@ -179,6 +203,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     const floor = this.floors.get(key) ?? null
 
     if (floor !== null) {
+      this.floors.delete(key)
       this.emit('delete-floor', floor)
     }
     
@@ -196,6 +221,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     const audio = this.audios.get(key) ?? null
 
     if (audio !== null) {
+      this.audios.delete(key)
       this.emit('delete-audio', audio)
     }
     
@@ -358,13 +384,113 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   /**
    * 현재 데이터의 상태를 저장합니다.
    * 이 메서드로 저장된 데이터는 `undo` 메서드를 이용하여 다시 되돌릴 수 있습니다.
-   * 되돌릴 때, `set-wall`, `set-floor`, `set-audio` 이벤트가 방출됩니다.
+   * @returns 저장된 현재 데이터의 상태입니다.
    */
-  saveState(): void {
+  saveState(): Engine.GameProject.SceneMap {
+    const clone = this.data
 
+    this.cacheStates.push(clone)
+    return clone
   }
 
-  undo(): void {
+  /**
+   * `U`, `A` 두 배열을 받고, `U` 배열에는 있으나, `A` 배열에는 없는 씬 오브젝트를 찾습니다. 이른바 `A`의 여집합을 반환합니다.
+   * 찾는 기준은 `x`, `y` 좌표를 기준으로 찾습니다.
+   * @param U 씬 오브젝트 배열입니다.
+   * @param A 씬 오브젝트 배열입니다.
+   * @returns `U`에는 있으나, `A`에는 존재하지 않는 씬 오브젝트 배열입니다. 
+   */
+  private getComplementSet<T extends Engine.GameProject.SceneMapObject>(U: T[], A: T[]): T[] {
+    return U.filter((u) => {
+      const same = A.find((a) => (u.x === a.x && u.y === a.y)) ?? null
+      const exists = same !== null
+
+      return !exists
+    })
+  }
+
+  /**
+   * `saveState` 메서드로 저장된 마지막으로 데이터를 복원합니다.
+   * 더이상 복원할 데이터가 없다면 `null`를 반환합니다.
+   * 되돌릴 때, `set-wall`, `set-floor`, `set-audio` 이벤트가 방출됩니다.
+   * @returns 복원된 데이터입니다.
+   */
+  undo(): Engine.GameProject.SceneMap|null {
+    const i = this.cacheStates.length - 1
+
+    // 저장된 정보가 전혀 없을 경우, 무언가의 오류이므로 중지합니다.
+    if (i < 0) {
+      return null
+    }
     
+    const last = this.cacheStates.pop()
+    const current = this.data
+    
+    // 배열에서 값을 빼왔지만, 무언가의 오류로 값이 없을 경우 중지합니다.
+    if (!last) {
+      return null
+    }
+
+    // 스택이 모두 비었다면, 초기화를 위해 최소한 1개의 스택을 다시 저장합니다.
+    if (this.cacheStates.length <= 0) {
+      const clone = this.copy(last)
+
+      this.cacheStates.push(clone)
+    }
+
+    // 맵의 크기가 변경되었다면 이벤트를 호출합니다.
+
+    if (last.side !== current.side) {
+      this.setSide(last.side)
+    }
+
+    // 마지막 저장된 데이터에서 현재 데이터 중 없는 데이터를 조회하여 추가 이벤트를 발생시킵니다.
+    // 이는 마지막에 저장한 후 삭제된 데이터이기 때문에, 되돌리는 과정에서 추가되므로 추가 이벤트를 발생시켜야 합니다.
+
+    // this.getComplementSet(last.walls, current.walls).forEach((wall) => {
+    //   this.setWall(wall)
+    // })
+    
+    // this.getComplementSet(last.floors, current.floors).forEach((floor) => {
+    //   this.setFloor(floor)
+    // })
+    
+    // this.getComplementSet(last.audios, current.audios).forEach((audio) => {
+    //   this.setAudio(audio)
+    // })
+    
+    // 현재 데이터에서 마지막 저장된 데이터 중 없는 데이터를 조회하여 삭제 이벤트를 발생시킵니다.
+    // 이는 마지막에 저장한 후 추가된 데이터이기 때문에, 되돌리는 과정에서 제거되므로 제거 이벤트를 발생시켜야 합니다.
+    
+    this.getComplementSet(current.walls, last.walls).forEach((wall) => {
+      const { x, y } = wall
+      this.deleteWallFromPosition(x, y)
+    })
+
+    this.getComplementSet(current.floors, last.floors).forEach((floor) => {
+      const { x, y } = floor
+      this.deleteFloorFromPosition(x, y)
+    })
+
+    this.getComplementSet(current.audios, last.audios).forEach((audio) => {
+      const { x, y } = audio
+      this.deleteAudioFromPosition(x, y)
+    })
+
+    // 그 외에 정보 (x, y, scale, isSensor, thrusholdRadius 등)의 정보는 추가/제거가 아닌 수정이므로
+    // 수정된 정보에 대한 이벤트도 방출되어야 함.
+
+    const { walls, floors, audios } = last
+    walls.forEach((wall) => {
+      this.setWall(wall)
+    })
+    floors.forEach((floor) => {
+      this.setFloor(floor)
+    })
+    audios.forEach((audio) => {
+      this.setAudio(audio)
+    })
+
+    return last
   }
 }

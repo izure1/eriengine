@@ -12,6 +12,10 @@ import { Vue, Component, Watch } from 'vue-property-decorator'
 import { PreviewScene } from './Phaser/PreviewScene'
 import ModalFormComponent, { ModalInputResult } from '@/Renderer/components/Modal/Form.vue'
 
+
+// 씬의 데이터를 변경하기 전에 this.scene.mapDataManager.saveState 메서드를 호출하여 상태를 저장해야 합니다.
+// 이후 사용자가 undo를 하여 해당 위치로 돌아갈 수 있게 하기 위함입니다.
+
 @Component({
   components: {
     ModalFormComponent
@@ -46,6 +50,9 @@ export default class SceneInputComponent extends Vue {
   protected disposeType!: number
   protected scene!: PreviewScene
 
+  private lastSpreadRadius: number = 500
+  private lastSpreadRepeat: number = 5
+
   private component<T extends Vue>(refName: string): T {
     return this.$refs[refName] as T
   }
@@ -55,7 +62,7 @@ export default class SceneInputComponent extends Vue {
     if (isNaN(side)) {
       return
     }
-    this.scene.setMapSize(side)
+    this.scene.mapDataManager.setSide(side)
   }
 
   private closeSceneConfig(): void {
@@ -126,6 +133,8 @@ export default class SceneInputComponent extends Vue {
         {
           text: '완료',
           click: (result) => {
+            this.scene.mapDataManager.saveState()
+
             this.saveConfig(result)
             this.closeSceneConfig()
           }
@@ -182,6 +191,8 @@ export default class SceneInputComponent extends Vue {
             {
               text: '완료',
               click: (result) => {
+                this.scene.mapDataManager.saveState()
+                
                 const { alias, scale, isSensor } = result
                 for (const wall of walls) {
                   this.scene.mapDataManager.setWall({ ...wall, alias, scale, isSensor })
@@ -247,6 +258,8 @@ export default class SceneInputComponent extends Vue {
             {
               text: '완료',
               click: (result) => {
+                this.scene.mapDataManager.saveState()
+
                 const { thresholdRadius, volume, loop, delay } = result
                 for (const audio of audios) {
                   this.scene.mapDataManager.setAudio({ ...audio, thresholdRadius, volume, loop, delay })
@@ -281,22 +294,27 @@ export default class SceneInputComponent extends Vue {
           type: 'number',
           text: '반지름',
           description: '흩뿌릴 범위의 반지름을 설정합니다. 현재 오브젝트의 좌표를 중심으로 해당 반지름 안에 페인트가 랜덤하게 배치됩니다.',
-          defaultValue: 1000
+          defaultValue: this.lastSpreadRadius
         },
         {
           key: 'repeat',
           type: 'number',
           text: '반복',
           description: '선택한 오브젝트를 몇 회 산개할 것인지 지정합니다.',
-          defaultValue: 5
+          defaultValue: this.lastSpreadRepeat
         }
       ])
       .setButtons([
         {
           text: '완료',
           click: (result) => {
+            this.scene.mapDataManager.saveState()
+
             const radius = result.radius as number
             const repeat = result.repeat as number
+
+            this.lastSpreadRadius = radius
+            this.lastSpreadRepeat = repeat
 
             const getRandomSpotOffset = (center: Point2, radius: number): Point2 => {
               const addX = Phaser.Math.Between(-radius, radius)
@@ -331,9 +349,6 @@ export default class SceneInputComponent extends Vue {
                 this.scene.mapDataManager.setAudio(clone)
               }
             }
-
-            // TODO: 세이브해야함
-            // 이후 다시 렌더링해야함
 
             this.closeSpreadConfig()
           }

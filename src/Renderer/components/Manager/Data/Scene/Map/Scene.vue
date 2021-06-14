@@ -56,6 +56,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { Game } from 'phaser'
+import * as Key from 'keycode-js'
 
 import createGameConfig from './Phaser/createConfig'
 
@@ -124,6 +125,14 @@ export default class SceneComponent extends Vue {
 
   private unwatchResizeWindow(): void {
     window.removeEventListener('resize', this.resizeCanvas)
+  }
+
+  private addKeyboardEvent(): void {
+    window.addEventListener('keydown', this.onKeydown)
+  }
+
+  private removeKeyboardEvent(): void {
+    window.removeEventListener('keydown', this.onKeydown)
   }
 
   create(palette: Palette, savedMap: Engine.GameProject.SceneMap): Game {
@@ -196,6 +205,28 @@ export default class SceneComponent extends Vue {
     this.cancelDisposePaint()
   }
 
+  private onKeydown(e: KeyboardEvent): void {
+    this.mainScene?.waitCreated().then(() => {
+      if (!this.mainScene) {
+        return
+      }
+
+      switch (e.code) {
+        case Key.CODE_Z: {
+          // undo (ctrl + z)
+          if (e.ctrlKey) {
+            const a = this.mainScene.mapDataManager.undo()
+            console.log('되돌림!', a)
+          }
+          break
+        }
+        default: {
+          break
+        }
+      }
+    })
+  }
+
   private cancelDisposePaint(): void {
     this.$emit('send-data', 'selectedPaint', null)
   }
@@ -206,15 +237,21 @@ export default class SceneComponent extends Vue {
       if (!this.mainScene) {
         return
       }
+
+      this.mainScene.mapDataManager.saveState()
+
       const { walls, floors, audios } = this.mainScene.selectedMapObjects
       for (const wall of walls) {
-        this.mainScene.eraseWall(wall)
+        const { x, y } = wall
+        this.mainScene.mapDataManager.deleteWallFromPosition(x, y)
       }
       for (const floor of floors) {
-        this.mainScene.eraseFloor(floor)
+        const { x, y } = floor
+        this.mainScene.mapDataManager.deleteFloorFromPosition(x, y)
       }
       for (const audio of audios) {
-        this.mainScene.eraseAudio(audio)
+        const { x, y } = audio
+        this.mainScene.mapDataManager.deleteAudioFromPosition(x, y)
       }
     })
   }
@@ -257,6 +294,7 @@ export default class SceneComponent extends Vue {
 
   mounted(): void {
     this.watchResizeWindow()
+    this.addKeyboardEvent()
   }
 
   beforeDestroy(): void {
@@ -264,6 +302,8 @@ export default class SceneComponent extends Vue {
     this.destroyGame(true)
     // 씬 캔버스 리사이즈 이벤트를 해제합니다.
     this.unwatchResizeWindow()
+    // 키보드 이벤트를 제거합니다
+    this.removeKeyboardEvent()
   }
 }
 </script>
