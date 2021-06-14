@@ -302,6 +302,13 @@ export default class SceneInputComponent extends Vue {
           text: '반복',
           description: '선택한 오브젝트를 몇 회 산개할 것인지 지정합니다.',
           defaultValue: this.lastSpreadRepeat
+        },
+        {
+          key: 'grid',
+          type: 'boolean',
+          text: '격자',
+          description: '오브젝트의 크기를 맵의 격자에 맞추어 배치합니다.',
+          defaultValue: true
         }
       ])
       .setButtons([
@@ -312,6 +319,7 @@ export default class SceneInputComponent extends Vue {
 
             const radius = result.radius as number
             const repeat = result.repeat as number
+            const isGrid = result.grid as boolean
 
             this.lastSpreadRadius = radius
             this.lastSpreadRepeat = repeat
@@ -326,26 +334,47 @@ export default class SceneInputComponent extends Vue {
               return { x, y }
             }
 
-            const getSpreadedObject = <T extends Engine.GameProject.SceneMapObject>(object: T, radius: number): T => {
+            const getSpreadedObject = <T extends Engine.GameProject.SceneMapObject>(object: T, radius: number, side: number): T => {
               const { x, y } = getRandomSpotOffset(object, radius)
               const clone = JSON.parse(JSON.stringify(object)) as T
+              const point = { x, y }
 
-              return { ...clone, x, y }
+              if (isGrid) {
+                const grid = this.scene.cursor.calcCursorOffset({ x, y }, side)
+                point.x = grid.x
+                point.y = grid.y
+              }
+
+              return {
+                ...clone,
+                ...point
+              }
+            }
+
+            const getSideFromWidth = (width: number): number => {
+              const rad = Phaser.Math.DegToRad(26.57)
+              return Math.sin(rad) * width
             }
 
             for (let i = 0; i < repeat; i++) {
               const { walls, floors, audios } = this.scene.selectedMapObjects
 
               for (const wall of walls) {
-                const clone = getSpreadedObject(wall, radius)
+                const side = this.scene.getTextureSideFromKey(wall.key)
+                const clone = getSpreadedObject(wall, radius, side)
+
                 this.scene.mapDataManager.setWall(clone)
               }
               for (const floor of floors) {
-                const clone = getSpreadedObject(floor, radius)
+                const side = this.scene.getTextureSideFromKey(floor.key)
+                const clone = getSpreadedObject(floor, radius, side)
+
                 this.scene.mapDataManager.setFloor(clone)
               }
               for (const audio of audios) {
-                const clone = getSpreadedObject(audio, radius)
+                const side = this.scene.getTextureSideFromKey(audio.key)
+                const clone = getSpreadedObject(audio, radius, side)
+                
                 this.scene.mapDataManager.setAudio(clone)
               }
             }

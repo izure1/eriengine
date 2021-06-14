@@ -581,25 +581,23 @@ export class PreviewScene extends Scene {
   }
 
   /**
-   * 현재 배치모드라면, 선택된 페인트의 크기에 맞는 커서 크기를 반환합니다.
-   * 그렇지 않다면 0을 반환합니다.
+   * 페인트의 키를 기반으로 에셋의 사이드 크기를 계산하여 가져옵니다.
+   * 만일 해당 키를 가지고 있는 에셋이 없다면 0을 반환합니다.
+   * @param key 에셋의 키입니다.
    */
-  private get cursorSize(): number {
-    if (this.disposeType === 0) {
-      return 0
-    }
-
-    if (!this.selectedPaint) {
-      return 0
-    }
-
+  getTextureSideFromKey(key: string): number {
     let width: number
     let height: number
 
-    switch (this.getPaletteType(this.selectedPaint.key)) {
+    const paint = this.getPaint(key)
+
+    switch (this.getPaletteType(key)) {
       // 이미지 파렛트일 경우
       case 1: {
-        const image = this.selectedPaint as PaletteImageAsset
+        if (paint === null) {
+          return 0
+        }
+        const image = paint as PaletteImageAsset
         const texture = this.textures.get(image.key)
         
         // 만일 일치하는 텍스쳐가 오류를 포함해 로드되지 않았거나, 누락되었을 경우 0을 반환합니다.
@@ -618,7 +616,10 @@ export class PreviewScene extends Scene {
       }
       // 스프라이트 파렛트일 경우
       case 2: {
-        const sprite = this.selectedPaint as PaletteSpriteAsset
+        if (paint === null) {
+          return 0
+        }
+        const sprite = paint as PaletteSpriteAsset
         width = sprite.frameWidth
         height = sprite.frameHeight
         break
@@ -643,6 +644,22 @@ export class PreviewScene extends Scene {
 
     const cursorSide = halfWidth / cosSide
     return cursorSide
+  }
+
+  /**
+   * 현재 배치모드라면, 선택된 페인트의 크기에 맞는 커서 크기를 반환합니다.
+   * 그렇지 않다면 0을 반환합니다.
+   */
+  private get cursorSize(): number {
+    if (this.disposeType === 0) {
+      return 0
+    }
+
+    if (!this.selectedPaint) {
+      return 0
+    }
+
+    return this.getTextureSideFromKey(this.selectedPaint.key)
   }
 
   private setCameraControl(): void {
