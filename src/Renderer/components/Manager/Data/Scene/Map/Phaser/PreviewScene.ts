@@ -271,21 +271,6 @@ export class PreviewScene extends Scene {
       }
     })
 
-    // 좌클릭 마우스를 때었을 경우, 배치가 끝났음을 알려줍니다.
-    this.input.on(Phaser.Input.Events.POINTER_UP, (e: Phaser.Input.Pointer) => {
-      // PointerUP 이벤트의 경우, e.buttons 속성값이 무조건 0이 되므로 우클릭을 때었을 경우에도 상태가 저장되는 오류가 있음.
-      // e.buttons가 무조건 0으로 나오는 것이 Phaser 오류인지 확실하지 않움.
-      // 이것에 대한 대응으로 leftButtonReleased 메서드를 사용.
-      // if (this.input.mousePointer.leftButtonReleased()) {
-      //   // 선택된 페인트가 있었을 경우, 이는 그리기를 하고 있었음을 알 수 있습니다.
-      //     // 따라서 그리기가 끝났고, 상태를 저장합니다.
-      //     if (this.selectedPaint !== null) {
-      //       console.log('저장됨!', this.mapDataManager)
-      //       this.mapDataManager.saveState()
-      //     }
-      // }
-    })
-
     // 맵 배치 삭제 및 선택 기능을 위해 이벤트를 할당합니다.
     this.select.events.on('drag-end', (_e, selection) => {
       switch (this.disposeType) {

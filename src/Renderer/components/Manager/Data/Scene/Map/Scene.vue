@@ -215,8 +215,7 @@ export default class SceneComponent extends Vue {
         case Key.CODE_Z: {
           // undo (ctrl + z)
           if (e.ctrlKey) {
-            const a = this.mainScene.mapDataManager.undo()
-            console.log('되돌림!', a)
+            this.mainScene.mapDataManager.undo()
           }
           break
         }
