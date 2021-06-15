@@ -29,7 +29,10 @@ async function ensureDefaultScenes(projectDirPath: string): Promise<Engine.GameP
   const scenes: { name: string, property: object } [] = [
     {
       name: mainSceneName,
-      property: { DEPTH: 0, AUTO_START: true }
+      property: {
+        DEPTH: 0,
+        AUTO_START: true
+      }
     },
     {
       name: guiSceneName,

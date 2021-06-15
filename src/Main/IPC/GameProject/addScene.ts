@@ -22,7 +22,8 @@ interface FileWriteQueue {
 
 async function writeSceneFile(_projectDirPath: string, filePath: string, property: object): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
   const STORAGE_KEY = getStorageKeyFromFilename(filePath)
-  const DEPTH: number = 0
+  const DEPTH = 0
+  const AUTO_START = false
   const files: FileWriteQueue[] = [
     {
       path: filePath,
@@ -31,6 +32,7 @@ async function writeSceneFile(_projectDirPath: string, filePath: string, propert
         DATA_LISTS,
         STORAGE_LISTS,
         DEPTH,
+        AUTO_START,
         ...property
       })
     }
@@ -44,8 +46,8 @@ async function writeSceneFile(_projectDirPath: string, filePath: string, propert
     if (typeof content === 'function') {
       try {
         await content(path)
-      } catch(e) {
-        const { name, message } = e as Error
+      } catch (reason) {
+        const { name, message } = reason as Error
         return { success: false, name, message }
       }
     }
