@@ -53,7 +53,7 @@ export default class NewScene extends BaseScene {
    * 
    *  일반적으로 씬은 자동으로 실행하지 않는 편이 좋습니다.
    */
-  static readonly AutoStart: boolean = false
+  static readonly AutoStart: boolean = {{ AUTO_START }}
 
   /**
    *  씬에서 재생될 배경음악입니다.
@@ -76,7 +76,7 @@ export default class NewScene extends BaseScene {
   init(data: object = {}): void {
     // 필요하다면 전장의 안개를 활성화합니다. gui씬에서는 사용하지 마십시오.
     // this.fow.enable()
-    
+    {{ USING_DIALOGUE_GUI_SCENE }}
     super.init(data)
     // 이 아래에 작성하세요
 
