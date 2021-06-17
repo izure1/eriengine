@@ -17,7 +17,7 @@ import RAW_SCENE from 'raw-loader!@/Template/Game/SCENE.txt'
 
 interface FileWriteQueue {
   path: string
-  content: string|((path: string) => Promise<void>)
+  content: string|((_path: string) => Promise<void>)
 }
 
 async function writeSceneFile(_projectDirPath: string, filePath: string, property: object): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {
@@ -106,7 +106,7 @@ export async function handler(projectDirPath: string, filePath: string, property
 }
 
 export function ipc(): void {
-  ipcMain.handle('add-scene', async (e: IpcMainInvokeEvent, projectDirPath: string, filePath: string, property: object): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> => {
+  ipcMain.handle('add-scene', async (e: IpcMainInvokeEvent, projectDirPath: string, filePath: string, _property: object): Promise<Engine.GameProject.AddSceneSuccess|Engine.GameProject.AddSceneFail> => {
     return await handler(projectDirPath, filePath)
   })
 }

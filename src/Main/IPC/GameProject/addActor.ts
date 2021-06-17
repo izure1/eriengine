@@ -5,7 +5,6 @@ import { handler as makeDirectory } from '../FileSystem/makeDirectory'
 import { handler as writeFile } from '../FileSystem/writeFile'
 import { handler as addStorageDirectory } from './addStorageDirectory'
 import {
-    PROJECT_SRC_DIRECTORY_NAME,
     PROJECT_SRC_STORAGE_ACTOR_SCRIPT_DIRECTORY_NAME,
     DATA_LISTS,
     STORAGE_LISTS
@@ -17,7 +16,7 @@ import RAW_ACTOR from 'raw-loader!@/Template/Game/ACTOR.txt'
 
 interface FileWriteQueue {
     path: string
-    content: string|((path: string) => Promise<void>)
+    content: string|((_path: string) => Promise<void>)
 }
 
 async function writeActorFile(_projectDirPath: string, filePath: string): Promise<Engine.FileSystem.WriteFileSuccess|Engine.FileSystem.WriteFileFail> {

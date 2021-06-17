@@ -32,7 +32,7 @@ function getRemovedTsExt(filePath: string): string {
   return normalize(path)
 }
 
-export function getModuleContentFromArray(list: string[], exportKey: string = '', mappingExport: (moduleDatas: ModuleMap[]) => string = mappingDefaultExport): string {
+export function getModuleContentFromArray(list: string[], exportKey: string = '', mappingExport: (_moduleDatas: ModuleMap[]) => string = mappingDefaultExport): string {
   let modules: string = ''
   const maps: ModuleMap[] = []
   for (let i = 0, len = list.length; i < len; i++) {

@@ -11,7 +11,7 @@ export async function handler(): Promise<void> {
 }
 
 export function ipc(): void {
-  ipcMain.handle('install-update', async (e: IpcMainInvokeEvent): Promise<void> => {
+  ipcMain.handle('install-update', async (_e: IpcMainInvokeEvent): Promise<void> => {
     return await handler()
   })
 }

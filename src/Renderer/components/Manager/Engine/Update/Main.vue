@@ -59,8 +59,10 @@ export default class UpdaterComponent extends Vue {
   private downloadProgress: number = 0
   private chunkSize: number = 0
   private error: string|null = null
-  private onDownloadProgress: ((this: UpdaterComponent, e: IpcRendererEvent, progress: number) => void)|null = null
-  private onDownloadError: ((this: UpdaterComponent, e: IpcRendererEvent, message: string) => void)|null = null
+  // eslint-disable-next-line no-unused-vars
+  private onDownloadProgress: ((this: UpdaterComponent, _e: IpcRendererEvent, _progress: number) => void)|null = null
+  // eslint-disable-next-line no-unused-vars
+  private onDownloadError: ((this: UpdaterComponent, _e: IpcRendererEvent, _message: string) => void)|null = null
 
   private get downloading(): boolean {
     return this.downloadProgress > 0 && this.downloadProgress < 100

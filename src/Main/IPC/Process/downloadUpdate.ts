@@ -57,7 +57,7 @@ export async function handler(): Promise<Engine.Process.DownloadUpdateSuccess|En
 }
 
 export function ipc(): void {
-  ipcMain.handle('download-update', async (e: IpcMainInvokeEvent): Promise<Engine.Process.DownloadUpdateSuccess|Engine.Process.DownloadUpdateFail> => {
+  ipcMain.handle('download-update', async (_e: IpcMainInvokeEvent): Promise<Engine.Process.DownloadUpdateSuccess|Engine.Process.DownloadUpdateFail> => {
     return await handler()
   })
 }

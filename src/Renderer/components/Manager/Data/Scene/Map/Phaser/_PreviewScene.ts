@@ -1,7 +1,7 @@
 import path from 'path'
 import Phaser from 'phaser'
 import { ipcRenderer } from 'electron'
-import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
+import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
 import { DialoguePlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
@@ -398,13 +398,13 @@ export default class PreviewScene extends Phaser.Scene {
     }
   }
 
-  private onMouseLeftUp(e: Phaser.Input.Pointer): void {
+  private onMouseLeftUp(_e: Phaser.Input.Pointer): void {
   }
   
-  private onMouseRightDown(e: Phaser.Input.Pointer): void {
+  private onMouseRightDown(_e: Phaser.Input.Pointer): void {
   }
 
-  private onMouseRightUp(e: Phaser.Input.Pointer): void {
+  private onMouseRightUp(_e: Phaser.Input.Pointer): void {
   }
 
   private async generateMapData(): Promise<boolean> {

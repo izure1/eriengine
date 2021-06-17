@@ -45,7 +45,7 @@ export async function handler(): Promise<Engine.Process.CheckUpdateSuccess|Engin
 }
 
 export function ipc(): void {
-  ipcMain.handle('check-update', async (e: IpcMainInvokeEvent): Promise<Engine.Process.CheckUpdateSuccess|Engine.Process.CheckUpdateFail> => {
+  ipcMain.handle('check-update', async (_e: IpcMainInvokeEvent): Promise<Engine.Process.CheckUpdateSuccess|Engine.Process.CheckUpdateFail> => {
     return await handler()
   })
 }

@@ -527,7 +527,7 @@ import {
 
 interface ActionList {
   text: string
-  click: (button: ActionButton) => void
+  click: (_button: ActionButton) => void
 }
 
 interface ActionButton {
@@ -536,7 +536,7 @@ interface ActionButton {
   lists: ActionList[]
 }
 
-type Rule = (v: string) => string|boolean
+type Rule = (_v: string) => string|boolean
 
 @Component({
   components: {
@@ -909,7 +909,7 @@ export default class SceneMapEditor extends Vue {
     window.removeEventListener('resize', this.resizeCanvas)
   }
 
-  private onMouseLeftButtonClick(e: MouseEvent): void {
+  private onMouseLeftButtonClick(_e: MouseEvent): void {
     this.closeContextmenu()
   }
 
@@ -955,7 +955,6 @@ export default class SceneMapEditor extends Vue {
   }
 
   private isSelectionType(...types: number[]): boolean {
-    let ret: boolean = false
     for (const type of types) {
       if (type === this.selectionType) {
         return true
@@ -1006,7 +1005,7 @@ export default class SceneMapEditor extends Vue {
     this.setDisposeBrush(brush)
   }
 
-  private setMapSide(side: number): void {
+  private setMapSide(_side: number): void {
     if (!this.scene) {
       return
     }

@@ -64,7 +64,7 @@ import ExplorerComponent, { ContextItemAction } from '@/Renderer/components/File
 export { ContextItemAction } from '@/Renderer/components/FileSystem/Explorer.vue'
 
 
-type Rule = (v: string) => boolean|string;
+type Rule = (_v: string) => boolean|string;
 
 @Component({
   components: {
@@ -102,7 +102,7 @@ export default class GeneratorComponent extends Vue {
   private filename!: string|(() => string)
   private extraActions!: ContextItemAction[]
   private extraContextmenus!: ContextItemAction[]
-  private add!: (filePath: string) => Promise<void>
+  private add!: (_filePath: string) => Promise<void>
   private currentPath: string = normalize(this.cwd)
 
   private isNamingDialogOpen: boolean = false

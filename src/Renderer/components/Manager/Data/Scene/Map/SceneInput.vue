@@ -351,11 +351,6 @@ export default class SceneInputComponent extends Vue {
               }
             }
 
-            const getSideFromWidth = (width: number): number => {
-              const rad = Phaser.Math.DegToRad(26.57)
-              return Math.sin(rad) * width
-            }
-
             for (let i = 0; i < repeat; i++) {
               const { walls, floors, audios } = this.scene.selectedMapObjects
 

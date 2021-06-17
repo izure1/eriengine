@@ -11,12 +11,18 @@
 import { Vue, Component } from 'vue-property-decorator'
 import { ParticlesBg } from 'particles-bg-vue'
 
+// eslint-disable-next-line no-unused-vars
 enum ParticlesType {
-    Ball        = 'ball',
-    Circle      = 'circle',
-    Cobweb      = 'cobweb',
-    Polygon     = 'polygon',
-    Square      = 'square'
+  // eslint-disable-next-line no-unused-vars
+  Ball        = 'ball',
+  // eslint-disable-next-line no-unused-vars
+  Circle      = 'circle',
+  // eslint-disable-next-line no-unused-vars
+  Cobweb      = 'cobweb',
+  // eslint-disable-next-line no-unused-vars
+  Polygon     = 'polygon',
+  // eslint-disable-next-line no-unused-vars
+  Square      = 'square'
 }
 
 @Component({

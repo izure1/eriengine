@@ -42,7 +42,7 @@ export class PreviewScene extends Scene {
   private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
 
   private waitCreatedPromise: Promise<void>
-  private waitCreatedResolver: ((value: void|PromiseLike<void>) => void)|null = null
+  private waitCreatedResolver: ((_value: void|PromiseLike<void>) => void)|null = null
 
   constructor(palette: Palette, mapDataState: Engine.GameProject.SceneMap, projectDirectory: string, config: string|Phaser.Types.Scenes.SettingsConfig) {
     super(config)

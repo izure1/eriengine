@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import normalize from 'normalize-path'
 
-type WatcherCallback = (filePath: string) => void
+type WatcherCallback = (_filePath: string) => void
 export class FileWatcher {
   protected cwd: string
   private recursive: boolean

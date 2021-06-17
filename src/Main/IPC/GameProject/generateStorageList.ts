@@ -42,11 +42,6 @@ export async function handler(projectDirPath: string): Promise<Engine.GameProjec
                     let content = 'export default {\n'
                     const storages: Map<string, Map<string, ({ name: string, path: string })[]>> = new Map
 
-                    // 모듈 파일이 없는 디렉토리
-                    const directories: string[] = items.map((itemPath: string): string => {
-                        return normalize(path.join(aliasCwd, itemPath))
-                    })
-
                     const getStorageDataFromPath = (itemPath: string): { relativePath: string, storage: string, subDirectory: string } => {
                         const relativePath = normalize(path.relative(aliasCwd, itemPath))
                         const paths = relativePath.split('/')

@@ -346,12 +346,12 @@
 </template>
 
 <script lang="ts">
-import { ipcRenderer, remote } from 'electron'
+import { ipcRenderer } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { getRandomSentence } from '@/Utils/getRandomSentence'
 import LICENSE from '@/Template/Project/LICENSE.txt'
 
-type Rule = (v: string) => boolean|string;
+type Rule = (_v: string) => boolean|string;
 
 @Component
 export default class NewProjectComponent extends Vue {

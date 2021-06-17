@@ -79,7 +79,7 @@ export interface ModalInputResult {
 
 export interface ModalButton<T> {
   text: string
-  click: (result: T) => void
+  click: (_result: T) => void
 }
 
 @Component({
@@ -163,7 +163,7 @@ export default class ModalFormComponent<T extends object = ModalInputResult> ext
     return this
   }
 
-  private onClickButton(buttonCallback: (result: unknown) => void): void {
+  private onClickButton(buttonCallback: (_result: unknown) => void): void {
     buttonCallback(this.result)
   }
 }

@@ -17,7 +17,7 @@ class MainWriteStream extends Stream.Writable {
     this.win = BrowserWindow.getAllWindows()[0]
   }
 
-  _write(chunk: Buffer|string|any, encoding: string, callback: (err?: Error|null) => void): void {
+  _write(chunk: Buffer|string|any, encoding: string, callback: (_err?: Error|null) => void): void {
     if (!this.win) {
       callback(new Error('Browser window not exists.'))
       return
@@ -26,7 +26,7 @@ class MainWriteStream extends Stream.Writable {
     callback(null)
   }
 
-  _destroy(error: Error|null, callback: (error?: Error|null) => void): void {
+  _destroy(error: Error|null, callback: (_err?: Error|null) => void): void {
     this.win = null
     callback(null)
   }
@@ -43,12 +43,12 @@ class RendererWriteStream extends Stream.Writable {
     this.channel = channel
   }
 
-  _write(chunk: Buffer|string|any, encoding: string, callback: (err?: Error|null) => void): void {
+  _write(chunk: Buffer|string|any, encoding: string, callback: (_err?: Error|null) => void): void {
     ipcRenderer.send(STREAM_IPC_CHANNEL, { channel: this.channel, data: chunk.toString() })
     callback(null)
   }
 
-  _destroy(error: Error|null, callback: (error?: Error|null) => void): void {
+  _destroy(error: Error|null, callback: (_err?: Error|null) => void): void {
     callback(null)
   }
 }
@@ -71,9 +71,9 @@ class MainReadStream extends Stream.Readable {
     ipcMain.on(STREAM_IPC_CHANNEL, this.onReceive)
   }
 
-  _read(size: number): void {}
+  _read(_size: number): void {}
 
-  _destroy(error: Error|null, callback: (error?: Error|null) => void): void {
+  _destroy(error: Error|null, callback: (_err?: Error|null) => void): void {
     ipcMain.off(STREAM_IPC_CHANNEL, this.onReceive)
     callback(null)
   }
@@ -97,9 +97,9 @@ class RendererReadStream extends Stream.Readable {
     ipcRenderer.on(STREAM_IPC_CHANNEL, this.onReceive)
   }
 
-  _read(size: number): void {}
+  _read(_size: number): void {}
 
-  _destroy(error: Error|null, callback: (error?: Error|null) => void): void {
+  _destroy(error: Error|null, callback: (_err?: Error|null) => void): void {
     ipcRenderer.off(STREAM_IPC_CHANNEL, this.onReceive)
     callback(null)
   }

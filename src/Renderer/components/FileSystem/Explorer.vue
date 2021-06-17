@@ -131,7 +131,7 @@ import { FileWatcher } from '@/Utils/FileWatcher'
 export interface ContextItemAction {
   icon: string
   description: string
-  action: (filePath: string) => void
+  action: (_filePath: string) => void
 }
 
 export const props = {
@@ -192,8 +192,8 @@ export default class ExplorerComponent extends Vue {
   private additionalReduce: number = 1
   private additionalLoaded: number = 0
   private currentPath: string = ''
-  private openDirectory!: (filePath: string) => void
-  private openFile!: (filePath: string) => void
+  private openDirectory!: (_filePath: string) => void
+  private openFile!: (_filePath: string) => void
   
   private files: string[] = []
   private isSearching: boolean = false

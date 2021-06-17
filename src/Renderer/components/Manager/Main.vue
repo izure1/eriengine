@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import path from 'path'
-import { ipcRenderer, shell, app } from 'electron'
+import { ipcRenderer, shell } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
 import {

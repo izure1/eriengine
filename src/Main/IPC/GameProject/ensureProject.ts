@@ -57,7 +57,7 @@ declare const __static: string
 
 interface FileWriteQueue {
   path?: string
-  content: string|((path?: string) => Promise<void>)
+  content: string|((_path?: string) => Promise<void>)
 }
 
 async function ensureRequireModules(projectDirPath: string, forceUpdate: boolean = false): Promise<Engine.ModuleSystem.InstallSuccess|Engine.ModuleSystem.InstallFail> {

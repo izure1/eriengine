@@ -20,7 +20,7 @@ export async function handler(): Promise<Engine.Process.GetEngineVersionSuccess|
 }
 
 export function ipc(): void {
-  ipcMain.handle('get-engine-version', async (e: IpcMainInvokeEvent): Promise<Engine.Process.GetEngineVersionSuccess|Engine.Process.GetEngineVersionFail> => {
+  ipcMain.handle('get-engine-version', async (_e: IpcMainInvokeEvent): Promise<Engine.Process.GetEngineVersionSuccess|Engine.Process.GetEngineVersionFail> => {
     return await handler()
   })
 }

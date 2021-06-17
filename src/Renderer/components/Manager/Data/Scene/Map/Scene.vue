@@ -183,7 +183,7 @@ export default class SceneComponent extends Vue {
   }
 
   /** 좌클릭했을 때 호출될 메서드입니다. */
-  private onLeftClick(e: MouseEvent): void {
+  private onLeftClick(_e: MouseEvent): void {
     this.isContextmenuOpen = false
   }
 

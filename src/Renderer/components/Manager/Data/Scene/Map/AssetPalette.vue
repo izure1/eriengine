@@ -33,7 +33,7 @@
 <script lang="ts">
 import path from 'path'
 
-import { Vue, Component, Watch } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import normalize from 'normalize-path'
 
 import { Palette, PalettePaintAsset } from './Phaser/Vars/Types'

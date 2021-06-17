@@ -2,13 +2,13 @@ import normalize from 'normalize-path'
 import { TypedEmitter } from 'tiny-typed-emitter'
 
 interface TypedEvents {
-  'set-side': (side: number) => void
-  'set-wall':  (wall: Engine.GameProject.SceneMapWall) => void
-  'set-floor': (floor: Engine.GameProject.SceneMapFloor) => void
-  'set-audio': (audio: Engine.GameProject.SceneMapAudio) => void
-  'delete-wall': (wall: Engine.GameProject.SceneMapWall) => void
-  'delete-floor': (floor: Engine.GameProject.SceneMapFloor) => void
-  'delete-audio': (audio: Engine.GameProject.SceneMapAudio) => void
+  'set-side': (_side: number) => void
+  'set-wall':  (_wall: Engine.GameProject.SceneMapWall) => void
+  'set-floor': (_floor: Engine.GameProject.SceneMapFloor) => void
+  'set-audio': (_audio: Engine.GameProject.SceneMapAudio) => void
+  'delete-wall': (_wall: Engine.GameProject.SceneMapWall) => void
+  'delete-floor': (_floor: Engine.GameProject.SceneMapFloor) => void
+  'delete-audio': (_audio: Engine.GameProject.SceneMapAudio) => void
 }
 
 export class SceneMapManager extends TypedEmitter<TypedEvents> {
