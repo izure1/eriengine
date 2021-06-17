@@ -1,10 +1,5 @@
 import path from 'path'
 
-interface Module {
-  name: string
-  version: string
-}
-
 export const ENGINE_AUTH_SECRETKEY: string = 'eriengine4'
 export const ENGINE_BUILDING_SERVER_PORT: number = 12257
 
