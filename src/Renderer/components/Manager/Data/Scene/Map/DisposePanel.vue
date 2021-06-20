@@ -220,7 +220,6 @@ export default class DisposePanelComponent extends Vue {
         this.$store.dispatch('snackbar', '씬에서 맵 정보를 읽어올 수 없습니다.')
         return
       }
-      this.$store.dispatch('snackbar', '맵 데이터가 저장되었습니다.')
       this.$emit('send-call', 'save', map)
     })
   }

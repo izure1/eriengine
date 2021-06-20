@@ -145,6 +145,8 @@ export default class ScenePaletteComponent extends Vue {
       this.$store.dispatch('snackbar', '씬 저장에 실패했습니다.')
     }
 
+    this.$store.dispatch('snackbar', '맵 데이터가 저장되었습니다.')
+
     return isWriteSuccess
   }
 

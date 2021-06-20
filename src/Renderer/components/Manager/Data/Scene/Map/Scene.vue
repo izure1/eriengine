@@ -212,10 +212,24 @@ export default class SceneComponent extends Vue {
       }
 
       switch (e.code) {
+        // undo (ctrl + z)
         case Key.CODE_Z: {
-          // undo (ctrl + z)
           if (e.ctrlKey) {
             this.mainScene.mapDataManager.undo()
+          }
+          break
+        }
+
+        // save (ctrl + s)
+        case Key.CODE_S: {
+          if (e.ctrlKey) {
+            const map = this.scene?.mapDataManager.data ?? null
+            if (map === null) {
+              this.$store.dispatch('snackbar', '씬에서 맵 정보를 읽어올 수 없습니다.')
+              return
+            }
+
+            this.$emit('send-call', 'save', map)
           }
           break
         }
