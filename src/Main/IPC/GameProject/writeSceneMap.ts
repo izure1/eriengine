@@ -1,8 +1,8 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { handler as addStorageJSON } from './addStorageJSON'
 import {
-    PROJECT_SRC_STORAGE_SCENE_MAP_DIRECTORY_NAME,
-    PROJECT_SRC_STORAGE_SCENE_MAP_NAME
+  PROJECT_SRC_STORAGE_SCENE_MAP_DIRECTORY_NAME,
+  PROJECT_SRC_STORAGE_SCENE_MAP_NAME
 } from '@/Const'
 
 export async function handler(projectDirPath: string, storageKey: string, content: Engine.GameProject.SceneMap = {

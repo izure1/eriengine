@@ -9,8 +9,8 @@ export async function handler(): Promise<Engine.Process.GetEngineVersionSuccess|
       message: '앱 버전을 성공적으로 가져왔습니다',
       version
     }
-  } catch (e) {
-    const { name, message } = e as Error
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,

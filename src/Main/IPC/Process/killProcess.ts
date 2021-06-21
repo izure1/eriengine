@@ -10,8 +10,8 @@ function killPromise(pid: number): Promise<void> {
         }
         resolve()
       })
-    } catch (e) {
-      reject(e)
+    } catch (reason) {
+      reject(reason)
     }
   })
 }
@@ -25,8 +25,8 @@ export async function handler(pid: number): Promise<Engine.Process.KillProcessSu
       message: '프로세스를 성공적으로 종료했습니다',
       pid
     }
-  } catch (e) {
-    const { name, message } = e as Error
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,

@@ -84,8 +84,8 @@ export default class DependenciesInstallComponent extends Vue {
       const missings: Dependency[]  = JSON.parse(stringify)
 
       return missings
-    } catch(e) {
-      this.goBack(e.toString())
+    } catch (reason) {
+      this.goBack(reason.toString())
       return []
     }
   }

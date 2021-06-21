@@ -10,8 +10,8 @@ export async function handler(applicationId: string): Promise<Engine.Process.Get
       message: '프로젝트 인증 암호화에 성공했습니다.',
       auth
     }
-  } catch (e) {
-    const { name, message } = e as Error
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,

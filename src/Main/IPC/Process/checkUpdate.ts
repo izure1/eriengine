@@ -34,8 +34,8 @@ export async function handler(): Promise<Engine.Process.CheckUpdateSuccess|Engin
       message: `자동 업데이트가 필요합니다. appVersion: '${appVersion}', updateVersion: '${updateVersion}'`,
       updateInfo: updateCheckResult.updateInfo
     }
-  } catch (e) {
-    const { name, message } = e
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,

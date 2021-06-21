@@ -140,8 +140,7 @@ export default class AssetLoaderComponent extends Vue {
         images,
         audios
       }
-    } catch (e) {
-      console.log(e)
+    } catch (reason) {
       return null
     }
   }

@@ -9,8 +9,8 @@ export async function handler(deadWord: string): Promise<Engine.Process.KillSpaw
       name: '스포너 종료',
       message: '스포너를 성공적으로 종료했습니다'
     }
-  } catch (e) {
-    const { name, message } = e as Error
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,

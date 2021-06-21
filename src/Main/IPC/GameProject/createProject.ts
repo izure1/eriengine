@@ -5,14 +5,14 @@ import { handler as ensureProject } from './ensureProject'
 import { handler as addScene } from './addScene'
 import { parseProperty } from '@/Utils/parseProperty'
 import {
-    PROJECT_DIRECTORY_NAME,
-    PROJECT_SRC_DIRECTORY_NAME,
-    PROJECT_SRC_DATA_DIRECTORY_NAME,
-    PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME
+  PROJECT_DIRECTORY_NAME,
+  PROJECT_SRC_DIRECTORY_NAME,
+  PROJECT_SRC_DATA_DIRECTORY_NAME,
+  PROJECT_SRC_DATA_SCENE_DIRECTORY_NAME
 } from '@/Const'
 
 function createSceneName(name: string): string {
-    return `${name}.${nanoid(10)}.ts`
+  return `${name}.${nanoid(10)}.ts`
 }
 
 function createUseDialogueCodeBlock(): string {

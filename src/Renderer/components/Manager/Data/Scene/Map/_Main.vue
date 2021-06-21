@@ -1069,7 +1069,7 @@ export default class SceneMapEditor extends Vue {
       this.paletteSprites = Object.values(spriteModule).filter(checkAssetExists) as Types.PaletteSpriteAsset[]
       this.paletteImages = Object.values(imageModule).filter(checkAssetExists) as Types.PaletteImageAsset[]
       this.paletteAudios = Object.values(audioModule).filter(checkAssetExists) as Types.PaletteAudioAsset[]
-    } catch (e) {
+    } catch (reason) {
       this.isBuiltFail = true
       return
     }

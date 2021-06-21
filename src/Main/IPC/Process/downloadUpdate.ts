@@ -39,8 +39,8 @@ export async function handler(): Promise<Engine.Process.DownloadUpdateSuccess|En
 
   try {
     await autoUpdater.downloadUpdate()
-  } catch (e) {
-    const { name, message } = e
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,

@@ -82,7 +82,7 @@ export default class BuildRunnerComponent extends Vue {
       const stringify = Base64.decode(buildData)
       const json: BuildData = JSON.parse(stringify)
       return json
-    } catch(e) {
+    } catch (reason) {
       return null
     }
   }

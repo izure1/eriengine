@@ -293,7 +293,7 @@ export default class BaseScene extends Phaser.Scene {
     }
     try {
       JSON.stringify(raw)
-    } catch (e) {
+    } catch (reason) {
       return false
     }
     return true

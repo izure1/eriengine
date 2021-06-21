@@ -65,7 +65,7 @@ async function ensureRequireModules(projectDirPath: string, forceUpdate: boolean
     const command = forceUpdate ? 'npm update' : 'npm i'
     const spawner = new ProcessSpawner({ shell: true, cwd: projectDirPath })
     await spawner.spawn(command, { writeStream: writeToRenderer('ensure-require-modules') })
-  } catch(reason) {
+  } catch (reason) {
     return {
       success: false,
       name: reason,
@@ -166,34 +166,34 @@ async function ensureBaseFile(projectDirPath: string, config: Engine.GameProject
   ]
 
   for (const { path, content } of files) {
-      if (typeof content === 'function') {
-          try {
-              await content(path)
-          } catch(e) {
-              const { name, message } = e as Error
-              return { success: false, name, message }
-          }
+    if (typeof content === 'function') {
+      try {
+        await content(path)
+      } catch (reason) {
+        const { name, message } = reason as Error
+        return { success: false, name, message }
       }
-      else {
-          if (!path) {
-              return {
-                  success: false,
-                  name: '프로젝트 기본 파일 생성',
-                  message: '파일이 생성될 경로가 지정되지 않았습니다'
-              }
-          }
-          const fileWrite = await writeFile(path, content)
-          if (!fileWrite.success) {
-              return fileWrite
-          }
+    }
+    else {
+      if (!path) {
+        return {
+          success: false,
+          name: '프로젝트 기본 파일 생성',
+          message: '파일이 생성될 경로가 지정되지 않았습니다'
+        }
       }
+      const fileWrite = await writeFile(path, content)
+      if (!fileWrite.success) {
+        return fileWrite
+      }
+    }
   }
 
   return {
-      success: true,
-      name: '프로젝트 기본 파일 생성',
-      message: '프로젝트 기본 파일 생성에 성공했습니다',
-      path: srcDirPath
+    success: true,
+    name: '프로젝트 기본 파일 생성',
+    message: '프로젝트 기본 파일 생성에 성공했습니다',
+    path: srcDirPath
   }
 }
 

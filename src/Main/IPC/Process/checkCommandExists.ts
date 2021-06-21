@@ -9,7 +9,7 @@ export async function handler(commandName: string): Promise<Engine.Process.Check
       name: '명령어 확인',
       message: `'${commandName}' 명령어가 존재합니다.`
     }
-  } catch (e) {
+  } catch (reason) {
     return {
       success: false,
       name: '명령어 확인',

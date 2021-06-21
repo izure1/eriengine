@@ -96,8 +96,8 @@ export class ProcessSpawner {
             resolve()
           }
         })
-      } catch (e) {
-        reject(e)
+      } catch (reason) {
+        reject(reason)
       }
     })
   }

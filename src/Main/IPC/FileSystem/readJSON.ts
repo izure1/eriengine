@@ -5,8 +5,8 @@ export async function handler(filePath: string): Promise<Engine.FileSystem.ReadJ
   let content: object
   try {
     content = await fs.readJSON(filePath)
-  } catch(e) {
-    const { message } = e as Error
+  } catch (reason) {
+    const { message } = reason as Error
     return {
       success: false,
       name: '파일 읽기 실패',

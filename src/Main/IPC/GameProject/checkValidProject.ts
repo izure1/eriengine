@@ -34,8 +34,8 @@ export async function handler({ engineAuth, applicationId }: Engine.GameProject.
       name: '프로젝트 설정 확인 성공',
       message: '올바른 프로젝트 설정입니다'
     }
-  } catch(e) {
-    const { name, message } = e as Error
+  } catch (reason) {
+    const { name, message } = reason as Error
     return {
       success: false,
       name,
