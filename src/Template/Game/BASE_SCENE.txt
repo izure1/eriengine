@@ -1,12 +1,13 @@
 import Phaser from 'phaser'
 import * as localforage from 'localforage'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
-import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
+import { Plugin as FeelingPlugin } from '@eriengine/plugin-feeling'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
+import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as ParticlePlugin } from '@eriengine/plugin-particle'
 import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
-import { Plugin as EnvironmentPlugin } from '@eriengine/plugin-environment'
 
 {{ DATA_LISTS }}
 {{ STORAGE_LISTS }}
@@ -70,15 +71,16 @@ export default class BaseScene extends Phaser.Scene {
 
   private static readonly ApplicationId: string = '{{ APPLICATION_ID }}'
 
-  readonly actor!: ActorPlugin
-  readonly isometric!: IsometricScenePlugin
-  readonly cursor!: IsometricCursorPlugin
-  readonly select!: IsometricSelectPlugin
-  readonly dialogue!: DialoguePlugin
-  readonly modal!: ModalPlugin
-  readonly fow!: FogOfWarPlugin
-  readonly spatial!: SpatialAudioPlugin
-  readonly environment!: EnvironmentPlugin
+  declare readonly actor: ActorPlugin
+  declare readonly dialogue: DialoguePlugin
+  declare readonly feeling: FeelingPlugin
+  declare readonly fow: FogOfWarPlugin
+  declare readonly isometric: IsometricScenePlugin
+  declare readonly cursor: IsometricCursorPlugin
+  declare readonly select: IsometricSelectPlugin
+  declare readonly modal: ModalPlugin
+  declare readonly particle: ParticlePlugin
+  declare readonly spatial: SpatialAudioPlugin
 
   /** 씬에서 재생되는 bgm 사운드 인스턴스입니다. */
   protected readonly bgm: Phaser.Sound.WebAudioSound|null = null

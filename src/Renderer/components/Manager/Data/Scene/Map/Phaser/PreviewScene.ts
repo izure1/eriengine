@@ -236,7 +236,7 @@ export class PreviewScene extends Scene {
           }
 
           const { x, y } = this.cursor.pointer
-          this.drawSelectedPaint(x, y)
+          this.drawSelectedPaint(Math.round(x), Math.round(y))
 
           // shift키를 누르지 않았다면, 이전에 선택되었던 리스트를 제거합니다.
           if (!e.event.shiftKey) {
@@ -264,7 +264,7 @@ export class PreviewScene extends Scene {
               y = offset.y
             }
 
-            this.drawSelectedPaint(x, y)
+            this.drawSelectedPaint(Math.round(x), Math.round(y))
           }
           break
         }

@@ -1,11 +1,12 @@
 import Phaser from 'phaser'
 import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
-import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
-import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
+import { Plugin as FeelingPlugin } from '@eriengine/plugin-feeling'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
+import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as ParticlePlugin } from '@eriengine/plugin-particle'
 import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
-import { Plugin as EnvironmentPlugin } from '@eriengine/plugin-environment'
 
 import Scenes from './{{ PROJECT_SRC_SCENELIST_NAME }}'
 import config from '../extend/package.json'
@@ -49,9 +50,9 @@ new Phaser.Game({
         plugin: ActorPlugin
       },
       {
-        key: 'IsometricScenePlugin',
-        mapping: 'isometric',
-        plugin: IsometricScenePlugin
+        key: 'DialoguePlugin',
+        mapping: 'dialogue',
+        plugin: DialoguePlugin
       },
       {
         key: 'IsometricCursorPlugin',
@@ -59,9 +60,19 @@ new Phaser.Game({
         plugin: IsometricCursorPlugin
       },
       {
+        key: 'IsometricScenePlugin',
+        mapping: 'isometric',
+        plugin: IsometricScenePlugin
+      },
+      {
         key: 'IsometricSelectPlugin',
         mapping: 'select',
         plugin: IsometricSelectPlugin
+      },
+      {
+        key: 'FeelingPlugin',
+        mapping: 'feeling',
+        plugin: FeelingPlugin
       },
       {
         key: 'FogOfWarPlugin',
@@ -69,24 +80,19 @@ new Phaser.Game({
         plugin: FogOfWarPlugin
       },
       {
-        key: 'DialoguePlugin',
-        mapping: 'dialogue',
-        plugin: DialoguePlugin
-      },
-      {
         key: 'ModalPlugin',
         mapping: 'modal',
         plugin: ModalPlugin
       },
       {
+        key: 'ParticlePlugin',
+        mapping: 'particle',
+        plugin: ParticlePlugin
+      },
+      {
         key: 'SpatialAudioPlugin',
         mapping: 'spatial',
         plugin: SpatialAudioPlugin
-      },
-      {
-        key: 'EnvironmentPlugin',
-        mapping: 'environment',
-        plugin: EnvironmentPlugin
       }
     ]
   },
