@@ -210,6 +210,7 @@ export default class SceneInputComponent extends Vue {
         this.closePropertiesConfig()
         break
       }
+      
       case 3: {
         const {
           thresholdRadius,
@@ -341,8 +342,8 @@ export default class SceneInputComponent extends Vue {
 
               if (isGrid) {
                 const grid = this.scene.cursor.calcCursorOffset({ x, y }, side)
-                point.x = grid.x
-                point.y = grid.y
+                point.x = Math.round(grid.x)
+                point.y = Math.round(grid.y)
               }
 
               return {

@@ -103,6 +103,19 @@ export default class EngineHomeComponent extends Vue {
         {
           text: '타일 레이어 생성기',
           uri: '/manager/tool/isometrical-layer'
+        },
+        {
+          text: '타일 에셋 다운로드',
+          uri: 'https://itch.io/game-assets/free/tag-2d/tag-isometric'
+        }
+      ]
+    },
+    {
+      subheader: '프로그래머',
+      lists: [
+        {
+          text: '코드 스펠 체커',
+          uri: 'https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker'
         }
       ]
     }

@@ -5,6 +5,7 @@ import { Plugin as FeelingPlugin } from '@eriengine/plugin-feeling'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as OptimizationPlugin } from '@eriengine/plugin-optimization'
 import { Plugin as ParticlePlugin } from '@eriengine/plugin-particle'
 import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
 
@@ -13,6 +14,7 @@ import config from '../extend/package.json'
 
 
 new Phaser.Game({
+  type: Phaser.WEBGL,
   width: config.gameDisplaySize[0],
   height: config.gameDisplaySize[1],
   scene: [
@@ -83,6 +85,11 @@ new Phaser.Game({
         key: 'ModalPlugin',
         mapping: 'modal',
         plugin: ModalPlugin
+      },
+      {
+        key: 'OptimizationPlugin',
+        mapping: 'optimization',
+        plugin: OptimizationPlugin
       },
       {
         key: 'ParticlePlugin',

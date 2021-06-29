@@ -6,6 +6,7 @@ import { Plugin as FeelingPlugin } from '@eriengine/plugin-feeling'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
+import { Plugin as OptimizationPlugin } from '@eriengine/plugin-optimization'
 import { Plugin as ParticlePlugin } from '@eriengine/plugin-particle'
 import { Plugin as SpatialAudioPlugin } from '@eriengine/plugin-spatial-audio'
 
@@ -79,6 +80,7 @@ export default class BaseScene extends Phaser.Scene {
   declare readonly cursor: IsometricCursorPlugin
   declare readonly select: IsometricSelectPlugin
   declare readonly modal: ModalPlugin
+  declare readonly optimization: OptimizationPlugin
   declare readonly particle: ParticlePlugin
   declare readonly spatial: SpatialAudioPlugin
 

@@ -1,14 +1,12 @@
 import Phaser from 'phaser'
-import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
-import { DialoguePlugin } from '@eriengine/plugin-dialogue'
-import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin, SelectPlugin } from '@eriengine/plugin-isometric-cursor'
+import { Plugin as OptimizationPlugin } from '@eriengine/plugin-optimization'
 
 export default function(width: number, height: number, scene: (Phaser.Scene|typeof Phaser.Scene)[], parent: HTMLElement): Phaser.Types.Core.GameConfig {
 
   return {
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
     width,
     height,
     scene: scene as any,
@@ -20,17 +18,19 @@ export default function(width: number, height: number, scene: (Phaser.Scene|type
     dom: {
       createContainer: true
     },
+    antialias: false,
+    powerPreference: 'high-performance',
     plugins: {
       scene: [
-        {
-          key: 'ActorPlugin',
-          mapping: 'actor',
-          plugin: ActorPlugin
-        },
         {
           key: 'IsometricScenePlugin',
           mapping: 'map',
           plugin: IsometricScenePlugin
+        },
+        {
+          key: 'OptimizationPlugin',
+          mapping: 'optimization',
+          plugin: OptimizationPlugin
         },
         {
           key: 'PointerPlugin',
@@ -41,16 +41,6 @@ export default function(width: number, height: number, scene: (Phaser.Scene|type
           key: 'SelectPlugin',
           mapping: 'select',
           plugin: SelectPlugin
-        },
-        {
-          key: 'FogOfWarPlugin',
-          mapping: 'fow',
-          plugin: FogOfWarPlugin
-        },
-        {
-          key: 'DialoguePlugin',
-          mapping: 'dialogue',
-          plugin: DialoguePlugin
         }
       ]
     },

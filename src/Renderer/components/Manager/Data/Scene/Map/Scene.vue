@@ -81,14 +81,13 @@ import { Palette, PalettePaintAsset } from './Phaser/Vars/Types'
   }
 })
 export default class SceneComponent extends Vue {
-  protected scene!: PreviewScene|null
   protected selectedPaint!: PalettePaintAsset|null
   protected disposeType!: number
 
-  private game: Game|null = null
-
-  private mainScene: PreviewScene|null = null
-  private guiScene: GuiScene|null = null
+  private game!: Game|null
+  private mainScene!: PreviewScene|null
+  private guiScene!: GuiScene|null
+  protected scene!: PreviewScene|null
 
   private isLoading: boolean = false
   private isContextmenuOpen: boolean = false
@@ -147,6 +146,8 @@ export default class SceneComponent extends Vue {
 
     this.$emit('send-data', 'scene', this.mainScene)
     this.resizeCanvas()
+
+    console.log(this, this.mainScene)
 
     // 씬에서 에셋을 불러오는 메세지를 띄웁니다.
     this.isLoading = true

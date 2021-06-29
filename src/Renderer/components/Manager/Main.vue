@@ -175,7 +175,7 @@ export default class ProjectFileListComponent extends Vue {
           name: '타일 레이어 생성기',
           description: '타일의 견본 레이어를 생성합니다',
           path: '/manager/tool/isometrical-layer'
-        }
+        },
       ]
     }
   ]

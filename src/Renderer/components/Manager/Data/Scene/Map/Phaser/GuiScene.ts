@@ -9,6 +9,7 @@ export class GuiScene extends Phaser.Scene {
   private cursor!: PointerPlugin
   private select!: SelectPlugin
   private pointer: Phaser.GameObjects.Text|null = null
+  private fps: Phaser.GameObjects.Text|null = null
   private preview: PreviewScene|null = null
 
   constructor() {
@@ -20,6 +21,14 @@ export class GuiScene extends Phaser.Scene {
       this.destroyCursor()
     }
     this.pointer = this.add.text(0, 0, '', { fontSize: '12px', color: '#00ff00' })
+  }
+
+  private generateFps(): void {
+    if (this.fps) {
+      this.destroyFps()
+    }
+    this.fps = this.add.text(0, 0, '', { fontSize: '15px', color: 'white', strokeThickness: 2, stroke: 'black', align: 'right' })
+    this.fps.setOrigin(1)
   }
 
   private updateCursor(): void {
@@ -37,9 +46,25 @@ export class GuiScene extends Phaser.Scene {
     this.pointer.setPosition(self.x + 20, self.y + 20)
   }
 
+  private updateFps(): void {
+    if (!this.fps) {
+      return
+    }
+
+    const { width, height } = this.renderer
+    const margin = 20
+    this.fps.setText(`fps: ${~~this.game.loop.actualFps}`)
+    this.fps.setPosition(width - margin, height - margin)
+  }
+
   private destroyCursor(): void {
     this.pointer?.destroy()
     this.pointer = null
+  }
+
+  private destroyFps(): void {
+    this.fps?.destroy()
+    this.fps = null
   }
 
   private destroyPreview(): void {
@@ -53,16 +78,19 @@ export class GuiScene extends Phaser.Scene {
   
   create(): void {
     this.generateCursor()
+    this.generateFps()
     this.cursor.enable(false)
     this.select.enable(false)
   }
 
   update(): void {
     this.updateCursor()
+    this.updateFps()
   }
 
   onDestroy(): void {
     this.destroyCursor()
+    this.destroyFps()
     this.destroyPreview()
   }
 

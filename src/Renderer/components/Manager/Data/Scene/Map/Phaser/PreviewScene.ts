@@ -2,11 +2,9 @@ import path from 'path'
 
 import normalize from 'normalize-path'
 import { Scene } from 'phaser'
-import { Plugin as ActorPlugin } from '@eriengine/plugin-actor'
-import { DialoguePlugin } from '@eriengine/plugin-dialogue'
-import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin, SelectPlugin } from '@eriengine/plugin-isometric-cursor'
+import { Plugin as OptimizationPlugin } from '@eriengine/plugin-optimization'
 
 import { PreviewAudioVisualizer } from './PreviewAudioVisualizer'
 import { SceneMapManager } from './SceneMapManager'
@@ -21,12 +19,10 @@ import IcoPaletteAudio from '@/Renderer/assets/ico-palette-audio.png'
 type FillableObject = Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Tint
 
 export class PreviewScene extends Scene {
-  readonly actor!: ActorPlugin
-  readonly dialogue!: DialoguePlugin
-  readonly fow!: FogOfWarPlugin
   readonly map!: IsometricScenePlugin
   readonly cursor!: PointerPlugin
   readonly select!: SelectPlugin
+  readonly optimization!: OptimizationPlugin
 
   protected readonly assetDirectory: string
   
@@ -38,6 +34,7 @@ export class PreviewScene extends Scene {
   protected disposeType: number
   
   private dragStartOffset: Point2 = { x: 0, y: 0 }
+  private test!: Phaser.Tilemaps.Tilemap
   
   private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
 
@@ -236,7 +233,7 @@ export class PreviewScene extends Scene {
           }
 
           const { x, y } = this.cursor.pointer
-          this.drawSelectedPaint(Math.round(x), Math.round(y))
+          this.disposeSelectedPaint(Math.round(x), Math.round(y))
 
           // shift키를 누르지 않았다면, 이전에 선택되었던 리스트를 제거합니다.
           if (!e.event.shiftKey) {
@@ -264,7 +261,7 @@ export class PreviewScene extends Scene {
               y = offset.y
             }
 
-            this.drawSelectedPaint(Math.round(x), Math.round(y))
+            this.disposeSelectedPaint(Math.round(x), Math.round(y))
           }
           break
         }
@@ -458,7 +455,7 @@ export class PreviewScene extends Scene {
 
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
-    this.map.setFloortile(x, y, key, undefined, animationKey)
+    this.optimization.add(this.map.setFloortile(x, y, key, undefined, animationKey))
   }
 
   /**
@@ -486,7 +483,7 @@ export class PreviewScene extends Scene {
    * @param x 배치할 x좌표입니다
    * @param y 배치할 y좌표입니다.
    */
-  private drawSelectedPaint(x: number, y: number): void {
+  private disposeSelectedPaint(x: number, y: number): void {
     if (!this.selectedPaint) {
       return
     }
@@ -537,17 +534,17 @@ export class PreviewScene extends Scene {
     const { x, y } = position
     
     this.children.list.filter((gameObject) => {
-
       // 오디오 객체가 아닌 게임 오브젝트 제외
       if ( !(gameObject instanceof PreviewAudioVisualizer) ) {
         return false
       }
+
       // 삭제하고자 하는 사운드가 배치된 위치가 다른 오디오 제외
       if (x !== gameObject.x || y !== gameObject.y) {
         return false 
       }
+      
       return true
-
     }).forEach((audio) => {
       audio.destroy()
     })
