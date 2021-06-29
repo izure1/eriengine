@@ -47,6 +47,7 @@ export default function(width: number, height: number, scene: (Phaser.Scene|type
     physics: {
       default: 'matter',
       matter: {
+        enableSleeping: true,
         debug: true,
         gravity: {
           x: 0,

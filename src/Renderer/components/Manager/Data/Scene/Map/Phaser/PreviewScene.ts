@@ -434,10 +434,12 @@ export class PreviewScene extends Scene {
 
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
-    this.map
-      .setWalltile(x, y, key, undefined, animationKey)
-      .setScale(scale)
-      .setSensor(isSensor)
+    const wall = this.map.setWalltile(x, y, key, undefined, animationKey)
+
+    this.optimization.add(wall)
+
+    wall.setScale(scale).setSensor(isSensor)
+    wall.setToSleep()
   }
 
   /**
