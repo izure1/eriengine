@@ -4,6 +4,7 @@ import { Plugin as ActorPlugin, Actor } from '@eriengine/plugin-actor'
 import { DialoguePlugin, ModalPlugin } from '@eriengine/plugin-dialogue'
 import { Plugin as FeelingPlugin } from '@eriengine/plugin-feeling'
 import { Plugin as FogOfWarPlugin } from '@eriengine/plugin-fog-of-war'
+import { Plugin as InventoryPlugin } from '@eriengine/plugin-inventory'
 import { PointerPlugin as IsometricCursorPlugin, SelectPlugin as IsometricSelectPlugin } from '@eriengine/plugin-isometric-cursor'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { Plugin as OptimizationPlugin } from '@eriengine/plugin-optimization'
@@ -72,18 +73,31 @@ export default class BaseScene extends Phaser.Scene {
 
   private static readonly ApplicationId: string = '{{ APPLICATION_ID }}'
 
+  /** 씬의 액터를 관리합니다. 액터를 추가/제거할 수 있습니다. */
   declare readonly actor: ActorPlugin
+  /** 씬의 대사창을 관리합니다. 대사를 출력하는 기능을 위해 사용합니다. */
   declare readonly dialogue: DialoguePlugin
+  /** 더움, 추움, 우울함 등을 시각적으로 화면에 표현하는 쉐이더 효과를 관리합니다. */
   declare readonly feeling: FeelingPlugin
+  /** 시간의 흐름을 표현하는데 사용합니다. 아침, 점심, 저녁, 밤의 시각적 효과를 부여하는데 사용됩니다. */
   declare readonly fow: FogOfWarPlugin
+  /** 인벤토리 기능입니다. 기본적으로 액터는 자체적으로 인벤토리를 가지고 있으므로, 이것을 따로 사용할 필요가 없습니다. */
+  declare readonly inventory: InventoryPlugin
+  /** 씬의 아이소메트릭 타일 관리를 합니다. 일반적으로 액터가 장애물을 피해 이동하는 길찾기 기능을 위해 사용됩니다. */
   declare readonly isometric: IsometricScenePlugin
+  /** 아이소메트릭 커서를 관리합니다. 건물의 배치 기능 등, 아이소메트릭 타일의 격자를 사용해야할 때 유용합니다. */
   declare readonly cursor: IsometricCursorPlugin
+  /** 드래그한 범위 내의 게임 오브젝트를 선택하는 용도로 사용됩니다. */
   declare readonly select: IsometricSelectPlugin
+  /** 플레이어에게 보여줄 안내창, 또는 플레이어가 스스로 입력해야하는 입력창을 관리합니다. 로그인 기능 등에 유용합니다. */
   declare readonly modal: ModalPlugin
+  /** 최적화를 관리합니다. 카메라의 렌더링 리스트를 관리하여 게임의 성능을 좀 더 끌어올리고 싶을 때 사용합니다. */
   declare readonly optimization: OptimizationPlugin
+  /** 파티클을 관리합니다. 특정 지역에 눈, 비, 또는 폭발 이펙트를 보여주고 싶거나 반짝이는 지역을 만들고 싶을 때 유용합니다. */
   declare readonly particle: ParticlePlugin
+  /** 3D 공간 오디오를 관리합니다. 카메라가 특정 지역에 가까이오면 소리가 커지고, 멀어지면 소리가 작아지는 사운드를 만들고 싶을 때 사용합니다. */
   declare readonly spatial: SpatialAudioPlugin
-
+  
   /** 씬에서 재생되는 bgm 사운드 인스턴스입니다. */
   protected readonly bgm: Phaser.Sound.WebAudioSound|null = null
 
@@ -104,6 +118,13 @@ export default class BaseScene extends Phaser.Scene {
       throw `${this.scene.key} 씬에 스토리지 정보가 없습니다.`
     }
     ;(this.__map as any) = Object.values(storage.Map)[0].default
+  }
+
+  protected generateItem(data: typeof Items): void {
+    for (const name in data) {
+      const item = data[name as keyof typeof data] as any
+      this.inventory.addItemBlueprint(item)
+    }
   }
 
   protected generateScript(storages: typeof Storages, key: keyof typeof storages): void {
@@ -408,6 +429,7 @@ export default class BaseScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.generateItem(Items)
     this.createAnimation()
     this.createMap()
     this.createAudio()

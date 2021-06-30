@@ -22,6 +22,7 @@ import ManagerActor from '@/Renderer/components/Manager/Data/Actor/Main.vue'
 import ManagerActorScript from '@/Renderer/components/Manager/Data/Actor/Script/Main.vue'
 import ManagerAnimation from '@/Renderer/components/Manager/Data/Animation/Main.vue'
 import ManagerSkill from '@/Renderer/components/Manager/Data/Skill/Main.vue'
+import ManagerItem from '@/Renderer/components/Manager/Data/Item/Main.vue'
 import ManagerImage from '@/Renderer/components/Manager/Data/Image/Main.vue'
 import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
@@ -149,6 +150,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'skill',
         component: ManagerSkill
+      },
+      {
+        path: 'item',
+        component: ManagerItem
       },
       {
         path: 'image',

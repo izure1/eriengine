@@ -73,6 +73,9 @@ declare namespace Engine {
     interface AddSkillSuccess extends PathRequired, Engine.ActionSuccessState {}
     interface AddSkillFail extends Engine.ActionFailState {}
 
+    interface AddItemSuccess extends PathRequired, Engine.ActionSuccessState {}
+    interface AddItemFail extends Engine.ActionFailState {}
+
     interface AddActorSuccess extends PathRequired, Engine.ActionSuccessState {}
     interface AddActorFail extends Engine.ActionFailState {}
 
@@ -123,6 +126,9 @@ declare namespace Engine {
 
     interface GenerateSkillListSuccess extends PathRequired, Engine.ActionSuccessState {}
     interface GenerateSkillListFail extends Engine.ActionFailState {}
+
+    interface GenerateItemListSuccess extends PathRequired, Engine.ActionSuccessState {}
+    interface GenerateItemListFail extends Engine.ActionFailState {}
 
     interface GenerateActorListSuccess extends PathRequired, Engine.ActionSuccessState {}
     interface GenerateActorListFail extends Engine.ActionFailState {}

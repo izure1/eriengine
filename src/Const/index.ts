@@ -40,6 +40,7 @@ export const PROJECT_SRC_ANIMSLIST_NAME: string     = 'ANIMS_LIST.ts'
 export const PROJECT_SRC_ASSETLIST_NAME: string     = 'ASSET_LIST.ts'
 export const PROJECT_SRC_AUDIOLIST_NAME: string     = 'AUDIO_LIST.ts'
 export const PROJECT_SRC_IMAGELIST_NAME: string     = 'IMAGE_LIST.ts'
+export const PROJECT_SRC_ITEMLIST_NAME: string      = 'ITEM_LIST.ts'
 export const PROJECT_SRC_SCENELIST_NAME: string     = 'SCENE_LIST.ts'
 export const PROJECT_SRC_SKILLLIST_NAME: string     = 'SKILL_LIST.ts'
 export const PROJECT_SRC_SPRITELIST_NAME: string    = 'SPRITE_LIST.ts'
@@ -51,6 +52,7 @@ export const DATA_LISTS: string =
 `import Assets from '@/${       path.parse(PROJECT_SRC_ASSETLIST_NAME).name }'\n` +
 `import Audios from '@/${       path.parse(PROJECT_SRC_AUDIOLIST_NAME).name }'\n` +
 `import Images from '@/${       path.parse(PROJECT_SRC_IMAGELIST_NAME).name }'\n` +
+`import Items from '@/${        path.parse(PROJECT_SRC_ITEMLIST_NAME).name }'\n` +
 `import Scenes from '@/${       path.parse(PROJECT_SRC_SCENELIST_NAME).name }'\n` +
 `import Skills from '@/${       path.parse(PROJECT_SRC_SKILLLIST_NAME).name }'\n` +
 `import Videos from '@/${       path.parse(PROJECT_SRC_VIDEOLIST_NAME).name }'`
@@ -83,6 +85,7 @@ export const PROJECT_SRC_DATA_ACTOR_DIRECTORY_NAME: string              = 'Actor
 export const PROJECT_SRC_DATA_ANIMATION_DIRECTORY_NAME: string          = 'Animation'
 export const PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME: string              = 'Audio'
 export const PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME: string              = 'Image'
+export const PROJECT_SRC_DATA_ITEM_DIRECTORY_NAME: string               = 'Item'
 export const PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME: string              = 'Skill'
 export const PROJECT_SRC_DATA_SPRITE_DIRECTORY_NAME: string             = 'Sprite'
 export const PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME: string              = 'Video'

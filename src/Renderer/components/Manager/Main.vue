@@ -61,6 +61,7 @@ import {
   PROJECT_SRC_DATA_AUDIO_DIRECTORY_NAME,
   PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME,
   PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME,
+  PROJECT_SRC_DATA_ITEM_DIRECTORY_NAME,
   PROJECT_SRC_DATA_VIDEO_DIRECTORY_NAME
 } from '@/Const'
 
@@ -95,6 +96,11 @@ export default class ProjectFileListComponent extends Vue {
           name: '스킬',
           description: '스킬을 관리합니다',
           path: '/manager/skill'
+        },
+        {
+          name: '아이템',
+          description: '아이템을 관리합니다',
+          path: '/manager/item'
         }
       ]
     },
@@ -225,6 +231,10 @@ export default class ProjectFileListComponent extends Vue {
     const skillDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_SKILL_DIRECTORY_NAME)
     const skillWatcher = new FileWatcher(skillDir).update(() => ipcRenderer.invoke('generate-skill-list', this.projectDirectory)).start().emit()
 
+    // 아이템 디렉토리 감지
+    const itemDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_ITEM_DIRECTORY_NAME)
+    const itemWatcher = new FileWatcher(itemDir).update(() => ipcRenderer.invoke('generate-item-list', this.projectDirectory)).start().emit()
+
     // 이미지 디렉토리 감지
     const imageDir = path.resolve(this.projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME, PROJECT_SRC_DATA_IMAGE_DIRECTORY_NAME)
     const imageWatcher = new FileWatcher(imageDir).update(() => ipcRenderer.invoke('generate-image-list', this.projectDirectory)).start().emit()
@@ -257,6 +267,7 @@ export default class ProjectFileListComponent extends Vue {
     this.watchers.add(sceneWatcher)
     this.watchers.add(animsWatcher)
     this.watchers.add(skillWatcher)
+    this.watchers.add(itemWatcher)
     this.watchers.add(imageWatcher)
     this.watchers.add(audioWatcher)
     this.watchers.add(videoWatcher)
