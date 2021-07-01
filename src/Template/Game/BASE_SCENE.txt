@@ -228,13 +228,17 @@ export default class BaseScene extends Phaser.Scene {
       wall.setSensor(isSensor)
       wall.setDataEnabled()
       wall.data.set('alias', alias)
+
+      this.optimization.add(wall)
     }
     for (const { key, x, y } of this.__map.floors) {
       let animsKey: string|undefined
       if (this.anims.exists(key)) {
         animsKey = key
       }
-      this.isometric.setFloortile(x, y, key, undefined, animsKey)
+      const floor = this.isometric.setFloortile(x, y, key, undefined, animsKey)
+      
+      this.optimization.add(flooor)
     }
     for (const { key, x, y, thresholdRadius, volume, delay, loop } of this.__map.audios) {
       const audio = this.spatial.addSpatialAudio(key, { x, y }, { volume })

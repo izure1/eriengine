@@ -16,5 +16,7 @@ export default function(this: BaseActor, target: BaseActor, dot: typeof this.dot
 
   
   // 이 리턴값은 스킬에 적중한 대상이 피격이벤트(get-hit)에서 수신받을 정보입니다.
-  return {}
+  return {
+    key
+  }
 }
