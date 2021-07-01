@@ -1,6 +1,6 @@
 {
   "name": "eriengine",
-  "version": "1.0.0-alpha.25",
+  "version": "1.0.0-alpha.26",
   "private": true,
   "scripts": {
     "lint": "vue-cli-service lint",
@@ -11,7 +11,7 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@eriengine/plugin-actor": "^1.5.2",
+    "@eriengine/plugin-actor": "^1.5.4",
     "@eriengine/plugin-dialogue": "^1.4.3",
     "@eriengine/plugin-feeling": "^1.0.0",
     "@eriengine/plugin-fog-of-war": "^1.3.1",

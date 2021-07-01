@@ -237,8 +237,8 @@ export default class BaseScene extends Phaser.Scene {
         animsKey = key
       }
       const floor = this.isometric.setFloortile(x, y, key, undefined, animsKey)
-      
-      this.optimization.add(flooor)
+
+      this.optimization.add(floor)
     }
     for (const { key, x, y, thresholdRadius, volume, delay, loop } of this.__map.audios) {
       const audio = this.spatial.addSpatialAudio(key, { x, y }, { volume })

@@ -11,7 +11,7 @@ export const key: string = __filename
  * @param target    이 스킬에 적중한 대상입니다.
  * @param dot       이 스킬에 도트 효과가 필요하다면 사용하십시오. 이는 독 데미지같은 기능을 구현하는데 유용합니다.
  */
-export default function(this: BaseActor, target: BaseActor, dot: typeof this.dot): object {
+export default function(this: BaseActor, target: BaseActor, dot: typeof this.dot) {
   // 아래에 스킬을 사용했을 때 작동할 내용을 프로그래밍하세요.
 
   

@@ -1,7 +1,7 @@
 declare namespace Types {
-  type Primitive = string|number|boolean|null
+  type Primitive = string|number|boolean|null|Json|Array<Primitive>
   interface Json {
-    [key: string]: Primitive|Primitive[]|Json
+    [key: string]: Primitive
   }
   type Transferable = Primitive|Json
   type TransferableEncoding = 'utf8'|'utf-8'|'hex'|'base64'

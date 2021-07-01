@@ -3,6 +3,10 @@ import BaseActor from '@/BaseActor'
 
 {{ DATA_LISTS }}
 
+type SkillInformation<K extends keyof typeof Skills> = {
+  [key in keyof ReturnType<typeof Skills[K]['default']>]: ReturnType<typeof Skills[K]['default']>[key]
+}
+
 /**
  *  타입 추론을 위한 클래스 타입입니다.
  *  해당하는 올바른 액터를 선택하여 주십시오.
@@ -66,7 +70,7 @@ export function onActorEnd(this: Actor): void {
  *  @param target       적중시킨 대상 액터입니다.
  *  @param information  적중시킨 스킬에 대한 정보입니다.
  */
-export function onActorHit(this: Actor, target: BaseActor, information: object): void {
+export function onActorHit(this: Actor, target: BaseActor, information: Types.Json): void {
   {{ onActorHit }}
 }
 
@@ -75,7 +79,7 @@ export function onActorHit(this: Actor, target: BaseActor, information: object):
  *  @param from         적중당한 스킬을 사용한 대상 액터입니다.
  *  @param information  적중당한 스킬에 대한 정보입니다.
  */
-export function onActorGetHit(this: Actor, from: BaseActor, information: object): void {
+export function onActorGetHit(this: Actor, from: BaseActor, information: Types.Json): void {
   {{ onActorGetHit }}
 }
 
