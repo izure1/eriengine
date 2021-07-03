@@ -457,7 +457,9 @@ export class PreviewScene extends Scene {
 
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
-    this.optimization.add(this.map.setFloortile(x, y, key, undefined, animationKey))
+    const floor = this.map.setFloortile(x, y, key, undefined, animationKey)
+
+    this.optimization.add(floor)
   }
 
   /**

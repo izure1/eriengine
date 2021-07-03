@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import { IsometricWall } from '@eriengine/plugin-isometric-scene'
+
 import BaseActor from '@/BaseActor'
 
 {{ DATA_LISTS }}
@@ -143,7 +145,7 @@ export function onCollideWithActorEnd(this: Actor, data: Phaser.Types.Physics.Ma
  *  @param pair     충돌한 대상 벽, 또는 센서입니다.
  *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
  */
-export function onCollideWithWallStart(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
+export function onCollideWithWallStart(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: IsometricWall, alias: string): void {
   {{ onCollideWithWallStart }}
 }
 
@@ -154,7 +156,7 @@ export function onCollideWithWallStart(this: Actor, data: Phaser.Types.Physics.M
  *  @param pair     충돌한 대상 벽, 또는 센서입니다.
  *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
  */
-export function onCollideWithWallActive(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
+export function onCollideWithWallActive(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: IsometricWall, alias: string): void {
   {{ onCollideWithWallActive }}
 }
 
@@ -164,6 +166,6 @@ export function onCollideWithWallActive(this: Actor, data: Phaser.Types.Physics.
  *  @param pair     충돌한 대상 벽, 또는 센서입니다.
  *  @param alias    충돌한 대상 벽, 또는 센서의 별칭입니다. 이는 씬 파렛트에서 속성으로 지정한 값입니다.
  */
-export function onCollideWithWallEnd(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: Phaser.Physics.Matter.Sprite, alias: string): void {
+export function onCollideWithWallEnd(this: Actor, data: Phaser.Types.Physics.Matter.MatterCollisionData, pair: IsometricWall, alias: string): void {
   {{ onCollideWithWallEnd }}
 }
