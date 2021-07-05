@@ -2,9 +2,9 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 
 import { handler as getUselessStorageKeys } from './getUselessStorageKeys'
 import { handler as getStorageDirectories } from './getStorageDirectories'
-import { handler as deleteItem } from '../FileSystem/delete'
+import { handler as trash } from '../FileSystem/trash'
 
-export async function handler(projectDirectory: string): Promise<Engine.GameProject.DeleteUselessStorageDirectoriesSuccess|Engine.GameProject.DeleteUselessStorageDirectoriesFail> {
+export async function handler(projectDirectory: string, confirm: boolean): Promise<Engine.GameProject.DeleteUselessStorageDirectoriesSuccess|Engine.GameProject.DeleteUselessStorageDirectoriesFail> {
   const uselessStorageKeysGet = await getUselessStorageKeys(projectDirectory)
 
   if (!uselessStorageKeysGet.success) {
@@ -17,7 +17,7 @@ export async function handler(projectDirectory: string): Promise<Engine.GameProj
       return storageDirectoriesGet as Engine.GameProject.DeleteUselessStorageDirectoriesFail
     }
 
-    const itemDelete = await deleteItem(storageDirectoriesGet.path, false)
+    const itemDelete = await trash(storageDirectoriesGet.path, confirm)
     if (!itemDelete.success) {
       return itemDelete as Engine.GameProject.DeleteUselessStorageDirectoriesFail
     }
@@ -31,7 +31,7 @@ export async function handler(projectDirectory: string): Promise<Engine.GameProj
 }
 
 export function ipc(): void {
-  ipcMain.handle('delete-useless-storage-directories', async (e: IpcMainInvokeEvent, projectDirectory: string): Promise<Engine.GameProject.DeleteUselessStorageDirectoriesSuccess|Engine.GameProject.DeleteUselessStorageDirectoriesFail> => {
-    return await handler(projectDirectory)
+  ipcMain.handle('delete-useless-storage-directories', async (e: IpcMainInvokeEvent, projectDirectory: string, confirm: boolean = false): Promise<Engine.GameProject.DeleteUselessStorageDirectoriesSuccess|Engine.GameProject.DeleteUselessStorageDirectoriesFail> => {
+    return await handler(projectDirectory, confirm)
   })
 }

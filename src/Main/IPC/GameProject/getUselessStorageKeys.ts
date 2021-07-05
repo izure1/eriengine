@@ -18,8 +18,8 @@ export async function handler(projectDirectory: string): Promise<Engine.GameProj
 
   return {
     success: true,
-    name: '',
-    message: '',
+    name: '사용하고 있지 않은 스토리지 키 읽기',
+    message: '사용하고 있지 않은 스토리지 키 목록 읽기에 성공했습니다',
     files: uselessKeys
   }
 }

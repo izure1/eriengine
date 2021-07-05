@@ -31,7 +31,7 @@ export async function handler(projectDirectory: string): Promise<Engine.GameProj
 
   return {
     success: true,
-    name: '사용 중인 스토리지 키',
+    name: '사용 중인 스토리지 키 읽기',
     message: '사용 중인 스토리지 키 목록 읽기에 성공했습니다',
     files: Array.from(usingKeys)
   }
