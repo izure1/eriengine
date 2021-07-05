@@ -70,6 +70,9 @@ function *generateIPC() {
   yield require('./Main/IPC/GameProject/getStoragePath')
   yield require('./Main/IPC/GameProject/getStorageDirectories')
   yield require('./Main/IPC/GameProject/getStorageFiles')
+  yield require('./Main/IPC/GameProject/getAllStorageKeys')
+  yield require('./Main/IPC/GameProject/getUsingStorageKeys')
+  yield require('./Main/IPC/GameProject/getUselessStorageKeys')
 
   yield require('./Main/IPC/GameProject/readSceneMap')
   yield require('./Main/IPC/GameProject/ensureSceneMap')

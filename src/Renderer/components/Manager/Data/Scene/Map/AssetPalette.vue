@@ -121,23 +121,3 @@ export default class AssetPaletteComponent extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-// .preview-paint-explorerwrapper {
-//   width: 100%;
-//   height: 100%;
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   backdrop-filter: blur(5px);
-//   z-index: 2;
-// }
-
-// .preview-paint-explorer {
-//   width: 500px;
-//   height: calc(100vh - 64px);
-//   position: absolute;
-//   top: 64px;
-//   right: 0;
-// }
-</style>

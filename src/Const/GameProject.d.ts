@@ -118,6 +118,15 @@ declare namespace Engine {
     interface GetStorageDirectoriesSuccess extends PathRequired, Engine.ActionSuccessState { files: string[] }
     interface GetStorageDirectoriesFail extends Engine.ActionFailState {}
 
+    interface GetAllStorageKeysSuccess extends Engine.ActionSuccessState { files: string[] }
+    interface GetAllStorageKeysFail extends Engine.ActionFailState {}
+
+    interface GetUsingStorageKeysSuccess extends Engine.ActionSuccessState { files: string[] }
+    interface GetUsingStorageKeysFail extends Engine.ActionFailState {}
+
+    interface GetUselessStorageKeysSuccess extends Engine.ActionSuccessState { files: string[] }
+    interface GetUselessStorageKeysFail extends Engine.ActionFailState {}
+
     interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
     interface GenerateAssetListFail extends Engine.ActionFailState {}
 
