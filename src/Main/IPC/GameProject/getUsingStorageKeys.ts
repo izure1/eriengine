@@ -11,15 +11,15 @@ import {
 } from '@/Const'
 
 export async function handler(projectDirectory: string): Promise<Engine.GameProject.GetUsingStorageKeysSuccess|Engine.GameProject.GetUsingStorageKeysFail> {
-  const allKeys = await getAllStorageKeys(projectDirectory)
+  const allStorageKeysGet = await getAllStorageKeys(projectDirectory)
 
-  if (!allKeys.success) {
-    return allKeys as Engine.GameProject.GetUsingStorageKeysFail
+  if (!allStorageKeysGet.success) {
+    return allStorageKeysGet as Engine.GameProject.GetUsingStorageKeysFail
   }
 
   const usingKeys: Set<string> = new Set
   const cwd = path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_DATA_DIRECTORY_NAME)
-  for (const key of allKeys.files) {
+  for (const key of allStorageKeysGet.files) {
     const filenames = await glob(`**/*.${key}.ts`, { cwd })
 
     const filename = filenames.pop() ?? null

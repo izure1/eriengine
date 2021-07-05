@@ -10,17 +10,17 @@ import {
 
 export async function handler(projectDirectory: string): Promise<Engine.GameProject.GetAllStorageKeysSuccess|Engine.GameProject.GetAllStorageKeysFail> {
   const storageDirectory = path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_STORAGE_DIRECTORY_NAME)
-  const dirs = await readDirectory(storageDirectory, { includeDirectories: true, includeFiles: false })
+  const directoryRead = await readDirectory(storageDirectory, { includeDirectories: true, includeFiles: false })
 
-  if (!dirs.success) {
-    return dirs as Engine.GameProject.GetAllStorageKeysFail
+  if (!directoryRead.success) {
+    return directoryRead as Engine.GameProject.GetAllStorageKeysFail
   }
 
   return {
     success: true,
     name: '스토리지 키 읽기',
     message: '스토리지 키 읽기에 성공했습니다',
-    files: dirs.files
+    files: directoryRead.files
   }
 }
 

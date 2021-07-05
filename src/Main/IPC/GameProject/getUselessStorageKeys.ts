@@ -4,17 +4,17 @@ import { handler as getAllStorageKeys } from './getAllStorageKeys'
 import { handler as getUsingStorageKeys } from './getUsingStorageKeys'
 
 export async function handler(projectDirectory: string): Promise<Engine.GameProject.GetUselessStorageKeysSuccess|Engine.GameProject.GetUselessStorageKeysFail> {
-  const allKeys = await getAllStorageKeys(projectDirectory)
-  const usingKeys = await getUsingStorageKeys(projectDirectory)
+  const allStorageKeysGet = await getAllStorageKeys(projectDirectory)
+  const usingStorageKeysGet = await getUsingStorageKeys(projectDirectory)
 
-  if (!allKeys.success) {
-    return allKeys as Engine.GameProject.GetUselessStorageKeysFail
+  if (!allStorageKeysGet.success) {
+    return allStorageKeysGet as Engine.GameProject.GetUselessStorageKeysFail
   }
-  if (!usingKeys.success) {
-    return usingKeys as Engine.GameProject.GetUselessStorageKeysFail
+  if (!usingStorageKeysGet.success) {
+    return usingStorageKeysGet as Engine.GameProject.GetUselessStorageKeysFail
   }
 
-  const uselessKeys = allKeys.files.filter((key) => !usingKeys.files.includes(key))
+  const uselessKeys = allStorageKeysGet.files.filter((key) => !usingStorageKeysGet.files.includes(key))
 
   return {
     success: true,

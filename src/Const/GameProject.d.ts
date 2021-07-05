@@ -126,6 +126,9 @@ declare namespace Engine {
 
     interface GetUselessStorageKeysSuccess extends Engine.ActionSuccessState { files: string[] }
     interface GetUselessStorageKeysFail extends Engine.ActionFailState {}
+    
+    interface DeleteUselessStorageDirectoriesSuccess extends Engine.ActionSuccessState {}
+    interface DeleteUselessStorageDirectoriesFail extends Engine.ActionFailState {}
 
     interface GenerateAssetListSuccess extends PathRequired, Engine.ActionSuccessState {}
     interface GenerateAssetListFail extends Engine.ActionFailState {}
