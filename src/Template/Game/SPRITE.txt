@@ -1,6 +1,4 @@
-import Phaser from 'phaser'
-
-{{ DATA_LISTS }}
+import Assets from '@/ASSET_LIST'
 
 
 // 스프라이트에 사용할 에셋입니다.
