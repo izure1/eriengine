@@ -80,28 +80,18 @@ export default class ProjectFileListComponent extends Vue {
   private isDrawerOpen: boolean = false
   private contextmenuGroups: ContextmenuGroup[] = [
     {
-      title: '프로그래밍',
+      title: '엔진',
       menus: [
         {
-          name: '씬',
-          description: '씬의 메인 파일을 관리합니다',
-          path: '/manager/scene'
+          name: '홈',
+          description: '엔진 홈으로 돌아갑니다',
+          path: '/manager/engine/home'
         },
-        {
-          name: '액터',
-          description: '액터를 관리합니다',
-          path: '/manager/actor'
+      {
+          name: '업데이트',
+          description: '엔진을 업데이트합니다',
+          path: '/manager/engine/update'
         },
-        {
-          name: '스킬',
-          description: '스킬을 관리합니다',
-          path: '/manager/skill'
-        },
-        {
-          name: '아이템',
-          description: '아이템을 관리합니다',
-          path: '/manager/item'
-        }
       ]
     },
     {
@@ -135,6 +125,31 @@ export default class ProjectFileListComponent extends Vue {
       ]
     },
     {
+      title: '프로그래밍',
+      menus: [
+        {
+          name: '씬',
+          description: '씬의 메인 파일을 관리합니다',
+          path: '/manager/scene'
+        },
+        {
+          name: '액터',
+          description: '액터를 관리합니다',
+          path: '/manager/actor'
+        },
+        {
+          name: '스킬',
+          description: '스킬을 관리합니다',
+          path: '/manager/skill'
+        },
+        {
+          name: '아이템',
+          description: '아이템을 관리합니다',
+          path: '/manager/item'
+        }
+      ]
+    },
+    {
       title: '프로젝트',
       menus: [
         {
@@ -157,21 +172,6 @@ export default class ProjectFileListComponent extends Vue {
           description: '메인화면으로 돌아갑니다',
           path: '/project/close'
         }
-      ]
-    },
-    {
-      title: '엔진',
-      menus: [
-        {
-          name: '홈',
-          description: '엔진 홈으로 돌아갑니다',
-          path: '/manager/engine/home'
-        },
-      {
-          name: '업데이트',
-          description: '엔진을 업데이트합니다',
-          path: '/manager/engine/update'
-        },
       ]
     },
     {
