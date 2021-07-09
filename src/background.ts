@@ -117,12 +117,12 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
     height: 760,
-    show: false,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       spellcheck: false,
       nodeIntegration: true,
+      contextIsolation: false,
       webSecurity: false
     },
     icon: path.resolve(__static, 'icon.png')
@@ -139,7 +139,6 @@ async function createWindow() {
   }
 
   win.setMenu(null)
-  win.once('ready-to-show', win.show)
 }
 
 // Quit when all windows are closed.

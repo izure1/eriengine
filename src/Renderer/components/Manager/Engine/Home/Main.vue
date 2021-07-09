@@ -3,6 +3,10 @@
     flat
     tile
   >
+    <v-card-title>프로젝트</v-card-title>
+    <v-card-subtitle>현재 프로젝트의 간략한 정보입니다</v-card-subtitle>
+    <engine-home-information-component />
+
     <v-card-title>위키</v-card-title>
     <v-card-subtitle>엔진을 이해하는데 도움이 될 수 있는 강좌입니다</v-card-subtitle>
     <engine-home-link-component :links="wikiLists" />
@@ -17,10 +21,12 @@
 import { Vue, Component } from 'vue-property-decorator'
 
 import EngineHomeLinkComponent, { LinkList } from './Link.vue'
+import EngineHomeInformationComponent from './Informations.vue'
 
 @Component({
   components: {
-    EngineHomeLinkComponent
+    EngineHomeLinkComponent,
+    EngineHomeInformationComponent
   }
 })
 export default class EngineHomeComponent extends Vue {
