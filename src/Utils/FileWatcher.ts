@@ -1,5 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
+import chokidar from 'chokidar'
 import normalize from 'normalize-path'
 
 type WatcherCallback = (_filePath: string) => void
@@ -8,7 +9,7 @@ export class FileWatcher {
   private recursive: boolean
   private interval: number
   private intervalId: number = NaN
-  private watcher: fs.FSWatcher|null = null
+  private watcher: chokidar.FSWatcher|null = null
   private callbacks: WatcherCallback[] = []
 
   constructor(cwd: string, recursive: boolean = true, interval: number = 1000) {
@@ -30,7 +31,8 @@ export class FileWatcher {
     if (!fs.existsSync(this.cwd)) {
       return
     }
-    this.watcher = fs.watch(this.cwd, { recursive: this.recursive, }, (e: string, filePath: string) => { this.onUpdate(e, filePath) })
+    this.watcher = chokidar.watch(this.cwd)
+    this.watcher.on('all', (e, filePath) => { this.onUpdate(e, filePath) })
   }
 
   private onUpdate(e: string, filePath: string): void {

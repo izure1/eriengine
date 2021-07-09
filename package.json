@@ -27,6 +27,7 @@
     "animejs": "^3.2.1",
     "ansi-to-html": "^0.6.14",
     "betterbacks": "0.0.0-beta.1",
+    "chokidar": "^3.5.2",
     "command-exists": "^1.2.9",
     "compare-versions": "^3.6.0",
     "core-js": "^3.6.5",
