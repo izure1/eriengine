@@ -39,7 +39,7 @@ export const disposable: boolean = true
  * @param inventory 해당 아이템이 속한 인벤토리 인스턴스입니다.
  * @param 아이템의 소유자입니다.
  */
-export const onBeforeAdd = async (item: ItemBlueprint, inventory: Inventory, owner: BaseActor): Promise<boolean> => {
+export const onBeforeAdd = (item: ItemBlueprint, inventory: Inventory, owner: BaseActor): boolean => {
   // 유효성 검사를 위한 내용을 프로그래밍 하세요.
   // false를 반환하면, 아이템을 인벤토리에 추가하는 것을 막을 수 있습니다.
 
@@ -53,7 +53,7 @@ export const onBeforeAdd = async (item: ItemBlueprint, inventory: Inventory, own
  * @param inventory 해당 아이템이 속한 인벤토리 인스턴스입니다.
  * @param 아이템의 소유자입니다.
  */
-export const onAdd = async (item: Item, inventory: Inventory, owner: BaseActor): Promise<void> => {
+export const onAdd = (item: Item, inventory: Inventory, owner: BaseActor): void => {
 
 }
 
@@ -66,7 +66,7 @@ export const onAdd = async (item: Item, inventory: Inventory, owner: BaseActor):
  * @param inventory 해당 아이템이 속한 인벤토리 인스턴스입니다.
  * @param 아이템의 소유자입니다.
  */
-export const onBeforeDrop = async (item: Item, inventory: Inventory, owner: BaseActor): Promise<boolean> => {
+export const onBeforeDrop = (item: Item, inventory: Inventory, owner: BaseActor): boolean => {
   // 유효성 검사를 위한 내용을 프로그래밍 하세요.
   // false를 반환하면, 아이템을 인벤토리에서 제거하는 것을 막을 수 있습니다.
 
@@ -80,7 +80,7 @@ export const onBeforeDrop = async (item: Item, inventory: Inventory, owner: Base
  * @param inventory 해당 아이템이 속했던 인벤토리 인스턴스입니다.
  * @param 아이템의 소유자입니다.
  */
-export const onDrop = async (item: Item, inventory: Inventory, owner: BaseActor): Promise<void> => {
+export const onDrop = (item: Item, inventory: Inventory, owner: BaseActor): void => {
 
 }
 
@@ -93,7 +93,7 @@ export const onDrop = async (item: Item, inventory: Inventory, owner: BaseActor)
  * @param inventory 해당 아이템이 속한 인벤토리 인스턴스입니다.
  * @param 아이템의 소유자입니다.
  */
-export const onBeforeUse = async (item: Item, inventory: Inventory, owner: BaseActor): Promise<boolean> => {
+export const onBeforeUse = (item: Item, inventory: Inventory, owner: BaseActor): boolean => {
   // 유효성 검사를 위한 내용을 프로그래밍 하세요.
   // false를 반환하면, 아이템을 사용하는 것을 막을 수 있습니다.
 
@@ -107,6 +107,6 @@ export const onBeforeUse = async (item: Item, inventory: Inventory, owner: BaseA
  * @param inventory 해당 아이템이 속했던 인벤토리 인스턴스입니다.
  * @param 아이템의 소유자입니다.
  */
-export const onUse = async (item: Item, inventory: Inventory, owner: BaseActor): Promise<void> => {
+export const onUse = (item: Item, inventory: Inventory, owner: BaseActor): void => {
 
 }
