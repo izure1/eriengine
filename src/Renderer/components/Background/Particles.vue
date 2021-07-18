@@ -1,10 +1,10 @@
 <template>
-    <particles-bg
-        :type="type"
-        :num="10"
-        :bg="true"
-        class="bg-particles"
-    />
+  <particles-bg
+    :type="type"
+    :num="10"
+    :bg="true"
+    class="bg-particles"
+  />
 </template>
 
 <script lang="ts">
@@ -26,35 +26,35 @@ enum ParticlesType {
 }
 
 @Component({
-    components: {
-        ParticlesBg
+  components: {
+    ParticlesBg
+  },
+  props: {
+    type: {
+      type: String,
+      default: (): String => {
+        return Object.values(ParticlesType).sort((): number => Math.random() > 0.5 ? 1 : -1).pop()!
+      }
     },
-    props: {
-        type: {
-            type: String,
-            default: (): String => {
-                return Object.values(ParticlesType).sort((): number => Math.random() > 0.5 ? 1 : -1).pop()!
-            }
-        },
-        num: {
-            type: Number,
-            default: 10
-        },
-        bg: {
-            type: Boolean,
-            default: true
-        }
+    num: {
+      type: Number,
+      default: 10
+    },
+    bg: {
+      type: Boolean,
+      default: true
     }
+  }
 })
 export default class ParticleBgComponent extends Vue {
-    private type!: string
-    private num!: number
-    private bg!: boolean
+  private type!: string
+  private num!: number
+  private bg!: boolean
 }
 </script>
 
 <style lang="scss" scoped>
 .bg-particles {
-    opacity: 0.3;
+  opacity: 0.3;
 }
 </style>
