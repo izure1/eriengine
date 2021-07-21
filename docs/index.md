@@ -1,4 +1,9 @@
 # 에리엔진
+<div style="text-align: center">
+  <img src="../public/icon.png" alt="logo" width=256>
+</div>
+
+## 설명
 에리엔진은 간단한 쿼터뷰 게임을 구현하도록 도와주는 게임 엔진입니다.  
 [Phaser3](https://github.com/photonstorm/phaser) 라이브러리를 사용하여 HTML 캔버스로 구현됩니다.
 
