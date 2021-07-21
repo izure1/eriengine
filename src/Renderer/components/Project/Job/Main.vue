@@ -1,5 +1,9 @@
 <template>
-  <v-card class="projectjob d-flex align-content-center flex-wrap">
+  <v-card
+    flat
+    tile
+    class="projectjob d-flex align-content-center flex-wrap"
+  >
     <v-spacer />
 
     <v-card flat class="projectjob-wrapper">

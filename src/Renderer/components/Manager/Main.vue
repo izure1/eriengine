@@ -16,9 +16,41 @@
         >
           {{ projectName }}
         </v-btn>
+        <span class="text-caption grey--text">v{{ projectVersion }}</span>
       </v-app-bar-title>
+
+      <v-spacer />
+      
+      <v-btn
+        icon
+        dark
+        @click="windowMinimize"
+      >
+        <v-icon>mdi-window-minimize</v-icon>
+      </v-btn>
+
+      <v-btn
+        icon
+        dark
+        @click="windowMaximize"
+      >
+        <v-icon small>mdi-window-maximize</v-icon>
+      </v-btn>
+
+      <v-btn
+        icon
+        dark
+        @click="windowClose"
+      >
+        <v-icon>mdi-window-close</v-icon>
+      </v-btn>
+
     </v-app-bar>
-    <v-navigation-drawer v-model="isDrawerOpen" fixed temporary class="py-3 px-1">
+    <v-navigation-drawer v-model="isDrawerOpen"
+      fixed
+      temporary
+      class="py-3 px-1"
+    >
       <v-list subheader>
         <div
           v-for="{ title, menus } in contextmenuGroups"
@@ -46,7 +78,7 @@
 
 <script lang="ts">
 import path from 'path'
-import { ipcRenderer, shell } from 'electron'
+import { ipcRenderer, shell, remote, BrowserWindow } from 'electron'
 import { Vue, Component } from 'vue-property-decorator'
 import { FileWatcher } from '@/Utils/FileWatcher'
 import {
@@ -200,6 +232,18 @@ export default class ProjectFileListComponent extends Vue {
     return this.$store.state.projectDirectory
   }
 
+  private get projectVersion(): string {
+    const { version } = this.$store.state.projectConfig
+    if (!version) {
+      return ''
+    }
+    return version
+  }
+
+  private get win(): BrowserWindow {
+    return remote.getCurrentWindow()
+  }
+
   private showManager(url: string): void {
     this.$router.replace(url).catch(() => null)
   }
@@ -286,6 +330,23 @@ export default class ProjectFileListComponent extends Vue {
     shell.openPath(filePath)
   }
 
+  private windowMinimize(): void {
+    this.win.minimize()
+  }
+
+  private windowMaximize(): void {
+    if (this.win.isMaximized()) {
+      this.win.restore()
+    }
+    else {
+      this.win.maximize()
+    }
+  }
+
+  private windowClose(): void {
+    remote.app.exit(0)
+  }
+
   created(): void {
     this.generateWatchers()
   }
@@ -302,5 +363,13 @@ export default class ProjectFileListComponent extends Vue {
     margin-top: 64px !important;
     overflow: auto;
     overflow-x: hidden;
+}
+
+.v-app-bar {
+  -webkit-app-region: drag;
+
+  button {
+    -webkit-app-region: no-drag;
+  }
 }
 </style>
