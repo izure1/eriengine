@@ -16,8 +16,8 @@
         >
           {{ projectName }}
         </v-btn>
-        <span class="text-caption grey--text">v{{ projectVersion }}</span>
       </v-app-bar-title>
+      <span class="text-caption grey--text ml-1">v{{ projectVersion }}</span>
 
       <v-spacer />
       

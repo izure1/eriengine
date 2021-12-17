@@ -3,15 +3,6 @@
     flat
     tile
   >
-    <v-subheader>
-      <v-spacer />
-
-      <div>
-        에리엔진
-        <span class="text-caption">v{{ engineVersion }}</span>
-      </div>
-    </v-subheader>
-
     <v-card-title>프로젝트</v-card-title>
     <v-card-subtitle>현재 프로젝트의 간략한 정보입니다</v-card-subtitle>
     <engine-home-information-component />

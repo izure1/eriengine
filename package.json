@@ -1,6 +1,6 @@
 {
   "name": "eriengine",
-  "version": "1.0.0-alpha.29",
+  "version": "1.0.0-alpha.30",
   "private": true,
   "scripts": {
     "lint": "vue-cli-service lint",
@@ -21,7 +21,7 @@
     "@eriengine/plugin-optimization": "^1.0.0",
     "@eriengine/plugin-particle": "^1.0.2",
     "@eriengine/plugin-spatial-audio": "^1.0.2",
-    "@vue/composition-api": "^1.0.0-rc.9",
+    "@vue/composition-api": "^1.4.1",
     "add-filename-increment": "^1.0.0",
     "an-array-of-english-words": "2.0.0",
     "animejs": "^3.2.1",
