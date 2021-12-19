@@ -218,12 +218,12 @@ export default class BaseScene extends Phaser.Scene {
   protected createMap(): void {
     this.isometric.setWorldSize(this.__map.side)
 
-    for (const { key, alias, x, y, scale, isSensor } of this.__map.walls)  {
+    for (const { id, key, alias, x, y, scale, isSensor } of this.__map.walls)  {
       let animsKey: string|undefined
       if (this.anims.exists(key)) {
         animsKey = key
       }
-      const wall = this.isometric.setWalltile(x, y, key, undefined, animsKey)
+      const wall = this.isometric.setWallTile(id, x, y, key, undefined, animsKey)
       wall.setScale(scale)
       wall.setSensor(isSensor)
       wall.setDataEnabled()
@@ -231,12 +231,12 @@ export default class BaseScene extends Phaser.Scene {
 
       this.optimization.add(wall)
     }
-    for (const { key, x, y } of this.__map.floors) {
+    for (const { id, key, x, y } of this.__map.floors) {
       let animsKey: string|undefined
       if (this.anims.exists(key)) {
         animsKey = key
       }
-      const floor = this.isometric.setFloortile(x, y, key, undefined, animsKey)
+      const floor = this.isometric.setFloorTile(id, x, y, key, undefined, animsKey)
 
       this.optimization.add(floor)
     }

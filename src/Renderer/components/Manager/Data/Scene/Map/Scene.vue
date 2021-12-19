@@ -256,16 +256,13 @@ export default class SceneComponent extends Vue {
 
       const { walls, floors, audios } = this.mainScene.selectedMapObjects
       for (const wall of walls) {
-        const { x, y } = wall
-        this.mainScene.mapDataManager.deleteWallFromPosition(x, y)
+        this.mainScene.mapDataManager.deleteWallFromId(wall.id)
       }
       for (const floor of floors) {
-        const { x, y } = floor
-        this.mainScene.mapDataManager.deleteFloorFromPosition(x, y)
+        this.mainScene.mapDataManager.deleteFloorFromId(floor.id)
       }
       for (const audio of audios) {
-        const { x, y } = audio
-        this.mainScene.mapDataManager.deleteAudioFromPosition(x, y)
+        this.mainScene.mapDataManager.deleteAudioFromId(audio.id)
       }
     })
   }

@@ -5,7 +5,7 @@ export class PreviewAudioVisualizer extends Phaser.GameObjects.Text {
   private beat: Phaser.GameObjects.Arc
   private tween: Phaser.Tweens.Tween
 
-  constructor(scene: Phaser.Scene, x: number, y: number, audio: { key: string, thresholdRadius: number }) {
+  constructor(scene: Phaser.Scene, id: string, x: number, y: number, audio: { key: string, thresholdRadius: number }) {
     super(scene, x, y, ['오디오', audio.key], { color: '#ffd152', strokeThickness: 3, stroke: 'black', align: 'center', fontStyle: 'bold' })
 
     const { thresholdRadius } = audio
@@ -13,6 +13,7 @@ export class PreviewAudioVisualizer extends Phaser.GameObjects.Text {
     const color = Phaser.Display.Color.GetColor(red, green, blue)
     
     this.setOrigin(0.5)
+    this.setName(id)
 
     this.thresholdRadius = thresholdRadius
 

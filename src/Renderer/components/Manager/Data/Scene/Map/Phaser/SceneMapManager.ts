@@ -6,6 +6,9 @@ interface TypedEvents {
   'set-wall':  (_wall: Engine.GameProject.SceneMapWall) => void
   'set-floor': (_floor: Engine.GameProject.SceneMapFloor) => void
   'set-audio': (_audio: Engine.GameProject.SceneMapAudio) => void
+  'add-wall':  (_wall: Engine.GameProject.SceneMapWall) => void
+  'add-floor': (_floor: Engine.GameProject.SceneMapFloor) => void
+  'add-audio': (_audio: Engine.GameProject.SceneMapAudio) => void
   'delete-wall': (_wall: Engine.GameProject.SceneMapWall) => void
   'delete-floor': (_floor: Engine.GameProject.SceneMapFloor) => void
   'delete-audio': (_audio: Engine.GameProject.SceneMapAudio) => void
@@ -13,9 +16,9 @@ interface TypedEvents {
 
 export class SceneMapManager extends TypedEmitter<TypedEvents> {
   protected side: number = 0
-  protected readonly walls: Map<string, Engine.GameProject.SceneMapWall> = new Map
-  protected readonly floors: Map<string, Engine.GameProject.SceneMapFloor> = new Map
-  protected readonly audios: Map<string, Engine.GameProject.SceneMapAudio> = new Map
+  protected readonly floors: Set<Engine.GameProject.SceneMapFloor> = new Set
+  protected readonly walls: Set<Engine.GameProject.SceneMapWall> = new Set
+  protected readonly audios: Set<Engine.GameProject.SceneMapAudio> = new Set
   
   protected cacheStates: Engine.GameProject.SceneMap[] = []
 
@@ -49,32 +52,48 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * 데이터를 기반으로 인스턴스를 초기화합니다.
    * @param data 초기화하고자 하는 데이터입니다.
    */
-   protected setDataState(data: Engine.GameProject.SceneMap): void {
+  protected setDataState(data: Engine.GameProject.SceneMap): void {
     const { side, walls, floors, audios } = data
 
     this.side = side
+    this.walls.clear()
+    this.floors.clear()
+    this.audios.clear()
 
-    for (const wall of walls) {
-      this.walls.set(this.createKey(wall.x, wall.y), wall)
-    }
-
-    for (const floor of floors) {
-      this.floors.set(this.createKey(floor.x, floor.y), floor)
-    }
-
-    for (const audio of audios) {
-      this.audios.set(this.createKey(audio.x, audio.y), audio)
-    }
+    walls.forEach((obj) => this.walls.add(obj))
+    floors.forEach((obj) => this.floors.add(obj))
+    audios.forEach((obj) => this.audios.add(obj))
   }
-  
-  /**
-   * 좌표를 기준으로 맵 데이터의 키를 생성하여 반환합니다.
-   * @param x x좌표입니다.
-   * @param y y좌표입니다.
-   * @returns 생성한 맵데이터의 키입니다. `${x},${y}` 의 문자열입니다.
-   */
-  createKey(x: number, y: number): string {
-    return `${x},${y}`
+
+  protected getObjectFromId<T extends Engine.GameProject.SceneMapObject>(data: Set<T>, id: string): T|null {
+    for (const obj of data) {
+      if (obj.id === id) {
+        return obj
+      }
+    }
+    return null
+  }
+
+  protected getObjectFromKeyAndPosition<T extends Engine.GameProject.SceneMapObject>(data: Set<T>, key: string, x: number, y: number): T|null {
+    for (const obj of data) {
+      if (
+        obj.key === key &&
+        obj.x === x &&
+        obj.y === y
+      ) {
+        return obj
+      }
+    }
+    return null
+  }
+
+  protected deleteObjectFromId<T extends Engine.GameProject.SceneMapObject>(data: Set<T>, id: string): T|null {
+    for (const obj of data) {
+      if (obj.id === id) {
+        data.delete(obj)
+      }
+    }
+    return null
   }
 
   /**
@@ -89,15 +108,83 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   }
 
   /**
+   * 해당 좌표에 일치하는 에셋으로 된 벽 오브젝트가 있다면 반환합니다. 없다면 `null`을 반환합니다.
+   * @param assetKey 오브젝트에 사용된 에셋키입니다.
+   * @param x 오브젝트가 배치된 x좌표입니다.
+   * @param y 오브젝트가 배치된 y좌표입니다.
+   * @returns 배치된 오브젝트를 반환합니다.
+   */
+  getWall<T extends Engine.GameProject.SceneMapObject>(assetKey: string, x: number, y: number): T|null {
+    return this.getObjectFromKeyAndPosition(this.walls, assetKey, x, y) as T|null
+  }
+
+  /**
+   * 해당 좌표에 일치하는 에셋으로 된 벽 오브젝트가 있는지 여부를 반환합니다.
+   * 이는 완벽히 동일한 위치에 동일한 에셋이 중복으로 배치되는 것을 막기 위함입니다.
+   * @param assetKey 오브젝트에 사용된 에셋키입니다.
+   * @param x 오브젝트가 배치된 x좌표입니다.
+   * @param y 오브젝트가 배치된 y좌표입니다.
+   * @returns 배치 여부를 반환합니다.
+   */
+  hasWall(assetKey: string, x: number, y: number): boolean {
+    return !!this.getWall(assetKey, x, y)
+  }
+
+  /**
+   * 해당 좌표에 일치하는 에셋으로 된 바닥 타일 오브젝트가 있다면 반환합니다. 없다면 `null`을 반환합니다.
+   * @param assetKey 오브젝트에 사용된 에셋키입니다.
+   * @param x 오브젝트가 배치된 x좌표입니다.
+   * @param y 오브젝트가 배치된 y좌표입니다.
+   * @returns 배치된 오브젝트를 반환합니다.
+   */
+  getFloor<T extends Engine.GameProject.SceneMapObject>(assetKey: string, x: number, y: number): T|null {
+    return this.getObjectFromKeyAndPosition(this.floors, assetKey, x, y) as T|null
+  }
+
+  /**
+   * 해당 좌표에 일치하는 에셋으로 된 바닥 타일 오브젝트가 있는지 여부를 반환합니다.
+   * 이는 완벽히 동일한 위치에 동일한 에셋이 중복으로 배치되는 것을 막기 위함입니다.
+   * @param assetKey 오브젝트에 사용된 에셋키입니다.
+   * @param x 오브젝트가 배치된 x좌표입니다.
+   * @param y 오브젝트가 배치된 y좌표입니다.
+   * @returns 배치 여부를 반환합니다.
+   */
+  hasFloor(assetKey: string, x: number, y: number): boolean {
+    return !!this.getFloor(assetKey, x, y)
+  }
+
+  /**
+   * 해당 좌표에 일치하는 에셋으로 된 오디오 오브젝트가 있다면 반환합니다. 없다면 `null`을 반환합니다.
+   * @param assetKey 오브젝트에 사용된 에셋키입니다.
+   * @param x 오브젝트가 배치된 x좌표입니다.
+   * @param y 오브젝트가 배치된 y좌표입니다.
+   * @returns 배치된 오브젝트를 반환합니다.
+   */
+  getAudio<T extends Engine.GameProject.SceneMapObject>(assetKey: string, x: number, y: number): T|null {
+    return this.getObjectFromKeyAndPosition(this.audios, assetKey, x, y) as T|null
+  }
+
+  /**
+   * 해당 좌표에 일치하는 에셋으로 된 오디오 오브젝트가 있는지 여부를 반환합니다.
+   * 이는 완벽히 동일한 위치에 동일한 에셋이 중복으로 배치되는 것을 막기 위함입니다.
+   * @param assetKey 오브젝트에 사용된 에셋키입니다.
+   * @param x 오브젝트가 배치된 x좌표입니다.
+   * @param y 오브젝트가 배치된 y좌표입니다.
+   * @returns 배치 여부를 반환합니다.
+   */
+  hasAudio(assetKey: string, x: number, y: number): boolean {
+    return !!this.getAudio(assetKey, x, y)
+  }
+
+  /**
    * 해당 좌표에 벽 타일 데이터를 지정합니다.
    * @param wall 벽 타일의 정보입니다.
    */
-  setWall(wall: Engine.GameProject.SceneMapWall): this {
-    const { x, y } = wall
-    const key = this.createKey(x, y)
-
-    this.walls.set(key, wall)
-    this.emit('set-wall', wall)
+  addWall(wall: Engine.GameProject.SceneMapWall, emit = true): this {
+    this.walls.add(wall)
+    if (emit) {
+      this.emit('add-wall', wall)
+    }
 
     return this
   }
@@ -106,12 +193,11 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * 해당 좌표에 바닥 타일 데이터를 지정합니다.
    * @param floor 바닥 타일의 정보입니다.
    */
-  setFloor(floor: Engine.GameProject.SceneMapFloor): this {
-    const { x, y } = floor
-    const key = this.createKey(x, y)
-    
-    this.floors.set(key, floor)
-    this.emit('set-floor', floor)
+  addFloor(floor: Engine.GameProject.SceneMapFloor, emit = true): this {
+    this.floors.add(floor)
+    if (emit) {
+      this.emit('add-floor', floor)
+    }
 
     return this
   }
@@ -120,14 +206,73 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * 해당 좌표에 오디오 데이터를 지정합니다.
    * @param audio 오디오의 정보입니다.
    */
-  setAudio(audio: Engine.GameProject.SceneMapAudio): this {
-    const { x, y } = audio
-    const key = this.createKey(x, y)
-
-    this.audios.set(key, audio)
-    this.emit('set-audio', audio)
+  addAudio(audio: Engine.GameProject.SceneMapAudio, emit = true): this {
+    this.audios.add(audio)
+    if (emit) {
+      this.emit('add-audio', audio)
+    }
 
     return this 
+  }
+
+  /**
+   * `addWall` 메서드로 추가된 오브젝트의 속성을 수정합니다. 존재하지 않는다면 추가하지 않습니다.
+   * @param wall 오브젝트 속성입니다.
+   */
+  setWall(wall: Engine.GameProject.SceneMapWall, emit = true): this {
+    const target = this.getObjectFromId(this.walls, wall.id)
+    if (target) {
+      const { alias, isSensor, key, scale, x, y } = wall
+      target.alias = alias
+      target.isSensor = isSensor
+      target.key = key
+      target.scale = scale
+      target.x = x
+      target.y = y
+      if (emit) {
+        this.emit('set-wall', target)
+      }
+    }
+    return this
+  }
+  
+  /**
+   * `addFloor` 메서드로 추가된 오브젝트의 속성을 수정합니다. 존재하지 않는다면 추가하지 않습니다.
+   * @param floor 오브젝트 속성입니다.
+   */
+  setFloor(floor: Engine.GameProject.SceneMapFloor, emit = true): this {
+    const target = this.getObjectFromId(this.floors, floor.id)
+    if (target) {
+      const { key, x, y } = floor
+      target.key = key
+      target.x = x
+      target.y = y
+      if (emit) {
+        this.emit('set-floor', target)
+      }
+    }
+    return this
+  }
+  
+  /**
+   * `addAudio` 메서드로 추가된 오브젝트의 속성을 수정합니다. 존재하지 않는다면 추가하지 않습니다.
+   * @param audio 오브젝트 속성입니다.
+   */
+  setAudio(audio: Engine.GameProject.SceneMapAudio, emit = true): this {
+    const target = this.getObjectFromId(this.audios, audio.id)
+    if (target) {
+      const { delay, loop, thresholdRadius, volume, x, y } = audio
+      target.delay = delay
+      target.loop = loop
+      target.thresholdRadius = thresholdRadius
+      target.volume = volume
+      target.x = x
+      target.y = y
+      if (emit) {
+        this.emit('set-audio', target)
+      }
+    }
+    return this
   }
 
   /**
@@ -139,101 +284,35 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   }
 
   /**
-   * 해당 좌표에 `setWall` 메서드로 지정한 벽 타일 정보를 반환합니다.
-   * @param x 지정한 벽 타일의 x좌표입니다.
-   * @param y 지정한 벽 타일의 y좌표입니다.
-   * @returns 해당 좌표에 있는 벽 타일의 데이터 정보입니다. 이 정보를 직접 수정하지 마십시오.
+   * `addWall` 메서드로 추가된 오브젝트를 `id` 속성을 기반으로 찾습니다. 없으면 `null`을 반환합니다.
+   * @param id 오브젝트의 고유값입니다.
    */
-  getWallFromPosition(x: number, y: number): Engine.GameProject.SceneMapWall|null {
-    const key = this.createKey(x, y)
-    
-    return this.walls.get(key) ?? null
+  getWallFromId(id: string): Engine.GameProject.SceneMapWall|null {
+    return this.getObjectFromId(this.walls, id)
   }
 
   /**
-   * 해당 좌표에 `setFloor` 메서드로 지정한 바닥 타일 정보를 반환합니다.
-   * @param x 지정한 바닥 타일의 x좌표입니다.
-   * @param y 지정한 바닥 타일의 y좌표입니다.
-   * @returns 해당 좌표에 있는 바닥 타일의 데이터 정보입니다. 이 정보를 직접 수정하지 마십시오.
+   * `addFloor` 메서드로 추가된 오브젝트를 `id` 속성을 기반으로 찾습니다. 없으면 `null`을 반환합니다.
+   * @param id 오브젝트의 고유값입니다.
    */
-  getFloorFromPosition(x: number, y: number): Engine.GameProject.SceneMapFloor|null {
-    const key = this.createKey(x, y)
-
-    return this.floors.get(key) ?? null
+  getFloorFromId(id: string): Engine.GameProject.SceneMapFloor|null {
+    return this.getObjectFromId(this.floors, id)
   }
 
   /**
-   * 해당 좌표에 `setAudio` 메서드로 지정한 오디오 정보를 반환합니다.
-   * @param x 지정한 오디오의 x좌표입니다.
-   * @param y 지정한 오디오의 y좌표입니다.
-   * @returns 해당 좌표에 있는 오디오의 데이터 정보입니다. 이 정보를 직접 수정하지 마십시오.
+   * `addAudio` 메서드로 추가된 오브젝트를 `id` 속성을 기반으로 찾습니다. 없으면 `null`을 반환합니다.
+   * @param id 오브젝트의 고유값입니다.
    */
-  getAudioFromPosition(x: number, y: number): Engine.GameProject.SceneMapAudio|null {
-    const key = this.createKey(x, y)
-
-    return this.audios.get(key) ?? null
+  getAudioFromId(id: string): Engine.GameProject.SceneMapAudio|null {
+    return this.getObjectFromId(this.audios, id)
   }
 
   /**
-   * 해당 좌표에 `setWall` 메서드로 지정한 벽 타일 정보를 삭제합니다.
-   * @param x 지정한 벽 타일의 x좌표입니다.
-   * @param y 지정한 벽 타일의 y좌표입니다.
-   * @returns 해당 좌표에 벽 타일의 정보가 있었다면 `true`, 없었다면 `false`를 반환합니다.
-   */
-  deleteWallFromPosition(x: number, y: number): boolean {
-    const key = this.createKey(x, y)
-    const wall = this.walls.get(key) ?? null
-
-    if (wall !== null) {
-      this.walls.delete(key)
-      this.emit('delete-wall', wall)
-    }
-    
-    return !!wall
-  }
-
-  /**
-   * 해당 좌표에 `setFloor` 메서드로 지정한 바닥 타일 정보를 삭제합니다.
-   * @param x 지정한 바닥 타일의 x좌표입니다.
-   * @param y 지정한 바닥 타일의 y좌표입니다.
-   * @returns 해당 좌표에 바닥 타일의 정보가 있었다면 `true`, 없었다면 `false`를 반환합니다.
-   */
-  deleteFloorFromPosition(x: number, y: number): boolean {
-    const key = this.createKey(x, y)
-    const floor = this.floors.get(key) ?? null
-
-    if (floor !== null) {
-      this.floors.delete(key)
-      this.emit('delete-floor', floor)
-    }
-    
-    return !!floor
-  }
-
-  /**
-   * 해당 좌표에 `setAudio` 메서드로 지정한 오디오 정보를 삭제합니다.
-   * @param x 지정한 오디오의 x좌표입니다.
-   * @param y 지정한 오디오의 y좌표입니다.
-   * @returns 해당 좌표에 오디오의 정보가 있었다면 `true`, 없었다면 `false`를 반환합니다.
-   */
-  deleteAudioFromPosition(x: number, y: number): boolean {
-    const key = this.createKey(x, y)
-    const audio = this.audios.get(key) ?? null
-
-    if (audio !== null) {
-      this.audios.delete(key)
-      this.emit('delete-audio', audio)
-    }
-    
-    return !!audio
-  }
-
-  /**
-   * `setWall` 메서드로 지정한 벽 타일 정보 중, 해당하는 페인트키로 생성된 정보만을 배열로 반환합니다.
+   * `addWall` 메서드로 지정한 벽 타일 정보 중, 해당하는 페인트키로 생성된 정보만을 배열로 반환합니다.
    * @param paintKey 해당 데이터의 `key` 데이터 값입니다.
    * @returns 해당하는 페인트키로 생성된 정보를 배열로 반환합니다.
    */
-  getWallFromPaintKey(paintKey: string): Engine.GameProject.SceneMapWall[] {
+  getWallsFromPaintKey(paintKey: string): Engine.GameProject.SceneMapWall[] {
     const normalizedPaintKey = normalize(paintKey)
     const walls = Array.from(this.walls.values())
 
@@ -241,11 +320,11 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   }
 
   /**
-   * `setFloor` 메서드로 지정한 바닥 타일 정보 중, 해당하는 페인트키로 생성된 정보만을 배열로 반환합니다.
+   * `addFloor` 메서드로 지정한 바닥 타일 정보 중, 해당하는 페인트키로 생성된 정보만을 배열로 반환합니다.
    * @param paintKey 해당 데이터의 `key` 데이터 값입니다.
    * @returns 해당하는 페인트키로 생성된 정보를 배열로 반환합니다.
    */
-  getFloorFromPaintKey(paintKey: string): Engine.GameProject.SceneMapFloor[] {
+  getFloorsFromPaintKey(paintKey: string): Engine.GameProject.SceneMapFloor[] {
     const normalizedPaintKey = normalize(paintKey)
     const floors = Array.from(this.floors.values())
 
@@ -253,15 +332,45 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   }
 
   /**
-   * `setAudio` 메서드로 지정한 오디오 정보 중, 해당하는 페인트키로 생성된 정보만을 배열로 반환합니다.
+   * `addAudio` 메서드로 지정한 오디오 정보 중, 해당하는 페인트키로 생성된 정보만을 배열로 반환합니다.
    * @param paintKey 해당 데이터의 `key` 데이터 값입니다.
    * @returns 해당하는 페인트키로 생성된 정보를 배열로 반환합니다.
    */
-  getAudioFromPaintKey(paintKey: string): Engine.GameProject.SceneMapAudio[] {
+  getAudiosFromPaintKey(paintKey: string): Engine.GameProject.SceneMapAudio[] {
     const normalizedPaintKey = normalize(paintKey)
     const audios = Array.from(this.audios.values())
 
     return audios.filter((audio) => normalize(audio.key) === normalizedPaintKey)
+  }
+
+  deleteWallFromId(id: string, emit = true): void {
+    const obj = this.getObjectFromId(this.walls, id)
+    if (obj) {
+      this.deleteObjectFromId(this.walls, id)
+      if (emit) {
+        this.emit('delete-wall', obj)
+      }
+    }
+  }
+
+  deleteFloorFromId(id: string, emit = true): void {
+    const obj = this.getObjectFromId(this.floors, id)
+    if (obj) {
+      this.deleteObjectFromId(this.floors, id)
+      if (emit) {
+        this.emit('delete-floor', obj)
+      }
+    }
+  }
+
+  deleteAudioFromId(id: string, emit = true): void {
+    const obj = this.getObjectFromId(this.audios, id)
+    if (obj) {
+      this.deleteObjectFromId(this.audios, id)
+      if (emit) {
+        this.emit('delete-audio', obj)
+      }
+    }
   }
   
   /**
@@ -269,8 +378,8 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @param paintKey 해당 데이터의 `key` 데이터 값입니다.
    */
   deleteWallsFromPaintKey(paintKey: string): void {
-    const walls = this.getWallFromPaintKey(paintKey)
-    
+    const walls = this.getWallsFromPaintKey(paintKey)
+
     if (walls.length === 0) {
       return
     }
@@ -279,8 +388,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       if (normalize(wall.key) !== normalize(paintKey)) {
         return
       }
-  
-      this.deleteWallFromPosition(wall.x, wall.y)
+      this.deleteWallFromId(wall.id)
     }
   }
 
@@ -289,7 +397,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @param paintKey 해당 데이터의 `key` 데이터 값입니다.
    */
   deleteFloorsFromPaintKey(paintKey: string): void {
-    const floors = this.getFloorFromPaintKey(paintKey)
+    const floors = this.getFloorsFromPaintKey(paintKey)
     
     if (floors.length === 0) {
       return
@@ -299,8 +407,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       if (normalize(floor.key) !== normalize(paintKey)) {
         return
       }
-
-      this.deleteFloorFromPosition(floor.x, floor.y)
+      this.deleteFloorFromId(floor.id)
     }
   }
 
@@ -309,7 +416,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @param paintKey 해당 데이터의 `key` 데이터 값입니다.
    */
   deleteAudiosFromPaintKey(paintKey: string): void {
-    const audios = this.getAudioFromPaintKey(paintKey)
+    const audios = this.getAudiosFromPaintKey(paintKey)
     
     if (audios.length === 0) {
       return
@@ -319,19 +426,18 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       if (normalize(audio.key) !== normalize(paintKey)) {
         return
       }
-  
-      this.deleteAudioFromPosition(audio.x, audio.y)
+      this.deleteAudioFromId(audio.id)
     }
   }
 
   /**
-   * `setWall` 메서드로 지정한 벽 타일 정보 중, `beforeKey`를 페인트키로 사용하는 정보를 `afterKey` 페인트키로 변환합니다.
+   * `addWall` 메서드로 지정한 벽 타일 정보 중, `beforeKey`를 페인트키로 사용하는 정보를 `afterKey` 페인트키로 변환합니다.
    * 이는 에셋이 삭제되어서 새로운 에셋으로 대체하는 과정에서 사용하기에 유용합니다.
    * @param beforeKey 이전에 사용하던 데이터의 `key` 데이터 값입니다.
    * @param afterKey 변경할 `key` 데이터 값입니다.
    */
   changeWallsPaintKey(beforeKey: string, afterKey: string): void {
-    const walls = this.getWallFromPaintKey(beforeKey)
+    const walls = this.getWallsFromPaintKey(beforeKey)
 
     if (walls.length === 0) {
       return
@@ -350,7 +456,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @param afterKey 변경할 `key` 데이터 값입니다.
    */
   changeFloorsPaintKey(beforeKey: string, afterKey: string): void {
-    const floors = this.getFloorFromPaintKey(beforeKey)
+    const floors = this.getFloorsFromPaintKey(beforeKey)
 
     if (floors.length === 0) {
       return
@@ -369,7 +475,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @param afterKey 변경할 `key` 데이터 값입니다.
    */
   changeAudiosPaintKey(beforeKey: string, afterKey: string): void {
-    const audios = this.getAudioFromPaintKey(beforeKey)
+    const audios = this.getAudiosFromPaintKey(beforeKey)
 
     if (audios.length === 0) {
       return
@@ -402,7 +508,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   private getComplementSet<T extends Engine.GameProject.SceneMapObject>(U: T[], A: T[]): T[] {
     return U.filter((u) => {
-      const same = A.find((a) => (u.x === a.x && u.y === a.y)) ?? null
+      const same = A.find((a) => (u.id === a.id)) ?? null
       const exists = same !== null
 
       return !exists
@@ -412,7 +518,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   /**
    * `saveState` 메서드로 저장된 마지막으로 데이터를 복원합니다.
    * 더이상 복원할 데이터가 없다면 `null`를 반환합니다.
-   * 되돌릴 때, `set-wall`, `set-floor`, `set-audio` 이벤트가 방출됩니다.
+   * 되돌릴 때, `add-wall`, `add-floor`, `add-audio` 이벤트가 방출됩니다.
    * @returns 복원된 데이터입니다.
    */
   undo(): Engine.GameProject.SceneMap|null {
@@ -463,18 +569,15 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     // 이는 마지막에 저장한 후 추가된 데이터이기 때문에, 되돌리는 과정에서 제거되므로 제거 이벤트를 발생시켜야 합니다.
     
     this.getComplementSet(current.walls, last.walls).forEach((wall) => {
-      const { x, y } = wall
-      this.deleteWallFromPosition(x, y)
+      this.deleteWallFromId(wall.id)
     })
-
+    
     this.getComplementSet(current.floors, last.floors).forEach((floor) => {
-      const { x, y } = floor
-      this.deleteFloorFromPosition(x, y)
+      this.deleteFloorFromId(floor.id)
     })
-
+    
     this.getComplementSet(current.audios, last.audios).forEach((audio) => {
-      const { x, y } = audio
-      this.deleteAudioFromPosition(x, y)
+      this.deleteAudioFromId(audio.id)
     })
 
     // 그 외에 정보 (x, y, scale, isSensor, thrusholdRadius 등)의 정보는 추가/제거가 아닌 수정이므로

@@ -8,7 +8,6 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
-
 import { PreviewScene } from './Phaser/PreviewScene'
 import ModalFormComponent, { ModalInputResult } from '@/Renderer/components/Modal/Form.vue'
 
@@ -54,6 +53,7 @@ export default class SceneInputComponent extends Vue {
   private lastSpreadRepeat: number = 5
 
   private component<T extends Vue>(refName: string): T {
+    console.log(this.$refs[refName])
     return this.$refs[refName] as T
   }
 
@@ -138,6 +138,12 @@ export default class SceneInputComponent extends Vue {
             this.saveConfig(result)
             this.closeSceneConfig()
           }
+        },
+        {
+          text: '취소',
+          click: () => {
+            this.closeSceneConfig()
+          }
         }
       ])
   }
@@ -183,8 +189,8 @@ export default class SceneInputComponent extends Vue {
             {
               key: 'isSensor',
               type: 'boolean',
-              text: '센서',
-              description: '실제로 충돌하지 않지만, 이벤트를 얻어낼 수 있습니다. 이는 지역에 들어오면 작동을 하도록 프로그래밍하는데 사용됩니다.',
+              text: '센서로 사용하기',
+              description: '실제로 충돌하지 않지만, 충돌 이벤트를 얻어낼 수 있습니다. 지역에 들어왔을 시 작동하도록 프로그래밍하는데 사용됩니다.',
               defaultValue: isSensor
             }
           ]).setButtons([
@@ -192,11 +198,16 @@ export default class SceneInputComponent extends Vue {
               text: '완료',
               click: (result) => {
                 this.scene.mapDataManager.saveState()
-                
                 const { alias, scale, isSensor } = result
                 for (const wall of walls) {
                   this.scene.mapDataManager.setWall({ ...wall, alias, scale, isSensor })
                 }
+                this.closePropertiesConfig()
+              }
+            },
+            {
+              text: '취소',
+              click: () => {
                 this.closePropertiesConfig()
               }
             }
@@ -267,6 +278,12 @@ export default class SceneInputComponent extends Vue {
                 }
                 this.closePropertiesConfig()
               }
+            },
+            {
+              text: '취소',
+              click: () => {
+                this.closePropertiesConfig()
+              }
             }
           ])
         break
@@ -303,13 +320,6 @@ export default class SceneInputComponent extends Vue {
           text: '반복',
           description: '선택한 오브젝트를 몇 회 산개할 것인지 지정합니다.',
           defaultValue: this.lastSpreadRepeat
-        },
-        {
-          key: 'grid',
-          type: 'boolean',
-          text: '격자',
-          description: '오브젝트의 크기를 맵의 격자에 맞추어 배치합니다.',
-          defaultValue: true
         }
       ])
       .setButtons([
@@ -320,59 +330,49 @@ export default class SceneInputComponent extends Vue {
 
             const radius = result.radius as number
             const repeat = result.repeat as number
-            const isGrid = result.grid as boolean
 
             this.lastSpreadRadius = radius
             this.lastSpreadRepeat = repeat
 
-            const getRandomSpotOffset = (center: Point2, radius: number): Point2 => {
-              const addX = Phaser.Math.Between(-radius, radius)
-              const addY = Phaser.Math.Between(-radius, radius)
+            const getRandomOffset = () => {
+              const x = Phaser.Math.Between(-radius, radius)
+              const y = Phaser.Math.Between(-radius, radius)
+              return { x, y }
+            }
 
+            const calcNewOffset = (center: Point2, addX: number, addY: number): Point2 => {
               const x = center.x + addX
               const y = center.y + addY
               
               return { x, y }
             }
 
-            const getSpreadedObject = <T extends Engine.GameProject.SceneMapObject>(object: T, radius: number, side: number): T => {
-              const { x, y } = getRandomSpotOffset(object, radius)
-              const clone = JSON.parse(JSON.stringify(object)) as T
-              const point = { x, y }
-
-              if (isGrid) {
-                const grid = this.scene.cursor.calcCursorOffset({ x, y }, side)
-                point.x = Math.round(grid.x)
-                point.y = Math.round(grid.y)
-              }
+            const createSpreadObject = <T extends Engine.GameProject.SceneMapObject>(object: T, addX: number, addY: number): T => {
+              const offset = calcNewOffset(object, addX, addY)
+              const clone = this.scene.createCloneMapObject(object)
 
               return {
                 ...clone,
-                ...point
+                ...offset,
               }
             }
 
             for (let i = 0; i < repeat; i++) {
               const { walls, floors, audios } = this.scene.selectedMapObjects
+              const { x, y } = getRandomOffset()
 
-              for (const wall of walls) {
-                const side = this.scene.getTextureSideFromKey(wall.key)
-                const clone = getSpreadedObject(wall, radius, side)
-
-                this.scene.mapDataManager.setWall(clone)
-              }
-              for (const floor of floors) {
-                const side = this.scene.getTextureSideFromKey(floor.key)
-                const clone = getSpreadedObject(floor, radius, side)
-
-                this.scene.mapDataManager.setFloor(clone)
-              }
-              for (const audio of audios) {
-                const side = this.scene.getTextureSideFromKey(audio.key)
-                const clone = getSpreadedObject(audio, radius, side)
-                
-                this.scene.mapDataManager.setAudio(clone)
-              }
+              walls.forEach((wall) => {
+                const clone = createSpreadObject(wall, x, y)
+                this.scene.mapDataManager.addWall(clone)
+              })
+              floors.forEach((floor) => {
+                const clone = createSpreadObject(floor, x, y)
+                this.scene.mapDataManager.addFloor(clone)
+              })
+              audios.forEach((audio) => {
+                const clone = createSpreadObject(audio, x, y)
+                this.scene.mapDataManager.addAudio(clone)
+              })
             }
 
             this.closeSpreadConfig()

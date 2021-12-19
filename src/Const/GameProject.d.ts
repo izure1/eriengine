@@ -25,6 +25,7 @@ declare namespace Engine {
     }
 
     interface SceneMapObject {
+      id: string
       key: string
       x: number
       y: number

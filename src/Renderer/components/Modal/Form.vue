@@ -1,7 +1,8 @@
 <template>
   <v-dialog :value="value"
+    max-width="650"
     persistent
-    max-width="500"
+    scrollable
   >
     <v-card>
       <v-card-title>{{ title }}</v-card-title>
@@ -9,40 +10,45 @@
 
       <v-card-text>
         <v-form>
-          <div v-for="(input, i) in inputs"
+          <div
+            v-for="(input, i) in inputs"
             :key="`modal-form-input-${i}`"
           >
             <v-subheader>{{ input.text }}</v-subheader>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-text-field v-if="input.type === 'string'"
-                  v-model="inputData[input.key]"
-                  v-on="on"
-                  type="text"
-                  :label="input.description"
-                  dense
-                  filled
-                  rounded
-                />
-                <v-text-field v-else-if="input.type === 'number'"
-                  v-model="inputData[input.key]"
-                  v-on="on"
-                  type="number"
-                  :label="input.description"
-                  dense
-                  filled
-                  rounded
-                />
-                <v-switch v-else-if="input.type === 'boolean'"
-                  v-model="inputData[input.key]"
-                  v-on="on"
-                  :label="input.description"
-                  dense
-                  inset
-                />
-              </template>
-              <span class="text-caption">{{ input.description }}</span>
-            </v-tooltip>
+            <v-text-field v-if="input.type === 'string'"
+              v-model="inputData[input.key]"
+              type="text"
+              :label="input.description"
+              dense
+              filled
+              rounded
+            />
+            <v-text-field v-else-if="input.type === 'number'"
+              v-model="inputData[input.key]"
+              type="number"
+              :label="input.description"
+              dense
+              filled
+              rounded
+            />
+            <div
+              v-else-if="input.type === 'boolean'"
+              class="px-3"
+            >
+              <v-row>
+                <v-col class="flex-grow-0">
+                  <v-switch
+                    v-model="inputData[input.key]"
+                    class="mt-0"
+                    dense
+                    inset
+                  />
+                </v-col>
+                <v-col>
+                  <div class="text-caption">{{ input.description }}</div>
+                </v-col>
+              </v-row>
+            </div>
           </div>
         </v-form>
       </v-card-text>

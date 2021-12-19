@@ -1,6 +1,7 @@
 import path from 'path'
 
 import normalize from 'normalize-path'
+import { nanoid } from 'nanoid'
 import { Scene } from 'phaser'
 import { Plugin as IsometricScenePlugin } from '@eriengine/plugin-isometric-scene'
 import { PointerPlugin, SelectPlugin } from '@eriengine/plugin-isometric-cursor'
@@ -34,9 +35,12 @@ export class PreviewScene extends Scene {
   protected disposeType: number
   
   private dragStartOffset: Point2 = { x: 0, y: 0 }
-  private test!: Phaser.Tilemaps.Tilemap
   
   private cameraControl: Phaser.Cameras.Controls.SmoothedKeyControl|null = null
+  private leftKey: Phaser.Input.Keyboard.Key|null = null
+  private rightKey: Phaser.Input.Keyboard.Key|null = null
+  private upKey: Phaser.Input.Keyboard.Key|null = null
+  private downKey: Phaser.Input.Keyboard.Key|null = null
 
   private waitCreatedPromise: Promise<void>
   private waitCreatedResolver: ((_value: void|PromiseLike<void>) => void)|null = null
@@ -65,27 +69,39 @@ export class PreviewScene extends Scene {
 
     // 벽이 추가/수정/제거되었을 경우, 벽의 비주얼을 수정합니다.
     this.mapDataManager
+      .on('add-wall', (wall) => {
+        this.drawWall(wall)
+      })
       .on('set-wall', (wall) => {
+        this.eraseWall(wall.id)
         this.drawWall(wall)
       })
       .on('delete-wall', (wall) => {
-        this.eraseWall(wall)
+        this.eraseWall(wall.id)
       })
     // 바닥이 추가/수정/제거되었을 경우, 바닥의 비주얼을 수정합니다.
     this.mapDataManager
+      .on('add-floor', (floor) => {
+        this.drawFloor(floor)
+      })
       .on('set-floor', (floor) => {
+        this.eraseFloor(floor.id)
         this.drawFloor(floor)
       })
       .on('delete-floor', (floor) => {
-        this.eraseFloor(floor)
+        this.eraseFloor(floor.id)
       })
     // 오디오가 추가/수정/제거되었을 경우, 오디오의 비주얼을 수정합니다.
     this.mapDataManager
+      .on('add-audio', (audio) => {
+        this.drawAudio(audio)
+      })
       .on('set-audio', (audio) => {
+        this.eraseAudio(audio.id)
         this.drawAudio(audio)
       })
       .on('delete-audio', (audio) => {
-        this.eraseAudio(audio)
+        this.eraseAudio(audio.id)
       })
 
     // 씬이 preload 단계를 넘어 create 되었을 때 해결될 프로미스입니다. 이는 `waitCreated` 메서드에서 이용됩니다.
@@ -97,6 +113,7 @@ export class PreviewScene extends Scene {
   /** 벽 타일의 기본 데이터를 반환합니다. */
   get defaultWallData(): Engine.GameProject.SceneMapWall {
     return {
+      id: nanoid(),
       key: '',
       x: 0,
       y: 0,
@@ -109,6 +126,7 @@ export class PreviewScene extends Scene {
   /** 바닥 타일의 기본 데이터를 반환합니다. */
   get defaultFloorData(): Engine.GameProject.SceneMapFloor {
     return {
+      id: nanoid(),
       key: '',
       x: 0,
       y: 0
@@ -118,6 +136,7 @@ export class PreviewScene extends Scene {
   /** 오디오 타일의 기본 데이터를 반환합니다. */
   get defaultAudioData(): Engine.GameProject.SceneMapAudio {
     return {
+      id: nanoid(),
       key: '',
       x: 0,
       y: 0,
@@ -158,21 +177,20 @@ export class PreviewScene extends Scene {
     }
 
     for (const object of this.select.selects) {
-      const { x, y } = object as unknown as Point2
-
+      const { name } = object
       switch (this.disposeType) {
         case 1: {
-          const wall = this.mapDataManager.getWallFromPosition(x, y)
+          const wall = this.mapDataManager.getWallFromId(name)
           if (wall) selected.walls.push(wall)
           break
         }
         case 2: {
-          const floor = this.mapDataManager.getFloorFromPosition(x, y)
+          const floor = this.mapDataManager.getFloorFromId(name)
           if (floor) selected.floors.push(floor)
           break
         }
         case 3: {
-          const audio = this.mapDataManager.getAudioFromPosition(x, y)
+          const audio = this.mapDataManager.getAudioFromId(name)
           if (audio) selected.audios.push(audio)
           break
         }
@@ -189,6 +207,15 @@ export class PreviewScene extends Scene {
 
   private copy<T extends object>(jsonData: T): T {
     return JSON.parse(JSON.stringify(jsonData))
+  }
+
+  createCloneMapObject<T extends Engine.GameProject.SceneMapObject>(data: T): T {
+    const id = nanoid()
+    const clone = JSON.parse(JSON.stringify(data)) as T
+    return {
+      ...clone,
+      id
+    }
   }
 
   preload(): void {
@@ -292,10 +319,26 @@ export class PreviewScene extends Scene {
         item.setTint(color)
       }
     })
+
+    this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP, false)
+    this.downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN, false)
+    this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT, false)
+    this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT, false)
+
+    this.upKey.on('up', () => this.updateSelectsMapDataPosition())
+    this.downKey.on('up', () => this.updateSelectsMapDataPosition())
+    this.leftKey.on('up', () => this.updateSelectsMapDataPosition())
+    this.rightKey.on('up', () => this.updateSelectsMapDataPosition())
+
+    // 씬이 파괴되면 모든 키 핸들링을 제거합니다.
+    this.events.on(Phaser.Scenes.Events.DESTROY, () => {
+      this.input.keyboard.removeAllKeys(true)
+    })
   }
 
   update(_time: number, delta: number): void {
     this.updateCamera(delta)
+    this.updateKeyboard(delta)
   }
 
   /**
@@ -326,6 +369,45 @@ export class PreviewScene extends Scene {
         repeat: -1
       })
     }
+  }
+
+  /**
+   * 맵 배치 방향키 기능을 위해 이벤트를 할당합니다.
+   * 성능 향상을 위해서 방향키에서 마우스를 땐 시점에만 저장하도록 설정합니다.
+   * 그리고 현재 오브젝트의 정보를 받아오기 위해 select.selects 목록에서 `name` 속성을 가져옵니다. 이 속성은 mapDataManager에서 설정한 id 값과 동일하기 때문입니다.
+   * 자세한 내용은 `drawWall`, `drawFloor` 등의 메서드의 구현을 참조하십시오.
+   */
+  private updateSelectsMapDataPosition(): void {
+    const getGameObjectFromId = <T extends Phaser.GameObjects.GameObject>(list: T[], id: string) => {
+      return list.find(({ name }) => name === id) ?? null
+    }
+
+    const { walls, floors, audios } = this.selectedMapObjects
+    const selects = this.select.selects as (Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Transform)[]
+
+    walls.forEach((wall) => {
+      const obj = getGameObjectFromId(selects, wall.id)
+      if (obj) {
+        const { x, y } = obj
+        this.mapDataManager.setWall({ ...wall, x, y }, false)
+      }
+    })
+
+    floors.forEach((floor) => {
+      const obj = getGameObjectFromId(selects, floor.id)
+      if (obj) {
+        const { x, y } = obj
+        this.mapDataManager.setFloor({ ...floor, x, y }, false)
+      }
+    })
+
+    audios.forEach((audio) => {
+      const obj = getGameObjectFromId(selects, audio.id)
+      if (obj) {
+        const { x, y } = obj
+        this.mapDataManager.setAudio({ ...audio, x, y }, false)
+      }
+    })
   }
 
   /**
@@ -424,7 +506,7 @@ export class PreviewScene extends Scene {
    * @param data Map.json에 저장된 씬 벽 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
    */
   private drawWall(data: Engine.GameProject.SceneMapWall): void {
-    const { key, x, y, scale, isSensor } = data
+    const { id, key, x, y, scale, isSensor } = data
     const paletteType = this.getPaletteType(key)
 
     // 없는 에셋이거나 누락되었다면 무시합니다
@@ -434,7 +516,8 @@ export class PreviewScene extends Scene {
 
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
-    const wall = this.map.setWalltile(x, y, key, undefined, animationKey)
+    const wall = this.map.setWallTile(id, x, y, key, undefined, animationKey)
+    wall.setName(id)
 
     this.optimization.add(wall)
 
@@ -447,7 +530,7 @@ export class PreviewScene extends Scene {
    * @param data Map.json에 저장된 씬 바닥타일 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
    */
   private drawFloor(data: Engine.GameProject.SceneMapFloor): void {
-    const { key, x, y } = data
+    const { id, key, x, y } = data
     const paletteType = this.getPaletteType(key)
 
     // 없는 에셋이거나 누락되었다면 무시합니다
@@ -457,7 +540,8 @@ export class PreviewScene extends Scene {
 
     const animationKey: string|undefined = paletteType === 2 ? key : undefined
 
-    const floor = this.map.setFloortile(x, y, key, undefined, animationKey)
+    const floor = this.map.setFloorTile(id, x, y, key, undefined, animationKey)
+    floor.setName(id)
 
     this.optimization.add(floor)
   }
@@ -467,7 +551,7 @@ export class PreviewScene extends Scene {
    * @param data Map.json에 저장된 씬 오디오 오브젝트 정보입니다. 최소 `key`, `x`, `y` 정보를 가지고 있어야 합니다. `key`가 `palette` 정보에 없다면 무시됩니다.
    */
   private drawAudio(data: Engine.GameProject.SceneMapAudio): void {
-    const { key, x, y, thresholdRadius } = data
+    const { id, key, x, y, thresholdRadius } = data
     const paletteType = this.getPaletteType(key)
 
     // 없는 에셋이거나 누락되었다면 무시합니다
@@ -475,10 +559,7 @@ export class PreviewScene extends Scene {
       return
     }
 
-    // 기존에 해당 위치에 존재하는 오디오를 제거합니다. 없다면 무시됩니다.
-    this.eraseAudio(data)
-
-    const visualizer = new PreviewAudioVisualizer(this, x, y, { key, thresholdRadius })
+    const visualizer = new PreviewAudioVisualizer(this, id, x, y, { key, thresholdRadius })
     this.add.existing(visualizer)
   }
 
@@ -494,17 +575,30 @@ export class PreviewScene extends Scene {
 
     const { key } = this.selectedPaint
 
+    // 배치할 때, 이전과 같은 장소에 같은 키를 가지고 있는 에셋이 있다면 중복으로 처리하여 배치하지 않습니다.
     switch (this.disposeType) {
       case 1: {
-        this.mapDataManager.setWall({ ...this.defaultWallData, key, x, y })
+        const exists = this.mapDataManager.getWall(key, x, y)!
+        if (exists) {
+          this.mapDataManager.deleteWallFromId(exists.id)
+        }
+        this.mapDataManager.addWall({ ...this.defaultWallData, key, x, y })
         break
       }
       case 2: {
-        this.mapDataManager.setFloor({ ...this.defaultFloorData, key, x, y })
+        const exists = this.mapDataManager.getFloor(key, x, y)
+        if (exists) {
+          this.mapDataManager.deleteFloorFromId(exists.id)
+        }
+        this.mapDataManager.addFloor({ ...this.defaultFloorData, key, x, y })
         break
       }
       case 3: {
-        this.mapDataManager.setAudio({ ...this.defaultAudioData, key, x, y })
+        const exists = this.mapDataManager.getAudio(key, x, y)
+        if (exists) {
+          this.mapDataManager.deleteAudioFromId(exists.id)
+        }
+        this.mapDataManager.addAudio({ ...this.defaultAudioData, key, x, y })
         break
       }
     }
@@ -512,42 +606,34 @@ export class PreviewScene extends Scene {
 
   /**
    * 설치된 벽을 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
-   * @param position 제거하고자 하는 벽이 설치된 씬의 좌표입니다.
+   * @param id 제거하고자 하는 벽의 고유값입니다.
    */
-  eraseWall(position: Point2): void {
-    const { x, y } = position
-
-    this.map.removeWalltile(x, y)
+  eraseWall(id: string): void {
+    this.map.removeWallTile(id)
   }
 
   /**
    * 설치된 바닥 타일을 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
-   * @param position 제거하고자 하는 바닥 타일이 설치된 씬의 좌표입니다.
+   * @param id 제거하고자 하는 바닥 타일의 고유값입니다.
    */
-  eraseFloor(position: Point2): void {
-    const { x, y } = position
-
-    this.map.removeFloortile(x, y)
+  eraseFloor(id: string): void {
+    this.map.removeFloorTile(id)
   }
 
   /**
    * 설치된 오디오를 제거합니다. 맵 데이터와, 씬의 오브젝트 모두 삭제됩니다.
-   * @param position 제거하고자 하는 오디오가 설치된 씬의 좌표입니다.
+   * @param id 제거하고자 하는 오디오의 고유값입니다.
    */
-  eraseAudio(position: Point2): void {
-    const { x, y } = position
-    
+  eraseAudio(id: string): void {
     this.children.list.filter((gameObject) => {
       // 오디오 객체가 아닌 게임 오브젝트 제외
       if ( !(gameObject instanceof PreviewAudioVisualizer) ) {
         return false
       }
-
       // 삭제하고자 하는 사운드가 배치된 위치가 다른 오디오 제외
-      if (x !== gameObject.x || y !== gameObject.y) {
+      if (gameObject.name !== id) {
         return false 
       }
-      
       return true
     }).forEach((audio) => {
       audio.destroy()
@@ -677,6 +763,29 @@ export class PreviewScene extends Scene {
     // 카메라 축소/확대 최대치 설정
     if (this.cameras.main.zoom < 0.25)  this.cameras.main.zoom = 0.25
     if (this.cameras.main.zoom > 1)     this.cameras.main.zoom = 1
+  }
+
+  private updateKeyboard(_delta: number): void {
+    if (this.upKey?.isDown) {
+      this.moveSelectedMapObject(0, -1)
+    }
+    if (this.downKey?.isDown) {
+      this.moveSelectedMapObject(0, 1)
+    }
+    if (this.leftKey?.isDown) {
+      this.moveSelectedMapObject(-1, 0)
+    }
+    if (this.rightKey?.isDown) {
+      this.moveSelectedMapObject(1, 0)
+    }
+  }
+
+  private moveSelectedMapObject(addX: number, addY: number): void {
+    this.select.selects.forEach((gameObject) => {
+      const selected = gameObject as Phaser.GameObjects.GameObject&Phaser.GameObjects.Components.Transform
+      selected.x += addX
+      selected.y += addY
+    })
   }
 
   /**
