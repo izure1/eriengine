@@ -57,8 +57,8 @@ export class PreviewScene extends Scene {
     this.selectedPaint = null
     this.disposeType = 0
 
-    this.mapDataState = this.copy(mapDataState)
-    this.mapDataManager = new SceneMapManager(this.mapDataState)
+    this.mapDataManager = new SceneMapManager(this.copy(mapDataState))
+    this.mapDataState = this.mapDataManager.data
 
     // Map Data Manager에서 setWall, setFloor, setAudio, deleteWall, deleteFloor, deleteAudio 등과의 메서드로 데이터가 변경되었을 때
     // 실제 씬에서 이 데이터를 기반으로 다시 그리기 (re-rendering) 해야 합니다.
@@ -325,6 +325,10 @@ export class PreviewScene extends Scene {
     this.leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT, false)
     this.rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT, false)
 
+    this.upKey.on('down', () => this.mapDataManager.saveState())
+    this.downKey.on('down', () => this.mapDataManager.saveState())
+    this.leftKey.on('down', () => this.mapDataManager.saveState())
+    this.rightKey.on('down', () => this.mapDataManager.saveState())
     this.upKey.on('up', () => this.updateSelectsMapDataPosition())
     this.downKey.on('up', () => this.updateSelectsMapDataPosition())
     this.leftKey.on('up', () => this.updateSelectsMapDataPosition())

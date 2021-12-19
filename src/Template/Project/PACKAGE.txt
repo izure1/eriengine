@@ -10,7 +10,7 @@
     "phaser": "^3.55.0",
     "process": "^0.11.10",
     "localforage": "^1.9.0",
-    "@eriengine/plugin-actor": "^1.5.5",
+    "@eriengine/plugin-actor": "^1.6.0",
     "@eriengine/plugin-dialogue": "^1.4.3",
     "@eriengine/plugin-feeling": "^1.0.1",
     "@eriengine/plugin-fog-of-war": "^1.3.1",

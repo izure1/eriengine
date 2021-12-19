@@ -15,8 +15,8 @@
     </v-card-title>
     <v-card-subtitle>
       <p v-if="isRunning">작업 중...  {{ emoticon1 }}</p>
-      <p v-else-if="isJobSuccess" class="green--text lighten-5">성공적으로 작업을 완료했습니다  ＼(´ ∇`)ノ</p>
-      <p v-else class="red--text">
+      <p v-else-if="isJobSuccess" class="text-caption green--text lighten-5">성공적으로 작업을 완료했습니다  ＼(´ ∇`)ノ</p>
+      <p v-else class="text-caption red--text">
         작업 실패.  ∑(゜△゜)
         <br>
         오류에 대한 자세한 내용은 아래 로그를 확인하세요.

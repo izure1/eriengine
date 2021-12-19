@@ -1,4 +1,5 @@
 import normalize from 'normalize-path'
+import { nanoid } from 'nanoid'
 import { TypedEmitter } from 'tiny-typed-emitter'
 
 interface TypedEvents {
@@ -21,6 +22,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   protected readonly audios: Set<Engine.GameProject.SceneMapAudio> = new Set
   
   protected cacheStates: Engine.GameProject.SceneMap[] = []
+  protected cacheExists: Map<string, Engine.GameProject.SceneMapObject> = new Map
 
   constructor(mapData: Engine.GameProject.SceneMap) {
     super()
@@ -48,17 +50,31 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     return JSON.parse(JSON.stringify(data))
   }
 
+  private compatible_ensureVersion<T extends Partial<Engine.GameProject.SceneMapObject>>(obj: T): T {
+    const id = obj.id ?? nanoid()
+    return {
+      ...obj,
+      id
+    }
+  }
+
   /**
    * 데이터를 기반으로 인스턴스를 초기화합니다.
    * @param data 초기화하고자 하는 데이터입니다.
    */
   protected setDataState(data: Engine.GameProject.SceneMap): void {
-    const { side, walls, floors, audios } = data
+    const { side } = data
+    let { walls, floors, audios } = data
 
     this.side = side
     this.walls.clear()
     this.floors.clear()
     this.audios.clear()
+
+    // compatible
+    walls = walls.map((wall) => this.compatible_ensureVersion(wall))
+    floors = floors.map((floor) => this.compatible_ensureVersion(floor))
+    audios = audios.map((audio) => this.compatible_ensureVersion(audio))
 
     walls.forEach((obj) => this.walls.add(obj))
     floors.forEach((obj) => this.floors.add(obj))
@@ -96,6 +112,10 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     return null
   }
 
+  private createCacheKeyFromData<T extends { key: string, x: number, y: number }>(disposeType: number, data: T): string {
+    return `${disposeType}:${data.key}:${data.x}:${data.y}`
+  }
+
   /**
    * 맵의 크기를 지정합니다. 한 변의 길이를 인수로 받습니다.
    * @param side 맵의 한 변의 길이입니다. 이 값을 기준으로 마름모의 아이소메트릭 씬이 생성됩니다.
@@ -115,7 +135,9 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @returns 배치된 오브젝트를 반환합니다.
    */
   getWall<T extends Engine.GameProject.SceneMapObject>(assetKey: string, x: number, y: number): T|null {
-    return this.getObjectFromKeyAndPosition(this.walls, assetKey, x, y) as T|null
+    const cacheKey = this.createCacheKeyFromData(1, { key: assetKey, x, y })
+    const found = this.cacheExists.get(cacheKey) ?? null
+    return found as T|null
   }
 
   /**
@@ -138,7 +160,9 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @returns 배치된 오브젝트를 반환합니다.
    */
   getFloor<T extends Engine.GameProject.SceneMapObject>(assetKey: string, x: number, y: number): T|null {
-    return this.getObjectFromKeyAndPosition(this.floors, assetKey, x, y) as T|null
+    const cacheKey = this.createCacheKeyFromData(2, { key: assetKey, x, y })
+    const found = this.cacheExists.get(cacheKey) ?? null
+    return found as T|null
   }
 
   /**
@@ -161,7 +185,9 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    * @returns 배치된 오브젝트를 반환합니다.
    */
   getAudio<T extends Engine.GameProject.SceneMapObject>(assetKey: string, x: number, y: number): T|null {
-    return this.getObjectFromKeyAndPosition(this.audios, assetKey, x, y) as T|null
+    const cacheKey = this.createCacheKeyFromData(3, { key: assetKey, x, y })
+    const found = this.cacheExists.get(cacheKey) ?? null
+    return found as T|null
   }
 
   /**
@@ -182,6 +208,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   addWall(wall: Engine.GameProject.SceneMapWall, emit = true): this {
     this.walls.add(wall)
+    this.cacheExists.set(this.createCacheKeyFromData(1, wall), wall)
     if (emit) {
       this.emit('add-wall', wall)
     }
@@ -195,6 +222,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   addFloor(floor: Engine.GameProject.SceneMapFloor, emit = true): this {
     this.floors.add(floor)
+    this.cacheExists.set(this.createCacheKeyFromData(2, floor), floor)
     if (emit) {
       this.emit('add-floor', floor)
     }
@@ -208,6 +236,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   addAudio(audio: Engine.GameProject.SceneMapAudio, emit = true): this {
     this.audios.add(audio)
+    this.cacheExists.set(this.createCacheKeyFromData(3, audio), audio)
     if (emit) {
       this.emit('add-audio', audio)
     }
@@ -221,7 +250,12 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   setWall(wall: Engine.GameProject.SceneMapWall, emit = true): this {
     const target = this.getObjectFromId(this.walls, wall.id)
-    if (target) {
+    if (!target) {
+      this.addWall(wall)
+    }
+    else {
+      this.cacheExists.delete(this.createCacheKeyFromData(1, target))
+
       const { alias, isSensor, key, scale, x, y } = wall
       target.alias = alias
       target.isSensor = isSensor
@@ -229,6 +263,8 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       target.scale = scale
       target.x = x
       target.y = y
+
+      this.cacheExists.set(this.createCacheKeyFromData(1, target), target)
       if (emit) {
         this.emit('set-wall', target)
       }
@@ -242,11 +278,18 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   setFloor(floor: Engine.GameProject.SceneMapFloor, emit = true): this {
     const target = this.getObjectFromId(this.floors, floor.id)
-    if (target) {
+    if (!target) {
+      this.addFloor(floor)
+    }
+    else {
+      this.cacheExists.delete(this.createCacheKeyFromData(2, target))
+
       const { key, x, y } = floor
       target.key = key
       target.x = x
       target.y = y
+
+      this.cacheExists.set(this.createCacheKeyFromData(2, target), target)
       if (emit) {
         this.emit('set-floor', target)
       }
@@ -260,7 +303,12 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
    */
   setAudio(audio: Engine.GameProject.SceneMapAudio, emit = true): this {
     const target = this.getObjectFromId(this.audios, audio.id)
-    if (target) {
+    if (!target) {
+      this.addAudio(audio)
+    }
+    else {
+      this.cacheExists.delete(this.createCacheKeyFromData(3, target))
+
       const { delay, loop, thresholdRadius, volume, x, y } = audio
       target.delay = delay
       target.loop = loop
@@ -268,6 +316,8 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       target.volume = volume
       target.x = x
       target.y = y
+
+      this.cacheExists.set(this.createCacheKeyFromData(3, target), target)
       if (emit) {
         this.emit('set-audio', target)
       }
@@ -346,6 +396,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   deleteWallFromId(id: string, emit = true): void {
     const obj = this.getObjectFromId(this.walls, id)
     if (obj) {
+      this.cacheExists.delete(this.createCacheKeyFromData(1, obj))
       this.deleteObjectFromId(this.walls, id)
       if (emit) {
         this.emit('delete-wall', obj)
@@ -356,6 +407,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   deleteFloorFromId(id: string, emit = true): void {
     const obj = this.getObjectFromId(this.floors, id)
     if (obj) {
+      this.cacheExists.delete(this.createCacheKeyFromData(2, obj))
       this.deleteObjectFromId(this.floors, id)
       if (emit) {
         this.emit('delete-floor', obj)
@@ -366,6 +418,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
   deleteAudioFromId(id: string, emit = true): void {
     const obj = this.getObjectFromId(this.audios, id)
     if (obj) {
+      this.cacheExists.delete(this.createCacheKeyFromData(3, obj))
       this.deleteObjectFromId(this.audios, id)
       if (emit) {
         this.emit('delete-audio', obj)
@@ -444,7 +497,9 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     }
 
     for (const wall of walls) {
+      this.cacheExists.delete(this.createCacheKeyFromData(1, wall))
       wall.key = afterKey
+      this.cacheExists.set(this.createCacheKeyFromData(1, wall), wall)
       this.emit('set-wall', wall)
     }
   }
@@ -463,7 +518,9 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     }
     
     for (const floor of floors) {
+      this.cacheExists.delete(this.createCacheKeyFromData(2, floor))
       floor.key = afterKey
+      this.cacheExists.set(this.createCacheKeyFromData(2, floor), floor)
       this.emit('set-floor', floor)
     }
   }
@@ -482,7 +539,9 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
     }
 
     for (const audio of audios) {
+      this.cacheExists.delete(this.createCacheKeyFromData(3, audio))
       audio.key = afterKey
+      this.cacheExists.set(this.createCacheKeyFromData(3, audio), audio)
       this.emit('set-audio', audio)
     }
   }
@@ -580,7 +639,7 @@ export class SceneMapManager extends TypedEmitter<TypedEvents> {
       this.deleteAudioFromId(audio.id)
     })
 
-    // 그 외에 정보 (x, y, scale, isSensor, thrusholdRadius 등)의 정보는 추가/제거가 아닌 수정이므로
+    // 그 외에 정보 (x, y, scale, isSensor, thresholdRadius 등)의 정보는 추가/제거가 아닌 수정이므로
     // 수정된 정보에 대한 이벤트도 방출되어야 함.
 
     const { walls, floors, audios } = last

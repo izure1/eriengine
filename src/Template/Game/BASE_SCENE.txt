@@ -23,9 +23,9 @@ interface Point2 {
 
 interface SceneMap {
   side: number
-  walls:  { key: string, x: number, y: number, alias: string, scale: number, isSensor: boolean }[]
-  floors: { key: string, x: number, y: number }[]
-  audios: { key: string, x: number, y: number, alias: string, thresholdRadius: number, volume: number, delay: number, loop: boolean }[]
+  walls:  { id: string, key: string, x: number, y: number, alias: string, scale: number, isSensor: boolean }[]
+  floors: { id: string, key: string, x: number, y: number }[]
+  audios: { id: string, key: string, x: number, y: number, alias: string, thresholdRadius: number, volume: number, delay: number, loop: boolean }[]
 }
 
 interface SceneStorage {
