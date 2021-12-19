@@ -30,6 +30,10 @@ export class PreviewAudioVisualizer extends Phaser.GameObjects.Text {
     })
   }
 
+  preUpdate() {
+    this.followBeat()
+  }
+
   private createTween(): Phaser.Tweens.Tween {
     return this.scene.tweens.addCounter({
       from: 0,
@@ -44,6 +48,15 @@ export class PreviewAudioVisualizer extends Phaser.GameObjects.Text {
         this.beat.setAlpha(Phaser.Math.Interpolation.Linear([1, 0], value / this.thresholdRadius))
       }
     })
+  }
+
+  private followBeat(): void {
+    if (!this.beat) {
+      return
+    }
+    console.log(123)
+    const { x, y } = this
+    this.beat.setPosition(x, y)
   }
 
   private destroyBeat(): void {
