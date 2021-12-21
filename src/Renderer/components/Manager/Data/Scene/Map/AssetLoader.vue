@@ -125,8 +125,14 @@ export default class AssetLoaderComponent extends Vue {
       const imageModule = __non_webpack_require__(imageModulePath)
       const audioModule = __non_webpack_require__(audioModulePath)
 
-      const checkAssetExists = (rawModuledata: unknown) => {
-        const { key } = rawModuledata as PalettePaintAsset
+      const checkAssetExists = (rawModuleData: unknown) => {
+        const { key, asset } = rawModuleData as PalettePaintAsset
+        if (
+          typeof key !== 'string' ||
+          typeof asset !== 'string'
+        ) {
+          return false
+        }
         const filePath = path.resolve(this.$store.state.projectDirectory, key)
         return fs.existsSync(filePath)
       }

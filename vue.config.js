@@ -2,8 +2,8 @@ const path = require('path')
 const { version } = require('./package.json')
 
 module.exports = {
-  "transpileDependencies": [
-    "vuetify"
+  'transpileDependencies': [
+    'vuetify'
   ],
   configureWebpack: {
     target: 'electron-renderer',
@@ -33,7 +33,8 @@ module.exports = {
       builderOptions: {
         win: {
           icon: path.resolve(__dirname, 'public', 'icon.png'),
-          artifactName: "${productName}-Setup-${version}.${ext}"
+          artifactName: '${productName}-Setup-${version}.${ext}',
+          requestedExecutionLevel: 'highestAvailable',
         },
         extraResources: [
           {

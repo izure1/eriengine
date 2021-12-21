@@ -23,7 +23,6 @@
     "@eriengine/plugin-spatial-audio": "^1.0.2",
     "@vue/composition-api": "^1.4.1",
     "add-filename-increment": "^1.0.0",
-    "adm-zip": "^0.5.9",
     "an-array-of-english-words": "2.0.0",
     "animejs": "^3.2.1",
     "ansi-to-html": "^0.6.14",
@@ -38,6 +37,7 @@
     "deepmerge": "^4.2.2",
     "del": "^6.0.0",
     "electron-updater": "^4.3.9",
+    "extract-zip": "^2.0.1",
     "fast-glob": "^3.2.4",
     "fs-extra": "^9.0.1",
     "get-folder-size": "^2.0.0",
@@ -68,7 +68,6 @@
   },
   "devDependencies": {
     "@mdi/font": "^5.8.55",
-    "@types/adm-zip": "^0.4.34",
     "@types/animejs": "^3.1.2",
     "@types/archiver": "^5.1.1",
     "@types/cross-spawn": "^6.0.2",

@@ -75,7 +75,6 @@
 </template>
 
 <script lang="ts">
-import os from 'os'
 import path from 'path'
 import fs from 'fs-extra'
 import { shell, ipcRenderer } from 'electron'
@@ -122,7 +121,6 @@ function useStatSize() {
 
 function useAppender() {
   const { root } = getCurrentInstance()!
-  const tmpdir = os.tmpdir()
   const projectDirectory = path.resolve(root.proxy.$store.state.projectDirectory)
 
   const isAppendDialogOpen = ref(false)
@@ -139,10 +137,9 @@ function useAppender() {
     // 이는 압축 해제 시, 파일이 실시간으로 생성되면 리스트 업데이트가 불필요할 정도로 일어나는 것을 방지하기 위함입니다.
     const src = source
     const dist = path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME, namespace)
-    const overwrite = true
 
-    const dist_tmp = await fs.mkdtemp(path.resolve(tmpdir, 'eriengine-'))
-    const unzip: Engine.FileSystem.UnzipSuccess|Engine.FileSystem.UnzipFail = await ipcRenderer.invoke('unzip', src, dist_tmp, overwrite)
+    const dist_tmp = await fs.mkdtemp(path.resolve(projectDirectory, 'unpackage-'))
+    const unzip: Engine.FileSystem.UnzipSuccess|Engine.FileSystem.UnzipFail = await ipcRenderer.invoke('unzip', src, dist_tmp)
 
     const fail = (message: string) => {
       root.proxy.$store.dispatch('snackbar', message)
