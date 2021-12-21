@@ -214,6 +214,11 @@ export default class ProjectFileListComponent extends Vue {
           description: '타일의 견본 레이어를 생성합니다',
           path: '/manager/tool/isometrical-layer'
         },
+        {
+          name: '무료 에셋 추가',
+          description: '인터넷에 공개된 무료 에셋을 자동으로 프로젝트에 추가합니다',
+          path: '/manager/tool/asset-appender'
+        }
       ]
     }
   ]

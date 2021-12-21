@@ -28,6 +28,8 @@ function *generateIPC() {
   yield require('./Main/IPC/FileSystem/delete')
   yield require('./Main/IPC/FileSystem/trash')
   yield require('./Main/IPC/FileSystem/showItem')
+  yield require('./Main/IPC/FileSystem/archive')
+  yield require('./Main/IPC/FileSystem/unzip')
 
   // Game project
   yield require('./Main/IPC/GameProject/createProject')
@@ -167,7 +169,8 @@ app.on('ready', async () => {
     try {
       await installExtension(VUEJS_DEVTOOLS)
     } catch (reason) {
-      console.error('Vue Devtools failed to install:', reason.toString())
+      const err = reason as Error
+      console.error('Vue Devtools failed to install:', err.toString())
     }
   }
 

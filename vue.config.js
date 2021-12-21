@@ -20,6 +20,7 @@ module.exports = {
       .use('raw-loader')
       .loader('raw-loader')
       .end()
+
     config
       .plugin('html')
       .tap(args => {
@@ -33,7 +34,14 @@ module.exports = {
         win: {
           icon: path.resolve(__dirname, 'public', 'icon.png'),
           artifactName: "${productName}-Setup-${version}.${ext}"
-        }
+        },
+        extraResources: [
+          {
+            from: path.resolve(__dirname, 'build'),
+            to: '',
+            filter: ['**/*']
+          }
+        ]
       }
     }
   }

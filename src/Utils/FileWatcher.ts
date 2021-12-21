@@ -3,7 +3,10 @@ import fs from 'fs-extra'
 import chokidar from 'chokidar'
 import normalize from 'normalize-path'
 
+import { SuppressJob } from '@/Utils/SuppressJob'
+
 type WatcherCallback = (_filePath: string) => void
+
 export class FileWatcher {
   protected cwd: string
   private recursive: boolean
@@ -11,6 +14,7 @@ export class FileWatcher {
   private intervalId: number = NaN
   private watcher: chokidar.FSWatcher|null = null
   private callbacks: WatcherCallback[] = []
+  private suppressJob: SuppressJob|null = null
 
   constructor(cwd: string, recursive: boolean = true, interval: number = 1000) {
     this.cwd = cwd
@@ -19,11 +23,14 @@ export class FileWatcher {
   }
 
   private destroyWatcher(): void {
-    if (!this.watcher) {
-      return
+    if (this.watcher) {
+      this.watcher.close()
+      this.watcher = null
     }
-    this.watcher.close()
-    this.watcher = null
+    if (this.suppressJob) {
+      this.suppressJob.clearJobs()
+      this.suppressJob = null
+    }
   }
 
   private setWatcher(): void {
@@ -31,26 +38,34 @@ export class FileWatcher {
     if (!fs.existsSync(this.cwd)) {
       return
     }
-    this.watcher = chokidar.watch(this.cwd)
-    this.watcher.on('all', (e, filePath) => { this.onUpdate(e, filePath) })
+    this.suppressJob = new SuppressJob(250)
+
+    this.watcher = chokidar.watch(this.cwd, { ignoreInitial: true, awaitWriteFinish: true })
+    this.watcher.on('add', (filePath) => { this.onUpdate(filePath) })
+    this.watcher.on('change', (filePath) => { this.onUpdate(filePath) })
+    this.watcher.on('unlink', (filePath) => { this.onUpdate(filePath) })
   }
 
-  private onUpdate(e: string, filePath: string): void {
-    for (const callback of this.callbacks) {
-      filePath = path.resolve(this.cwd, filePath)
-      filePath = normalize(filePath)
-      callback(filePath)
+  private onUpdate(filePath: string): void {
+    if (this.suppressJob) {
+      this.suppressJob.doJob('update', () => {
+        filePath = path.resolve(this.cwd, filePath)
+        filePath = normalize(filePath)
+        for (const callback of this.callbacks) {
+          callback(filePath)
+        }
+      })
     }
   }
 
   private startCheckInterval(): void {
     if (this.watcher && !fs.existsSync(this.cwd)) {
       this.destroyWatcher()
-      this.onUpdate('change', this.cwd)
+      this.onUpdate(this.cwd)
     }
     if (!this.watcher && fs.existsSync(this.cwd)) {
       this.setWatcher()
-      this.onUpdate('change', this.cwd)
+      this.onUpdate(this.cwd)
     }
   }
 
@@ -70,7 +85,7 @@ export class FileWatcher {
   }
 
   emit(): this {
-    this.onUpdate('', '')
+    this.onUpdate('')
     return this
   }
 

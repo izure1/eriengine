@@ -28,6 +28,7 @@ import ManagerAudio from '@/Renderer/components/Manager/Data/Audio/Main.vue'
 import ManagerVideo from '@/Renderer/components/Manager/Data/Video/Main.vue'
 import ManagerToolMain from '@/Renderer/components/Manager/Tool/Main.vue'
 import ManagerToolIsometricalLayer from '@/Renderer/components/Manager/Tool/IsometricalLayer.vue'
+import ManagerToolAssetAppender from '@/Renderer/components/Manager/Tool/AssetAppender.vue'
 import ManagerEngineHome from '@/Renderer/components/Manager/Engine/Home/Main.vue'
 import ManagerEngineTutorial from '@/Renderer/components/Manager/Engine/Tutorial/Main.vue'
 import ManagerEngineUpdate from '@/Renderer/components/Manager/Engine/Update/Main.vue'
@@ -202,6 +203,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'tool/isometrical-layer',
         component: ManagerToolIsometricalLayer
+      },
+      {
+        path: 'tool/asset-appender',
+        component: ManagerToolAssetAppender
       }
     ]
   },

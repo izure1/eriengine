@@ -55,6 +55,12 @@ declare namespace Engine {
     interface showItemSuccess extends FileSystemState, Engine.ActionSuccessState {}
     interface showItemFail extends Engine.ActionFailState {}
 
+    interface ArchiveSuccess extends FileSystemState, Engine.ActionSuccessState {}
+    interface ArchiveFail extends Engine.ActionFailState {}
+
+    interface UnzipSuccess extends FileTranslate, Engine.ActionSuccessState {}
+    interface UnzipFail extends Engine.ActionFailState {}
+
     interface FileFilter {
       name: string
       extensions: string[]

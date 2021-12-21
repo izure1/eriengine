@@ -53,7 +53,6 @@ export default class SceneInputComponent extends Vue {
   private lastSpreadRepeat: number = 5
 
   private component<T extends Vue>(refName: string): T {
-    console.log(this.$refs[refName])
     return this.$refs[refName] as T
   }
 

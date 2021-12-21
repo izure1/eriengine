@@ -3,6 +3,7 @@
     flat
     tile
   >
+    <v-subheader>현재 버전: {{ engineVersion }}</v-subheader>
     <v-card-title>프로젝트</v-card-title>
     <v-card-subtitle>현재 프로젝트의 간략한 정보입니다</v-card-subtitle>
     <engine-home-information-component />
@@ -104,6 +105,15 @@ export default class EngineHomeComponent extends Vue {
   ]
 
   private toolLists: LinkList[] = [
+    {
+      subheader: '공용',
+      lists: [
+        {
+          text: '무료 에셋 추가',
+          uri: '/manager/tool/asset-appender'
+        }
+      ]
+    },
     {
       subheader: '아티스트',
       lists: [

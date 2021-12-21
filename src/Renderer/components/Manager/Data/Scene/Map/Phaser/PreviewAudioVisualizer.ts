@@ -54,7 +54,6 @@ export class PreviewAudioVisualizer extends Phaser.GameObjects.Text {
     if (!this.beat) {
       return
     }
-    console.log(123)
     const { x, y } = this
     this.beat.setPosition(x, y)
   }

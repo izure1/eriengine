@@ -47,3 +47,8 @@ declare module '*.webm' {
     const _: string
     export default _
 }
+
+declare module '*.zip' {
+  const _: string
+  export default _
+}
