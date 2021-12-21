@@ -5,13 +5,15 @@
         :elevation="hover ? 12 : 2"
         :class="{ 'on-hover': hover }"
         max-width="250"
-        min-height="400"
-        class="card-wrapper"
+        min-height="425"
+        class="d-flex flex-column card-wrapper"
         @click="openExternal(url)"
       >
         <v-img
           :src="logo"
-          height="250"
+          width="100%"
+          min-height="250"
+          max-height="250"
           class="align-end text-h5 white--text font-weight-bold"
           :style="{ 'background-color': color }"
         >
@@ -20,11 +22,12 @@
         
         <v-divider />
         <v-card-subtitle>{{ subtitle }}</v-card-subtitle>
-        <v-card-actions class="pt-10 px-3 pb-3 flex-column flex-nowrap">
+        <v-card-actions class="px-3 pb-3 flex-grow-1 flex-reverse-column align-end">
           <v-btn
             class="primary--text mx-0"
             width="100%"
             outlined
+            large
             @click.stop="confirmAppend(namespace)"
           >
             설치하기
@@ -50,7 +53,7 @@
             설치할 경우 프로젝트의 용량이 <span class="font-weight-bold">{{ calcSize(source).toFixed(2) }}MB</span>만큼 늘어납니다.
           </p>
           <p>
-            이 에셋은 <span class="font-weight-bold">Assets/{{ namespace }} </span> 경로를 포함해, 일부 프로젝트 디렉토리를 덮어 씌울 것입니다.
+            이 에셋은 <span class="font-weight-bold">{{ warnDirectory }}</span> 경로를 덮어 씌울 것입니다.
             <br>
             해당 경로에 중요한 데이터가 있다면 백업하십시오.
           </p>
@@ -78,7 +81,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import { shell, ipcRenderer } from 'electron'
-import { defineComponent, getCurrentInstance, ref } from '@vue/composition-api'
+import { computed, defineComponent, getCurrentInstance, ref } from '@vue/composition-api'
 
 import {
   PROJECT_SRC_DIRECTORY_NAME,
@@ -120,11 +123,19 @@ function useStatSize() {
 }
 
 function useAppender() {
-  const { root } = getCurrentInstance()!
+  const { root, props } = getCurrentInstance()!
+  const namespace = props.namespace as string
+  const source = props.source as string
+  
   const projectDirectory = path.resolve(root.proxy.$store.state.projectDirectory)
 
   const isAppendDialogOpen = ref(false)
   const appending = ref(false)
+
+  const warnDirectory = computed(() => {
+    const zipName = path.parse(source).name
+    return path.posix.join('Assets', namespace, zipName)
+  })
 
   const confirmAppend = () => {
     isAppendDialogOpen.value = true
@@ -136,10 +147,9 @@ function useAppender() {
     // 임시 폴더에 생성한 후, 완료되면 프로젝트 디렉토리로 이동합니다.
     // 이는 압축 해제 시, 파일이 실시간으로 생성되면 리스트 업데이트가 불필요할 정도로 일어나는 것을 방지하기 위함입니다.
     const src = source
-    const dist = path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME, namespace)
+    const dist = path.resolve(projectDirectory, PROJECT_SRC_DIRECTORY_NAME, PROJECT_SRC_ASSET_DIRECTORY_NAME, namespace, path.parse(source).name)
 
-    const dist_tmp = await fs.mkdtemp(path.resolve(projectDirectory, 'unpackage-'))
-    const unzip: Engine.FileSystem.UnzipSuccess|Engine.FileSystem.UnzipFail = await ipcRenderer.invoke('unzip', src, dist_tmp)
+    const unzip: Engine.FileSystem.UnzipSuccess|Engine.FileSystem.UnzipFail = await ipcRenderer.invoke('unzip', src, dist)
 
     const fail = (message: string) => {
       root.proxy.$store.dispatch('snackbar', message)
@@ -151,13 +161,6 @@ function useAppender() {
       return fail(unzip.message)
     }
 
-    try {
-      await fs.rename(dist_tmp, dist)
-    } catch (reason) {
-      const message = reason.toString()
-      return fail(message)
-    }
-
     isAppendDialogOpen.value = false
     appending.value = false
   }
@@ -165,6 +168,7 @@ function useAppender() {
   return {
     isAppendDialogOpen,
     appending,
+    warnDirectory,
     confirmAppend,
     append,
   }

@@ -29,15 +29,17 @@
         <v-card-title>이름을 입력하세요</v-card-title>
         <v-card-subtitle>이름을 변경하면 이 파일을 참조하는 다른 파일에서도 수정해야합니다</v-card-subtitle>
         <v-card-text>
-          <v-text-field v-model="namingText"
-            :rules="[ namingRule ]"
-            :suffix="namingExt"
-            ref="dialog-naming"
-            label="이름"
-            placeholder="이곳에 입력하세요"
-            filled
-            rounded
-          />
+          <v-form @submit.prevent="dispatchNaming">
+            <v-text-field v-model="namingText"
+              :rules="[ namingRule ]"
+              :suffix="namingExt"
+              ref="dialog-naming"
+              label="이름"
+              placeholder="이곳에 입력하세요"
+              filled
+              rounded
+            />
+          </v-form>
         </v-card-text>
 
         <v-divider />

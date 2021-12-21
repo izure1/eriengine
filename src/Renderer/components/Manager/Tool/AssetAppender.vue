@@ -46,15 +46,23 @@ export default defineComponent({
   setup() {
     const isProduction = process.env.NODE_ENV === 'production'
     const resourcesPath = isProduction ? process.resourcesPath : path.resolve(process.cwd(), 'build')
-    console.log(resourcesPath)
 
     const list = ref<Card[]>([
       {
         logo: 'https://www.kenney.nl/data/img/logo.png',
         title: 'Kenny Isometric Tiles',
-        subtitle: 'Kenny.nl에서 제공한 무료 에셋을 프로젝트에 추가합니다.',
-        source: path.resolve(resourcesPath, 'additional', 'FreeAssets', 'Kenny.zip'),
-        namespace: 'Kenny-isometric-tiles',
+        subtitle: 'Kenny.nl에서 제공한 아이소메트릭 타일 에셋을 프로젝트에 추가합니다.',
+        source: path.resolve(resourcesPath, 'additional', 'FreeAssets', 'Kenny-isometric.zip'),
+        namespace: 'Kenny',
+        url: 'https://www.kenney.nl/',
+        color: '#2ECC92',
+      },
+      {
+        logo: 'https://www.kenney.nl/data/img/logo.png',
+        title: 'Kenny Audio',
+        subtitle: 'Kenny.nl에서 제공한 오디오 에셋을 프로젝트에 추가합니다.',
+        source: path.resolve(resourcesPath, 'additional', 'FreeAssets', 'Kenny-audio.zip'),
+        namespace: 'Kenny',
         url: 'https://www.kenney.nl/',
         color: '#2ECC92',
       }

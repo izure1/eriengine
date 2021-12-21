@@ -43,7 +43,7 @@ export class FileWatcher {
     // todo: 폴링을 쓰는 이유
     // chikidar에서 폴링을 사용하지 않으면 여러 디렉토리가 중첩되어 있을 경우, 상위 디렉토리를 잠그는 오류가 발생함.
     // https://github.com/paulmillr/chokidar/issues/320
-    const watchInterval = 3000
+    const watchInterval = 1500
     this.watcher = chokidar.watch(this.cwd, { ignoreInitial: true, awaitWriteFinish: true, usePolling: true, interval: watchInterval, binaryInterval: watchInterval })
     this.watcher.on('add', (filePath) => { this.onUpdate(filePath) })
     this.watcher.on('change', (filePath) => { this.onUpdate(filePath) })
