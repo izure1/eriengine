@@ -48,6 +48,8 @@ export class FileWatcher {
     this.watcher.on('add', (filePath) => { this.onUpdate(filePath) })
     this.watcher.on('change', (filePath) => { this.onUpdate(filePath) })
     this.watcher.on('unlink', (filePath) => { this.onUpdate(filePath) })
+    this.watcher.on('addDir', (filePath) => { this.onUpdate(filePath) })
+    this.watcher.on('unlinkDir', (filePath) => { this.onUpdate(filePath) })
   }
 
   private onUpdate(filePath: string): void {
